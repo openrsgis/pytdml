@@ -19,7 +19,7 @@ print("Number of classes: " + str(training_dataset.number_of_classes))
 class_map = pytdml.creat_class_map(training_dataset)  # create class map
 train_set, val_set, test_set = pytdml.split_train_valid_test(training_dataset, 0.7, 0.2, 0.1)  # split dataset
 train_dataset = pytdml.TorchEOImageSceneTD(  # create Torch train dataset
-    test_set,
+    train_set,
     class_map,
     transforms.Compose(  # transform for the training set
         [transforms.RandomResizedCrop(size=156, scale=(0.8, 1.0)),  # random resize
