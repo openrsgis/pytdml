@@ -1,0 +1,54 @@
+dataset_type: EOTrainingDataset
+id: uit_hcd_california_2017
+name: UiT_HCD_California_2017
+description: The dataset...
+version: 1.0
+created_time: 2017
+updated_time: 2017
+providers:
+  - LP DAAC
+  - ESA
+keywords:
+  - Change Detection
+data_sources:
+  - id: landsat8
+    data_type: Optical
+    platform: Landsat-8
+    sensor: Operational Land Imager
+    resolution: 15m
+  - id: sentinel1A
+    data_type: SAR
+    platform: Sentinel-1A
+    sensor: C-band synthetic-aperture radar
+    resolution: 5m
+classes:
+  - change: 1
+  - unchange: 0
+bands:
+  - - red
+    - green
+    - blue
+  - - VH
+    - VV
+    - VV/VH
+image_size: 2000x3500
+tasks:
+  - description: Multi-source images Change detection
+    task_type: Change Detection
+data:
+  task_type: ChangeDetection
+  label_type: PixelLabel
+  data_time: [2017-01-05, 2017-12-18]
+  data_path:
+    - type: image_before
+      format: .png
+      root_path: D:\TrainingDatasets\UiT_HCD_California_2017\before
+      sub_path:
+    - type: image_after
+      format: .png
+      root_path: D:\TrainingDatasets\UiT_HCD_California_2017\after
+      sub_path:
+    - type: label
+      format: .png
+      root_path: D:\TrainingDatasets\UiT_HCD_California_2017\label
+      sub_path:

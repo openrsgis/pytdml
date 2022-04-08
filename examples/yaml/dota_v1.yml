@@ -1,0 +1,77 @@
+dataset_type: EOTrainingDataset
+id: dota_v1.0
+name: DOTA_V1.0
+description: The dataset...
+version: 1.0
+created_time: 2018
+updated_time: 2018
+providers:
+  - Wuhan University
+keywords:
+  - 2D object detection
+data_sources:
+  - id: google_earth
+    data_type: Optical
+    citation: https://earth.google.com/
+    resolution: 0.5m
+  - id: gf_2
+    data_type: Optical
+    platform: GF-2
+  - id: jl_1
+    data_type: Optical
+    platform: JL-1
+classes:
+  - plane
+  - ship
+  - storage
+  - tank
+  - baseball
+  - diamond
+  - tennis
+  - court
+  - basketball
+  - court
+  - ground
+  - track
+  - field
+  - harbor
+  - bridge
+  - large vehicle
+  - small vehicle
+  - helicopter
+  - roundabout
+  - soccer ball field
+  - swimming pool
+bands:
+  - red
+  - green
+  - blue
+image_size: 1242x375
+tasks:
+  - description: Detection with oriented bounding boxes
+    task_type: Building Object Detection
+data:
+  task_type: ObjectDetection
+  label_type: ObjectLabel
+  data_path:
+    - type: image
+      format: .png
+      root_path: D:\TrainingDatasets\DOTAv1.5\train\images
+      sub_path:
+    - type: label
+      format: .txt
+      skip_lines: 2
+      separate: \s
+      column:
+        - x1
+        - y1
+        - x2
+        - y2
+        - x3
+        - y3
+        - x4
+        - y4
+        - class
+        - isDiffDetectable
+      root_path: D:\TrainingDatasets\DOTAv1.5\train\DOTA-v1.5_train_hbb
+      sub_path:
