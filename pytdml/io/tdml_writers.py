@@ -8,8 +8,8 @@
 
 import json
 from typing import Union
-from .basic_types import TrainingDataset
-from .utils import remove_empty
+from pytdml.type.basic_types import TrainingDataset
+from pytdml.utils import remove_empty
 
 
 def write_to_json(td: TrainingDataset, file_path: str, indent: Union[None, int, str] = 4):

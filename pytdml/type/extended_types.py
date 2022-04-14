@@ -12,7 +12,7 @@ from typing import List, Union
 
 import geojson
 from geojson import Point, LineString, Polygon
-from .basic_types import Label, TrainingData, TrainingDataset, TrainingDataQuality, Task, MetricsInLiterature, \
+from pytdml.type.basic_types import Label, TrainingData, TrainingDataset, TrainingDataQuality, Task, MetricsInLiterature, \
     KeyValuePair, Labeling
 
 

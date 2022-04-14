@@ -7,8 +7,8 @@
 # ------------------------------------------------------------------------------
 import json
 
-from .basic_types import TrainingDataset
-from .extended_types import EOTrainingDataset
+from pytdml.type.basic_types import TrainingDataset
+from pytdml.type.extended_types import EOTrainingDataset
 
 
 def read_from_json(file_path: str):
