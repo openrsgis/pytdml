@@ -34,9 +34,9 @@ data:
   data_path:
     - type: image
       format: .tif
-      root_path: D:\TrainingDatasets\GID\Large-scale Classification_5classes\image_RGB
+      root_path: D:\TrainingDatasets\GID\Large-scale Classification_5classes\test_image
       sub_path:
     - type: label
       format: .tif
-      root_path: D:\TrainingDatasets\GID\Large-scale Classification_5classes\label_5classes
+      root_path: D:\TrainingDatasets\GID\Large-scale Classification_5classes\test_label
       sub_path:

@@ -5,8 +5,8 @@ import yaml
 import pandas as pd
 from geojson import Polygon
 
-from pytdml import write_to_json, EOTask, EODataSource, EOTrainingDataset, EOTrainingData, SceneLabel, PixelLabel, \
-    ObjectLabel
+from pytdml.io import write_to_json
+from pytdml.type import EOTask, EODataSource, EOTrainingDataset, EOTrainingData, SceneLabel, PixelLabel, ObjectLabel
 
 
 def yaml_to_eo_tdml(yaml_path):
@@ -251,7 +251,7 @@ def read_txt_label(csv_path, column_name, separate):
             label = ObjectLabel(
                 object=polygon,
                 geometry_type='Horizontal BBox',
-                _class=row['class'],
+                label_class=row['class'],
                 is_difficultly_detectable=row['isDiffDetectable']
             )
             labels.append(label)

@@ -12,7 +12,8 @@ from typing import List, Union
 
 import geojson
 from geojson import Point, LineString, Polygon
-from pytdml.type.basic_types import Label, TrainingData, TrainingDataset, TrainingDataQuality, Task, MetricsInLiterature, \
+from pytdml.type.basic_types import Label, TrainingData, TrainingDataset, TrainingDataQuality, Task, \
+    MetricsInLiterature, \
     KeyValuePair, Labeling
 
 
@@ -47,7 +48,7 @@ class ObjectLabel(Label):
     Extended label type for object level training data
     """
     object: Union[Point, LineString, Polygon] = field(default=None)
-    _class: str = field(default=None)
+    label_class: str = field(default=None)
     geometry_type: str = field(default=None)
     is_difficultly_detectable: bool = field(default=None)
 
@@ -57,20 +58,20 @@ class ObjectLabel(Label):
             "isNegative": self.is_negative,
             'object': self.object,
             'geometryType': self.geometry_type,
-            'class': self._class,
+            'class': self.label_class,
             'isDiffDetectable': self.is_difficultly_detectable
         }
 
     @staticmethod
     def from_dict(json_dict: dict):
         if json_dict.__contains__("object") and json_dict["type"] == "ObjectLabel":
-            label = ObjectLabel(object=geojson.load(json_dict["object"]))
+            label = ObjectLabel(object=geojson.loads(json_dict["object"].__str__().replace("'", "\"")))
             if json_dict.__contains__("isNegative"):
                 label.is_negative = json_dict["isNegative"]
             if json_dict.__contains__("geometryType"):
                 label.geometry_type = json_dict["geometryType"]
             if json_dict.__contains__("class"):
-                label._class = json_dict["class"]
+                label.label_class = json_dict["class"]
             if json_dict.__contains__("isDiffDetectable"):
                 label.is_difficultly_detectable = json_dict["isDiffDetectable"]
             return label
@@ -94,8 +95,8 @@ class PixelLabel(Label):
 
     @staticmethod
     def from_dict(json_dict: dict):
-        if json_dict.__contains__("imageURL") and json_dict["type"] == "PixelLabel":
-            label = PixelLabel(image_url=json_dict["imageURL"])
+        if json_dict.__contains__("imageUrl") and json_dict["type"] == "PixelLabel":
+            label = PixelLabel(image_url=json_dict["imageUrl"])
             if json_dict.__contains__("isNegative"):
                 label.is_negative = json_dict["isNegative"]
             return label

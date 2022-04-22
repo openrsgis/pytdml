@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------
 import random
 
-from pytdml import TrainingDataset
+from pytdml.type import TrainingDataset
 
 
 def split_train_valid_test(td: TrainingDataset, train_ratio=0.7, valid_ratio=0.0, test_ratio=0.3):
@@ -36,5 +36,9 @@ def creat_class_map(td: TrainingDataset):
     assert td.classes is not None, "Training dataset has no classes"
     class_map = {}
     for i, _class in enumerate(td.classes):
-        class_map[_class] = i
+        if isinstance(_class, dict):
+            for item in _class.items():
+                class_map[item[0]] = item[1]
+        else:
+            class_map[_class] = i
     return class_map
