@@ -42,6 +42,7 @@ def td_image_crop(td: EOTrainingDataset, save_tdml_path: str, save_crop_dir: str
                 )
                 index = index + 1
                 new_td_list.append(new_d.to_dict())
+    td_dict["amountOfTrainingData"] = len(new_td_list)
     td_dict['data'] = new_td_list
     with open(save_tdml_path, "w") as f:
         json.dump(remove_empty(td_dict), f, indent=4)

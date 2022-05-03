@@ -2,7 +2,7 @@ dataset_type: EOTrainingDataset
 id: gid_5c
 name: GID-Large-scale Classification
 description: The dataset...
-version: 1.0"
+version: 1.0
 created_time: 2018
 updated_time: 2018
 providers:

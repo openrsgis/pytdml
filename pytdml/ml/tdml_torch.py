@@ -24,7 +24,6 @@ class TorchEOImageSceneTD(Dataset):
         self.td_list = td_list
         self.class_map = class_map
         self.transform = transform
-        self.size = len(td_list)
 
     def __len__(self):
         return len(self.td_list)
@@ -34,7 +33,8 @@ class TorchEOImageSceneTD(Dataset):
         img = Image.open(img_path)
         img.load()
         label = self.class_map[self.td_list[item].labels[0].label_class]
-        img = self.transform(img)
+        if self.transform is not None:
+            img = self.transform(img)
         return img, label
 
 
@@ -69,8 +69,9 @@ class TorchEOImageObjectTD(Dataset):
             targets.append(target_)
         targets = np.array(targets)
         img = img[:, :, (2, 1, 0)]
-        img, boxes, labels = self.transform(img, targets[:, :4], targets[:, 4])
-        targets = np.hstack((boxes, np.expand_dims(labels, axis=1)))
+        if self.transform is not None:
+            img, boxes, labels = self.transform(img, targets[:, :4], targets[:, 4])
+            targets = np.hstack((boxes, np.expand_dims(labels, axis=1)))
         return torch.from_numpy(img).permute(2, 0, 1), targets, img_height, img_width
 
 
@@ -92,7 +93,8 @@ class TorchEOImageSegmentationTD(Dataset):
         img_path = self.td_list[item].data_url
         img = Image.open(img_path)
         img.load()
-        img = self.transform(img)
+        if self.transform is not None:
+            img = self.transform(img)
         label_path = self.td_list[item].labels[0].image_url
         label = cv2.imread(label_path, cv2.COLOR_BGR2RGB)
         index_label = utils.label_to_index(label, self.color_to_index)
