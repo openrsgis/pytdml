@@ -38,7 +38,7 @@ The training dataset can be encoded to TrainingDML-AI JSON format by YAML config
 pytdml/yaml_to_tdml.py --config=<YAML configuration file path> --output=<Output TrainingDML-AI JSON file path>
 ```
 
-YAML configuration file schema is described in [encoding YAML configuration file schema](https://github.com/TrainingDML/pytdml/blob/main/encoding_config_schema.yaml).
+YAML configuration file schema is described in [encoding YAML configuration file schema](https://github.com/TrainingDML/pytdml/blob/main/encoding_config_schema.yml).
 
 #### Using the API from python
 
