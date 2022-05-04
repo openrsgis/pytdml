@@ -1,10 +1,34 @@
 # ------------------------------------------------------------------------------
 #
 # Project: pytdml
+# Authors: Boyi Shangguan, Kaixuan Wang
+# Created: 2022-05-04
+# Email: sgby@whu.edu.cn
 #
 # ------------------------------------------------------------------------------
 #
+# Copyright (c) 2022 OGC Training Data Markup Language for AI Standard Working Group
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 # ------------------------------------------------------------------------------
+import argparse
 import json
 import os
 import sys
@@ -69,22 +93,23 @@ def image_crop(data_url, save_dir, sub_size):
     return crop_image_path_list
 
 
-def main(argv=None):
-    if len(argv) < 4:
-        print("Please set parameters "
-              "<*input tdml json file path> "
-              "<*save path of new tdml json file> "
-              "<*save dir of result images and labels> "
-              "<*crop size>")
-        return
-    tdml_path = argv[1]
-    save_tdml_path = argv[2]
-    save_crop_dir = argv[3]
-    sub_size = int(argv[4])
+def main():
+    parser = argparse.ArgumentParser(description='Encode a training dataset to TrainingDML-AI JSON format based on '
+                                                 'YAML configuration file')
+    parser.add_argument('--input', type=str, required=True, help='Input original TrainingDML-AU file path')
+    parser.add_argument('--output_json', type=str, required=True, help='Output result TrainingDML-AI JSON file path')
+    parser.add_argument('--output_images', type=str, required=True, help='Output dir of result cropped images')
+    parser.add_argument('--size', type=int, required=True, help='Crop size of images')
+
+    args = parser.parse_args()
+    tdml_path = args.input
+    save_tdml_path = args.output_json
+    save_crop_dir = args.output_images
+    sub_size = args.size
     training_datasets = read_from_json(tdml_path)
     if training_datasets:
         td_image_crop(training_datasets, save_tdml_path, save_crop_dir, sub_size)
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+    sys.exit(main())

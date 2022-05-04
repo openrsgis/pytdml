@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("whu_rs19.json")  # read from TDML json file
-training_dataset.data = training_dataset.data[0: 100]
 print("Load training dataset: " + training_dataset.name)
 print("Number of training samples: " + str(training_dataset.amount_of_training_data))
 print("Number of classes: " + str(training_dataset.number_of_classes))

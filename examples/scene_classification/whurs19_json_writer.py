@@ -3,6 +3,9 @@ import os
 from pytdml import *
 
 # get training data
+from pytdml.io import write_to_json
+from pytdml.type import EOTrainingDataset, EOTrainingData, SceneLabel, EOTask, EODataSource
+
 td_list = []
 image_path = r"D:\TrainingDatasets\WHU-RS19\image"
 for root, dirs, files in os.walk(image_path):
