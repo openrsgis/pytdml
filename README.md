@@ -15,7 +15,7 @@ The package can be installed via pip.
 
 ### Dependencies
 
-Dependencies are listed in [requirements.txt](requirements.txt). Dependencies are automatically installed during
+Dependencies are listed in [requirements.txt](https://github.com/TrainingDML/pytdml/blob/main/requirements.txt). Dependencies are automatically installed during
 pytdml's installation.
 
 ### Installing the Package
@@ -37,6 +37,8 @@ The training dataset can be encoded to TrainingDML-AI JSON format by YAML config
 ```bash
 pytdml/yaml_to_tdml.py --config=<YAML configuration file path> --output=<Output TrainingDML-AI JSON file path>
 ```
+
+YAML configuration file schema is described in [encoding YAML configuration file schema](https://github.com/TrainingDML/pytdml/blob/main/encoding_config_schema.yaml).
 
 #### Using the API from python
 
