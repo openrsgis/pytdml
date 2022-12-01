@@ -295,7 +295,7 @@ class TrainingDataset:
     classification_schema: str = field(default=None)
     classes: Union[List[KeyValuePair], List[str]] = field(default=None)
     tasks: List[Task] = field(default_factory=list)
-    labelings: List[Labeling] = field(default_factory=list)
+    labeling: List[Labeling] = field(default_factory=list)
     quality: TrainingDataQuality = field(default=TrainingDataQuality())
     data: List[TrainingData] = field(default_factory=list)
 
@@ -315,9 +315,9 @@ class TrainingDataset:
 
     def get_labelings(self) -> List[Labeling]:
         """
-        Return the labelings of the training dataset
+        Return the labeling of the training dataset
         """
-        return self.labelings
+        return self.labeling
 
     def get_tasks(self) -> List[Task]:
         """
@@ -350,7 +350,7 @@ class TrainingDataset:
             "classificationSchema": self.classification_schema,
             "classes": self.classes,
             "tasks": [t.to_dict() for t in self.tasks],
-            "labelings": [labeling.to_dict() for labeling in self.labelings],
+            "labeling": [labeling.to_dict() for labeling in self.labeling],
             "quality": self.quality.to_dict(),
             "data": [d.to_dict() for d in self.data]
         }
@@ -387,8 +387,8 @@ class TrainingDataset:
                 td.classes = json_dict["classes"]
             if json_dict.__contains__("tasks"):
                 td.tasks = [Task.from_dict(t) for t in json_dict["tasks"]]
-            if json_dict.__contains__("labelings"):
-                td.labelings = [Labeling.from_dict(labeling) for labeling in json_dict["labelings"]]
+            if json_dict.__contains__("labeling"):
+                td.labeling = [Labeling.from_dict(labeling) for labeling in json_dict["labeling"]]
             if json_dict.__contains__("quality"):
                 td.quality = TrainingDataQuality.from_dict(json_dict["quality"])
             if json_dict.__contains__("data"):

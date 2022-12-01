@@ -29,6 +29,7 @@
 #
 # ------------------------------------------------------------------------------
 import argparse
+import json
 import os
 import sys
 
@@ -69,6 +70,7 @@ def yaml_to_eo_tdml(yaml_path):
                 sensor=data_source.__contains__('sensor') and data_source['sensor'] or "",
                 citation=data_source.__contains__('citation') and data_source['citation'] or "",
                 resolution=data_source.__contains__('resolution') and data_source['resolution'] or "",
+                format=data_source.__contains__('format') and data_source['format'] or ""
             )
             data_sources.append(eo_data_source)
 
@@ -245,12 +247,13 @@ def load_data_object_detection(image_set, label_set):
     """
     td_list = []
     label_format = label_set['format']
-    label_column = label_set['column']
-    image_dir, label_dir = get_image_label_url(image_set, label_set)
+    image_format = image_set['format']
 
-    index = 0
     if label_format == '.txt':  # txt format
+        image_dir, label_dir = get_image_label_url(image_set, label_set)
         separate = label_set['separate']
+        label_column = label_set['column']
+        index = 0
         for image_url, label_url in zip(image_dir, label_dir):
             labels = read_txt_label(label_url, label_column, separate)
             td = EOTrainingData(
@@ -260,6 +263,28 @@ def load_data_object_detection(image_set, label_set):
             )
             td.number_of_Labels = len(td.labels)
             index = index + 1
+            td_list.append(td)
+    elif label_format == 'stac' and image_format == 'stac':  # stac format
+        images_stac_path = image_set['root_path'] + "\\collection.json"
+        labels_stac_path = label_set['root_path'] + "\\collection.json"
+        images_stac_json = json.load(open(images_stac_path, 'r'))
+        labels_stac_json = json.load(open(labels_stac_path, 'r'))
+        num = len(images_stac_json['links'])
+        for i in range(num):
+            image_stac_path = os.path.join(image_set['root_path'], images_stac_json['link'][i]['href'])
+            label_stac_path = os.path.join(label_set['root_path'], labels_stac_json['link'][i]['href'])
+            image_stac_json = json.load(open(image_stac_path, 'r'))
+            label_stac_json = json.load(open(label_stac_path, 'r'))
+            label_json_path = os.path.join(os.path.dirname(label_stac_path), label_stac_json['assets']['labels']['href'])
+            labels = read_geojson_label(label_json_path)
+            td = EOTrainingData(
+                id=image_stac_json['id'],
+                extent=image_stac_json['bbox'],
+                date_time=image_stac_json['properties']['datetime'],
+                data_url=os.path.join(os.path.dirname(image_stac_path), image_stac_json['assets'].values()[0]['href']),
+                labels=labels,
+            )
+            td.number_of_Labels = len(td.labels)
             td_list.append(td)
         return td_list
 
@@ -286,6 +311,19 @@ def read_txt_label(csv_path, column_name, separate):
                 is_difficultly_detectable=row['isDiffDetectable']
             )
             labels.append(label)
+    return labels
+
+
+def read_geojson_label(geojson_path):
+    """
+    Read the label file in geojson format in object detection
+    """
+    fc = json.load(geojson_path)
+    labels = []
+    for f in fc['features']:
+        labels.append(ObjectLabel(
+            object=f
+        ))
     return labels
 
 

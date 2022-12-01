@@ -78,7 +78,7 @@ class ObjectLabel(Label):
             "type": "ObjectLabel",
             "isNegative": self.is_negative,
             'object': self.object,
-            'geometryType': self.geometry_type,
+            'bboxType': self.geometry_type,
             'class': self.label_class,
             'isDiffDetectable': self.is_difficultly_detectable
         }
@@ -89,8 +89,8 @@ class ObjectLabel(Label):
             label = ObjectLabel(object=geojson.loads(json_dict["object"].__str__().replace("'", "\"")))
             if json_dict.__contains__("isNegative"):
                 label.is_negative = json_dict["isNegative"]
-            if json_dict.__contains__("geometryType"):
-                label.geometry_type = json_dict["geometryType"]
+            if json_dict.__contains__("bboxType"):
+                label.geometry_type = json_dict["bboxType"]
             if json_dict.__contains__("class"):
                 label.label_class = json_dict["class"]
             if json_dict.__contains__("isDiffDetectable"):
@@ -111,13 +111,13 @@ class PixelLabel(Label):
         return {
             "type": "PixelLabel",
             "isNegative": self.is_negative,
-            'imageUrl': self.image_url
+            'imageURL': self.image_url
         }
 
     @staticmethod
     def from_dict(json_dict: dict):
-        if json_dict.__contains__("imageUrl") and json_dict["type"] == "PixelLabel":
-            label = PixelLabel(image_url=json_dict["imageUrl"])
+        if json_dict.__contains__("imageURL") and json_dict["type"] == "PixelLabel":
+            label = PixelLabel(image_url=json_dict["imageURL"])
             if json_dict.__contains__("isNegative"):
                 label.is_negative = json_dict["isNegative"]
             return label
@@ -136,6 +136,7 @@ class EODataSource:
     platform: str = field(default=None)
     sensor: str = field(default=None)
     resolution: str = field(default=None)
+    format: str = field(default=None)
 
     def to_dict(self):
         return {
@@ -144,7 +145,8 @@ class EODataSource:
             'citation': self.citation,
             'platform': self.platform,
             'sensor': self.sensor,
-            'resolution': self.resolution
+            'resolution': self.resolution,
+            'format': self.format
         }
 
     @staticmethod
@@ -161,6 +163,8 @@ class EODataSource:
                 data_source.sensor = json_dict["sensor"]
             if json_dict.__contains__("resolution"):
                 data_source.resolution = json_dict["resolution"]
+            if json_dict.__contains__("format"):
+                    data_source.resolution = json_dict["format"]
             return data_source
         else:
             raise ValueError("The given json_dict is not a valid EODataSource")
@@ -231,7 +235,7 @@ class EOTrainingData(TrainingData):
             "labels": [label.to_dict() for label in self.labels],
             'extent': self.extent,
             'dateTime': self.date_time,
-            'dataUrl': self.data_url
+            'dataURL': self.data_url
         }
 
     @staticmethod
@@ -254,8 +258,8 @@ class EOTrainingData(TrainingData):
                 training_data.extent = json_dict["extent"]
             if json_dict.__contains__("dateTime"):
                 training_data.date_time = json_dict["dateTime"]
-            if json_dict.__contains__("dataUrl"):
-                training_data.data_url = json_dict["dataUrl"]
+            if json_dict.__contains__("dataURL"):
+                training_data.data_url = json_dict["dataURL"]
             return training_data
         else:
             raise ValueError("The given json_dict is not a valid EOTrainingData")
@@ -295,7 +299,7 @@ class EOTrainingDataset(TrainingDataset):
             'bands': self.bands,
             'imageSize': self.image_size,
             "tasks": [t.to_dict() for t in self.tasks],
-            "labelings": [labeling.to_dict() for labeling in self.labelings],
+            "labeling": [labeling.to_dict() for labeling in self.labeling],
             "quality": self.quality.to_dict(),
             "data": [d.to_dict() for d in self.data]
         }
@@ -344,8 +348,8 @@ class EOTrainingDataset(TrainingDataset):
                 td.image_size = json_dict["imageSize"]
             if json_dict.__contains__("tasks"):
                 td.tasks = [EOTask.from_dict(t) for t in json_dict["tasks"]]
-            if json_dict.__contains__("labelings"):
-                td.labelings = [Labeling.from_dict(labeling) for labeling in json_dict["labelings"]]
+            if json_dict.__contains__("labeling"):
+                td.labeling = [Labeling.from_dict(labeling) for labeling in json_dict["labeling"]]
             if json_dict.__contains__("quality"):
                 td.quality = EOTrainingDataQuality.from_dict(json_dict["quality"])
             if json_dict.__contains__("data"):

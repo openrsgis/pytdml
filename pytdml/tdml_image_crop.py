@@ -48,8 +48,8 @@ def td_image_crop(td: EOTrainingDataset, save_tdml_path: str, save_crop_dir: str
     for d in td_list:
         label_type = d['labels'][0]['type']
         if label_type == 'PixelLabel':
-            image_url = d['dataUrl']
-            label_url = d['labels'][0]['imageUrl']
+            image_url = d['dataURL']
+            label_url = d['labels'][0]['imageURL']
             image_dir = os.path.join(save_crop_dir, "images")
             label_dir = os.path.join(save_crop_dir, "labels")
             if not os.path.isdir(image_dir):

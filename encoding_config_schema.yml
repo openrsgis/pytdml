@@ -16,6 +16,7 @@ data_sources:
     sensor:
     resolution:
     citation:
+    format:
 classes:
   - Car # *Scene Classification, *Object Detection
   - Car: RGB(0,0,255) # *Semantic Segmentation, *Change Detection
