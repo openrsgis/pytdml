@@ -13,7 +13,7 @@ keywords:
 classes:
   - Building
 tasks:
-  - description: Building Object Change Detection
+  - description: Track buildings in satellite imagery time series
     task_type: Building Object Change Detection
 data_sources:
   - id: mosaic-image
