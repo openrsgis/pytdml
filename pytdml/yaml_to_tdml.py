@@ -45,58 +45,106 @@ def yaml_to_eo_tdml(yaml_path):
     """
     Transform yaml to tdml
     """
-    try:
-        yaml_file = open(yaml_path, "r", encoding='utf-8')
-        yaml_dict = yaml.load(yaml_file, Loader=yaml.FullLoader)
-        dataset_type = yaml_dict['dataset_type']
-        tasks_list = yaml_dict['tasks']
-        data_sources_list = yaml_dict['data_sources']
-        td_list = load_data(yaml_dict['data'])
+    yaml_file = open(yaml_path, "r", encoding='utf-8')
+    yaml_dict = yaml.load(yaml_file, Loader=yaml.FullLoader)
+    dataset_type = yaml_dict['dataset_type']
+    tasks_list = yaml_dict['tasks']
+    data_sources_list = yaml_dict['data_sources']
+    td_list = load_data(yaml_dict['data'])
 
-        tasks = []
-        for task in tasks_list:
-            eo_task = EOTask(
-                task_type=task.__contains__('task_type') and task['task_type'] or "",
-                description=task.__contains__('description') and task['description'] or ""
-            )
-            tasks.append(eo_task)
+    tasks = []
+    for task in tasks_list:
+        eo_task = EOTask(
+            task_type=task.__contains__('task_type') and task['task_type'] or "",
+            description=task.__contains__('description') and task['description'] or ""
+        )
+        tasks.append(eo_task)
 
-        data_sources = []
-        for data_source in data_sources_list:
-            eo_data_source = EODataSource(
-                id=data_source.__contains__('id') and data_source['id'] or "",
-                data_type=data_source.__contains__('data_type') and data_source['data_type'] or "",
-                platform=data_source.__contains__('platform') and data_source['platform'] or "",
-                sensor=data_source.__contains__('sensor') and data_source['sensor'] or "",
-                citation=data_source.__contains__('citation') and data_source['citation'] or "",
-                resolution=data_source.__contains__('resolution') and data_source['resolution'] or "",
-                format=data_source.__contains__('format') and data_source['format'] or ""
-            )
-            data_sources.append(eo_data_source)
+    data_sources = []
+    for data_source in data_sources_list:
+        eo_data_source = EODataSource(
+            id=data_source.__contains__('id') and data_source['id'] or "",
+            data_type=data_source.__contains__('data_type') and data_source['data_type'] or "",
+            platform=data_source.__contains__('platform') and data_source['platform'] or "",
+            sensor=data_source.__contains__('sensor') and data_source['sensor'] or "",
+            citation=data_source.__contains__('citation') and data_source['citation'] or "",
+            resolution=data_source.__contains__('resolution') and data_source['resolution'] or "",
+            format=data_source.__contains__('format') and data_source['format'] or ""
+        )
+        data_sources.append(eo_data_source)
 
-        if dataset_type == 'EOTrainingDataset':
-            eo_training_dataset = EOTrainingDataset(
-                id=yaml_dict['id'],
-                name=yaml_dict['name'],
-                description=yaml_dict['description'],
-                tasks=tasks,
-                data=td_list,
-                version=yaml_dict['version'],
-                amount_of_training_data=len(td_list),
-                created_time=yaml_dict['created_time'],
-                updated_time=yaml_dict['updated_time'],
-                providers=yaml_dict["providers"],
-                keywords=yaml_dict["keywords"],
-                data_sources=data_sources,
-                classes=yaml_dict['classes'],
-                number_of_classes=len(yaml_dict['classes']),
-                bands=yaml_dict['bands'],
-                image_size=yaml_dict['image_size']
-            )
-            return eo_training_dataset
-    except KeyError:
-        print("Invalid EOTrainingDataset yaml")
-        return None
+    if dataset_type == 'EOTrainingDataset':
+        eo_training_dataset = EOTrainingDataset(
+            id=yaml_dict['id'],
+            name=yaml_dict['name'],
+            description=yaml_dict['description'],
+            tasks=tasks,
+            data=td_list,
+            version=yaml_dict['version'],
+            amount_of_training_data=len(td_list),
+            created_time=yaml_dict['created_time'],
+            updated_time=yaml_dict['updated_time'],
+            providers=yaml_dict["providers"],
+            keywords=yaml_dict["keywords"],
+            data_sources=data_sources,
+            classes=yaml_dict['classes'],
+            number_of_classes=len(yaml_dict['classes']),
+            bands=yaml_dict['bands'],
+            image_size=yaml_dict['image_size']
+        )
+        return eo_training_dataset
+    # try:
+    #     yaml_file = open(yaml_path, "r", encoding='utf-8')
+    #     yaml_dict = yaml.load(yaml_file, Loader=yaml.FullLoader)
+    #     dataset_type = yaml_dict['dataset_type']
+    #     tasks_list = yaml_dict['tasks']
+    #     data_sources_list = yaml_dict['data_sources']
+    #     td_list = load_data(yaml_dict['data'])
+    #
+    #     tasks = []
+    #     for task in tasks_list:
+    #         eo_task = EOTask(
+    #             task_type=task.__contains__('task_type') and task['task_type'] or "",
+    #             description=task.__contains__('description') and task['description'] or ""
+    #         )
+    #         tasks.append(eo_task)
+    #
+    #     data_sources = []
+    #     for data_source in data_sources_list:
+    #         eo_data_source = EODataSource(
+    #             id=data_source.__contains__('id') and data_source['id'] or "",
+    #             data_type=data_source.__contains__('data_type') and data_source['data_type'] or "",
+    #             platform=data_source.__contains__('platform') and data_source['platform'] or "",
+    #             sensor=data_source.__contains__('sensor') and data_source['sensor'] or "",
+    #             citation=data_source.__contains__('citation') and data_source['citation'] or "",
+    #             resolution=data_source.__contains__('resolution') and data_source['resolution'] or "",
+    #             format=data_source.__contains__('format') and data_source['format'] or ""
+    #         )
+    #         data_sources.append(eo_data_source)
+    #
+    #     if dataset_type == 'EOTrainingDataset':
+    #         eo_training_dataset = EOTrainingDataset(
+    #             id=yaml_dict['id'],
+    #             name=yaml_dict['name'],
+    #             description=yaml_dict['description'],
+    #             tasks=tasks,
+    #             data=td_list,
+    #             version=yaml_dict['version'],
+    #             amount_of_training_data=len(td_list),
+    #             created_time=yaml_dict['created_time'],
+    #             updated_time=yaml_dict['updated_time'],
+    #             providers=yaml_dict["providers"],
+    #             keywords=yaml_dict["keywords"],
+    #             data_sources=data_sources,
+    #             classes=yaml_dict['classes'],
+    #             number_of_classes=len(yaml_dict['classes']),
+    #             bands=yaml_dict['bands'],
+    #             image_size=yaml_dict['image_size']
+    #         )
+    #         return eo_training_dataset
+    # except KeyError:
+    #     print("Invalid EOTrainingDataset yaml")
+    #     return None
 
 
 def load_data(data_dict):
@@ -271,8 +319,8 @@ def load_data_object_detection(image_set, label_set):
         labels_stac_json = json.load(open(labels_stac_path, 'r'))
         num = len(images_stac_json['links'])
         for i in range(num):
-            image_stac_path = os.path.join(image_set['root_path'], images_stac_json['link'][i]['href'])
-            label_stac_path = os.path.join(label_set['root_path'], labels_stac_json['link'][i]['href'])
+            image_stac_path = os.path.join(image_set['root_path'], images_stac_json['links'][i]['href'])
+            label_stac_path = os.path.join(label_set['root_path'], labels_stac_json['links'][i]['href'])
             image_stac_json = json.load(open(image_stac_path, 'r'))
             label_stac_json = json.load(open(label_stac_path, 'r'))
             label_json_path = os.path.join(os.path.dirname(label_stac_path), label_stac_json['assets']['labels']['href'])
@@ -281,7 +329,7 @@ def load_data_object_detection(image_set, label_set):
                 id=image_stac_json['id'],
                 extent=image_stac_json['bbox'],
                 date_time=image_stac_json['properties']['datetime'],
-                data_url=os.path.join(os.path.dirname(image_stac_path), image_stac_json['assets'].values()[0]['href']),
+                data_url=os.path.join(os.path.dirname(image_stac_path), list(image_stac_json['assets'].values())[0]['href']),
                 labels=labels,
             )
             td.number_of_Labels = len(td.labels)
@@ -318,7 +366,7 @@ def read_geojson_label(geojson_path):
     """
     Read the label file in geojson format in object detection
     """
-    fc = json.load(geojson_path)
+    fc = json.load(open(geojson_path))
     labels = []
     for f in fc['features']:
         labels.append(ObjectLabel(
