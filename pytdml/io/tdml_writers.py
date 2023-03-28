@@ -38,5 +38,5 @@ def write_to_json(td: TrainingDataset, file_path: str, indent: Union[None, int, 
     """
     Writes a TrainingDataset to a JSON file.
     """
-    with open(file_path, "w") as f:
-        json.dump(remove_empty(td.to_dict()), f, indent=indent)
+    with open(file_path, "w", encoding='utf-8') as f:
+        json.dump(remove_empty(td.to_dict()), f, indent=indent, ensure_ascii=False)
