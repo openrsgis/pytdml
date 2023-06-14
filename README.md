@@ -245,7 +245,7 @@ for item in training_dataset.data:
         bucket_name, key_name = pytdml.io.S3_reader.parse_s3_path(path)
         object_data = s3_client.get_object(bucket_name, key_name)
         # Process the S3 object data (read as PIL Image)
-        with PIL.Image.open(object_data) as img:
+        with PIL.Image.open(BytesIO(object_data)) as img:
             # processing....
     else:
         print("Invalid S3 path:", path)
