@@ -30,3 +30,4 @@
 # ------------------------------------------------------------------------------
 from pytdml.io.tdml_readers import read_from_json
 from pytdml.io.tdml_writers import write_to_json
+from pytdml.io.S3_reader import S3Client, parse_s3_path

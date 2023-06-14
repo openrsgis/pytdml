@@ -230,4 +230,26 @@ pytdml/tdml_image_crop.py  --input=<Input original TrainingDML-AU file path> --o
                           --output_images=<Output dir of result cropped images> --size=<Crop size of images>
 ```
 
+### read training data from S3
+
+```python
+import pytdml
+
+# Initialize S3client 
+s3_client = pytdml.io.S3Cl_reader.S3Client("s3", "your_server", "your_akey", "your_skey")
+# Load the training dataset
+training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
+for item in training_dataset.data:
+    path = item.data_url
+    if pytdml.io.S3_reader.pasrse_s3_path(path):
+        bucket_name, key_name = pytdml.io.S3_reader.parse_s3_path(path)
+        object_data = s3_client.get_object(bucket_name, key_name)
+        # Process the S3 object data (read as PIL Image)
+        with PIL.Image.open(object_data) as img:
+            # processing....
+    else:
+        print("Invalid S3 path:", path)
+```
+
+
 
