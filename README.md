@@ -236,7 +236,7 @@ pytdml/tdml_image_crop.py  --input=<Input original TrainingDML-AU file path> --o
 import pytdml
 
 # Initialize S3client 
-s3_client = pytdml.io.S3Cl_reader.S3Client("s3", "your_server", "your_akey", "your_skey")
+s3_client = pytdml.io.S3_reader.S3Client("s3", "your_server", "your_akey", "your_skey")
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
 for item in training_dataset.data:

@@ -5,20 +5,21 @@ from pytdml import *
 
 # get training data
 from pytdml.io import write_to_json
-from pytdml.type import EOTrainingDataset, EOTrainingData, SceneLabel, EOTask, EODataSource
+from pytdml.type import EOTrainingDataset, EOTrainingData, SceneLabel, EOTask
 
+# get training data from s3
+s3_client = pytdml.io.S3Client('s3', "your_server", "your_ak", "your_sk")
 td_list = []
-image_path = r"D:\TrainingDatasets\WHU-RS19\image"
-for root, dirs, files in os.walk(image_path):
-    for file in files:
-        if file != "Thumbs.db":
-            td = EOTrainingData(
-                id=file.split(".")[0],
-                labels=[SceneLabel(label_class=os.path.relpath(root, image_path))],
-                data_url=os.path.join(root, file),
-                date_time="2010"
-            )
-            td_list.append(td)
+bucket_name = "my-bucket"
+obj_list = s3_client.list_objects(Bucket=bucket_name, Prefix="whu_rs19/")
+for obj in obj_list:
+    td = EOTrainingData(
+        id=obj.split(".")[0],
+        labels=[SceneLabel(label_class=obj.split("/")[1])],
+        data_url=f"s3://{bucket_name}/{quote(obj)}",
+        date_time="2010"
+    )
+    td_list.append(td)
 
 # generate EO training dataset
 whu_rs19 = EOTrainingDataset(
@@ -49,3 +50,7 @@ whu_rs19 = EOTrainingDataset(
 )
 # write to json
 write_to_json(whu_rs19, "whu_rs19.json")
+
+
+
+
