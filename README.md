@@ -87,6 +87,24 @@ dataset = EOTrainingDataset(
 write_to_json(dataset, "dataset.json")
 ```
 
+#### encoding training data from S3
+
+```python
+# get training data from s3
+s3_client = pytdml.io.S3Client('s3', "your_server", "your_ak", "your_sk")
+td_list = []
+bucket_name = "my-bucket"
+obj_list = s3_client.list_objects(Bucket=bucket_name, Prefix="whu_rs19/")
+for obj in obj_list:
+    td = EOTrainingData(
+        id=obj.split(".")[0],
+        labels=[SceneLabel(label_class=obj.split("/")[1])],
+        data_url=f"s3://{bucket_name}/{quote(obj)}",
+        date_time="2010"
+    )
+    td_list.append(td)
+```
+
 ### Parsing
 
 The training dataset described with TrainingDML-AI JSON file can be parsed with python API and transformed to
@@ -101,6 +119,27 @@ training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML js
 print("Load training dataset: " + training_dataset.name)
 print("Number of training samples: " + str(training_dataset.amount_of_training_data))
 print("Number of classes: " + str(training_dataset.number_of_classes))
+```
+
+#### read training data from s3
+
+```python
+import pytdml
+
+# Initialize S3client 
+s3_client = pytdml.io.S3_reader.S3Client("s3", "your_server", "your_akey", "your_skey")
+# Load the training dataset
+training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
+for item in training_dataset.data:
+    path = item.data_url
+    if pytdml.io.S3_reader.pasrse_s3_path(path):
+        bucket_name, key_name = pytdml.io.S3_reader.parse_s3_path(path)
+        object_data = s3_client.get_object(bucket_name, key_name)
+        # Process the S3 object data (read as PIL Image)
+        with PIL.Image.open(BytesIO(object_data)) as img:
+            # processing....
+    else:
+        print("Invalid S3 path:", path)
 ```
 
 #### Transform to PyTorch dataset
@@ -229,27 +268,4 @@ The images of training dataset in TrainingDML-AI JSON format can be cropped with
 pytdml/tdml_image_crop.py  --input=<Input original TrainingDML-AU file path> --output_json=<Output result TrainingDML-AI JSON file path>
                           --output_images=<Output dir of result cropped images> --size=<Crop size of images>
 ```
-
-### read training data from S3
-
-```python
-import pytdml
-
-# Initialize S3client 
-s3_client = pytdml.io.S3_reader.S3Client("s3", "your_server", "your_akey", "your_skey")
-# Load the training dataset
-training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
-for item in training_dataset.data:
-    path = item.data_url
-    if pytdml.io.S3_reader.pasrse_s3_path(path):
-        bucket_name, key_name = pytdml.io.S3_reader.parse_s3_path(path)
-        object_data = s3_client.get_object(bucket_name, key_name)
-        # Process the S3 object data (read as PIL Image)
-        with PIL.Image.open(BytesIO(object_data)) as img:
-            # processing....
-    else:
-        print("Invalid S3 path:", path)
-```
-
-
 
