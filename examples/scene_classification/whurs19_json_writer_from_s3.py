@@ -11,7 +11,7 @@ from pytdml.type import EOTrainingDataset, EOTrainingData, SceneLabel, EOTask
 s3_client = pytdml.io.S3Client('s3', "your_server", "your_ak", "your_sk")
 td_list = []
 bucket_name = "my-bucket"
-obj_list = s3_client.list_objects(Bucket=bucket_name, Prefix="whu_rs19/")
+obj_list = s3_client.list_objects(bucket_name=bucket_name, prefix="whu_rs19/")
 for obj in obj_list:
     td = EOTrainingData(
         id=obj.split(".")[0],
