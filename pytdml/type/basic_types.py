@@ -59,7 +59,7 @@ class MetricsInLiterature:
     """
     doi: str
     algorithm: str = field(default=None)
-    metrics: List[KeyValuePair] = field(default_factory=list[KeyValuePair])
+    metrics: List[KeyValuePair] = field(default_factory=list)
 
     def to_dict(self):
         return {
@@ -143,8 +143,8 @@ class LabelingProcedure:
     Labeling procedure type
     """
     id: str
-    methods: list[str] = field(default_factory=list)
-    tools: list[str] = field(default_factory=list)
+    methods: List[str] = field(default_factory=list)
+    tools: List[str] = field(default_factory=list)
 
     def to_dict(self):
         return {
@@ -204,10 +204,10 @@ class ScopeDescription:
     """
     From ISO 19115-1 MD_ScopeDescription
     """
-    attributes: list[str] = field(default_factory=list)
-    features: list[str] = field(default_factory=list)
-    featureInstances: list[str] = field(default_factory=list)
-    attributeInstances: list[str] = field(default_factory=list)
+    attributes: List[str] = field(default_factory=list)
+    features: List[str] = field(default_factory=list)
+    featureInstances: List[str] = field(default_factory=list)
+    attributeInstances: List[str] = field(default_factory=list)
     dataset: str = field(default=None)
     other: str = field(default=None)
 
@@ -245,7 +245,7 @@ class Scope:
     From ISO 19115-1 MD_Scope
     """
     level: str
-    levelDescription: List[ScopeDescription] = field(default_factory=list[ScopeDescription])
+    levelDescription: List[ScopeDescription] = field(default_factory=list)
 
     def to_dict(self):
         return {
@@ -302,7 +302,7 @@ class DataQuality:
     From ISO 19157-1 DataQuality
     """
     scope: Scope
-    report: List[QualityElement] = field(default_factory=list[QualityElement])
+    report: List[QualityElement] = field(default_factory=list)
 
     def to_dict(self):
         return {
@@ -360,8 +360,8 @@ class TrainingData:
     number_of_labels: int = field(default=None)
     data_sources: List[str] = field(default_factory=list)
     quality: DataQuality = field(default=None)
-    labeling: List[Labeling] = field(default_factory=list[Labeling])
-    labels: List[Label] = field(default_factory=list[Label])
+    labeling: List[Labeling] = field(default_factory=list)
+    labels: List[Label] = field(default_factory=list)
 
     def get_labels(self) -> List[Label]:
         """
@@ -412,9 +412,9 @@ class Changeset:
     dataset_id: str = field(default=None)
     version: str = field(default=None)
     created_time: str = field(default=None)
-    add: List[TrainingData] = field(default_factory=list[TrainingData])
-    modify: List[TrainingData] = field(default_factory=list[TrainingData])
-    delete: List[TrainingData] = field(default_factory=list[TrainingData])
+    add: List[TrainingData] = field(default_factory=list)
+    modify: List[TrainingData] = field(default_factory=list)
+    delete: List[TrainingData] = field(default_factory=list)
 
     def to_dict(self):
         return {
@@ -468,17 +468,17 @@ class TrainingDataset:
     updated_time: str = field(default=None)
     providers: List[str] = field(default_factory=list)
     keywords: List[str] = field(default_factory=list)
-    metrics_in_literature: List[MetricsInLiterature] = field(default_factory=list[MetricsInLiterature])
-    statistics_info: List[KeyValuePair] = field(default_factory=list[KeyValuePair])
+    metrics_in_literature: List[MetricsInLiterature] = field(default_factory=list)
+    statistics_info: List[KeyValuePair] = field(default_factory=list)
     dataSources: List[str] = field(default_factory=list)
     number_of_classes: int = field(default=None)
     classification_schema: str = field(default=None)
     classes: Union[List[KeyValuePair], List[str]] = field(default=None)
-    tasks: List[Task] = field(default_factory=list[Task])
-    labeling: List[Labeling] = field(default_factory=list[Labeling])
+    tasks: List[Task] = field(default_factory=list)
+    labeling: List[Labeling] = field(default_factory=list)
     quality: DataQuality = field(default=None)
-    changesets: List[Changeset] = field(default_factory=list[Changeset])
-    data: List[TrainingData] = field(default_factory=list[TrainingData])
+    changesets: List[Changeset] = field(default_factory=list)
+    data: List[TrainingData] = field(default_factory=list)
 
     def get_training_data(self) -> List[TrainingData]:
         """

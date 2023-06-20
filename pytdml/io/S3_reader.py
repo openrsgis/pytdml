@@ -40,11 +40,12 @@ class S3Client:
         return bucket_list
 
     def list_objects(self, bucket_name, prefix):
+        obj_list = []
         try:
             # 列出存储桶中的对象
             response = self.s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
             # 打印对象列表
-            obj_list = []
+
             if 'Contents' in response:
                 for obj in response['Contents']:
                     obj_list.append(obj['Key'])
