@@ -87,7 +87,7 @@ dataset = EOTrainingDataset(
 write_to_json(dataset, "dataset.json")
 ```
 
-#### encoding training data from S3
+#### Encoding training data from S3
 
 ```python
 # get training data from s3
@@ -121,7 +121,7 @@ print("Number of training samples: " + str(training_dataset.amount_of_training_d
 print("Number of classes: " + str(training_dataset.number_of_classes))
 ```
 
-#### read training data from s3
+#### Read training data from s3
 
 ```python
 import pytdml
