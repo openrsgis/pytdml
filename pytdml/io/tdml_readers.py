@@ -40,10 +40,29 @@ def read_from_json(file_path: str):
     """
     with open(file_path, "r", encoding='utf-8') as f:
         json_dict = json.load(f)
-        # Different kinds of training datasets are supported
-        if json_dict["type"] == "TrainingDataset":
-            return TrainingDataset.from_dict(json_dict)
-        elif json_dict["type"] == "EOTrainingDataset":
-            return EOTrainingDataset.from_dict(json_dict)
-        else:
-            raise ValueError("Unknown TDML type: {}".format(json_dict["type"]))
+    return parse_json(json_dict)
+
+
+def parse_json(json_dict):
+    # Different kinds of training datasets are supported
+    if json_dict["type"] == "TrainingDataset":
+        return TrainingDataset.from_dict(json_dict)
+    elif json_dict["type"] == "EOTrainingDataset":
+        return EOTrainingDataset.from_dict(json_dict)
+    else:
+        raise ValueError("Unknown TDML type: {}".format(json_dict["type"]))
+
+
+# def read_from_json(file_path: str):
+#     """
+#     Reads a TDML JSON file and returns a TrainingDataset object.
+#     """
+#     with open(file_path, "r", encoding='utf-8') as f:
+#         json_dict = json.load(f)
+#         # Different kinds of training datasets are supported
+#         if json_dict["type"] == "TrainingDataset":
+#             return TrainingDataset.from_dict(json_dict)
+#         elif json_dict["type"] == "EOTrainingDataset":
+#             return EOTrainingDataset.from_dict(json_dict)
+#         else:
+#             raise ValueError("Unknown TDML type: {}".format(json_dict["type"]))

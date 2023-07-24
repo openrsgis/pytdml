@@ -32,10 +32,12 @@ import cv2
 import numpy as np
 import torch
 from PIL import Image
+import os
 
 import pytdml.utils as utils
 
 from torch.utils.data import Dataset
+from torchvision.datasets.vision import VisionDataset
 
 
 class TorchEOImageSceneTD(Dataset):
@@ -124,6 +126,274 @@ class TorchEOImageSegmentationTD(Dataset):
         index_label = np.asarray(index_label, dtype=np.int64)
         index_label = torch.from_numpy(index_label)
         return img, index_label
+
+
+class TorchSceneClassificationTD(VisionDataset):
+    """
+    Torch Dataset for EO image scene classification training dataset
+    """
+
+    def __init__(self, td_list, root, class_map, transform=None):
+        super().__init__(root=root, transform=transform)
+        self._basedir = root
+
+        self.td_list = td_list
+        self.imgs, self.labels = self._load_img_label()
+
+        self.class_map = class_map
+
+    def _load_img_label(self):
+        # self.imgs = [utils.generate_file_path(self._basedir, self.root) for item in self.td_list]
+        # imgs = [os.path.join(self._basedir, "EOTrainingDataset", self.tdml.name, class_name, file)
+        #         for class_name in self.tdml.classes
+        #         for file in os.listdir(os.path.join(self._basedir, "EOTrainingDataset", self.tdml.name, class_name))]
+        # imgs = [os.path.join(self._basedir, "EOTrainingDataset", *utils.object_path_parse_(item.data_url))
+        #         for item in self.td_list]
+        imgs = [item.data_url[0] for item in self.td_list]
+        labels = [item.labels[0].label_class for item in self.td_list]
+        return imgs, labels
+
+    def __len__(self):
+        return len(self.td_list)
+
+    def __getitem__(self, item):
+
+        img_path = self.imgs[item]
+        img = utils.image_open(img_path)
+        # single band check
+        img = utils.channel_processing(img)
+
+        label = self.class_map[self.td_list[item].labels[0].label_class]
+        if self.transform is not None:
+            img = self.transform(img)
+        return img, label
+
+    def class_to_idx(self):
+        return self.class_map
+
+
+class TorchObjectDetectionTD(VisionDataset):
+    """
+    Torch Dataset for EO image object detection training dataset
+    """
+
+    def __init__(self, td_list, root, class_map, transform=None):
+        super().__init__(root=root, transform=transform)
+        self._basedir = root
+
+        self.td_data_list = td_list
+        self.class_map = class_map
+
+        self.images = [item.data_url[0] for item in self.td_data_list]
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.td_data_list)
+
+    def __getitem__(self, index):
+
+        img = utils.image_open(self.images[index])
+
+        img_height, img_width, channel = img.shape
+        img = utils.channel_processing(img)
+        labels = self.td_data_list[index].labels
+        targets = utils.target_to_dict(labels, self.class_map, img_width, img_height)
+
+        if self.transform is not None:
+            img, targets = self.transform(img, targets)
+        return img, targets
+
+
+class TorchSemanticSegmentationTD(VisionDataset):
+    """
+    Torch Dataset for EO image Semantic Segmentation training dataset
+    """
+
+    def __init__(self, td_list, root, classes, transform=None):
+        super(TorchSemanticSegmentationTD, self).__init__(None, transform=transform)
+        self._basedir = root
+        self.class_list = classes
+        self.transform = transform
+
+        self.td_data_list = self._load_data(td_list)
+        self._imgs, self._labels = self._load_img_label(self.td_data_list)
+
+    def __len__(self):
+        return len(self.td_data_list)
+
+    def _load_data(self, td_list):
+        """
+        """
+        return td_list
+
+    def _load_img_label(self, td_list):
+
+        # for item in td_list:
+        #     img_path = utils.generate_file_path(self._basedir, item.data_url)
+        #     img_paths.append(img_path)
+        #
+        #     label_path = item.labels[0].image_url
+        #     label_path = utils.generate_file_path(self._basedir, label_path)
+        #     label_paths.append(label_path)
+        img_paths = []
+        label_paths = []
+        for item in td_list:
+            # if utils.check_object_path(item.data_url[0]) and utils.check_object_path(item.labels[0].image_url):
+            #     label_paths.append(os.path.join(self._basedir, "EOTrainingDataset",
+            #                                     *utils.object_path_parse_(item.labels[0].image_url)))
+            #     img_paths.append(os.path.join(self._basedir, "EOTrainingDataset",
+            #                                   *utils.object_path_parse_(item.data_url)))
+            # else:
+            #     img_paths.append(item.data_url[0])
+            #     label_paths.append(item.labels[0].image_url)
+            img_paths.append(item.data_url[0])
+            label_paths.append(item.labels[0].image_url)
+        return img_paths, label_paths
+
+    def __getitem__(self, item):
+        image = utils.image_open(self._imgs[item])
+
+        # image = torch.from_numpy(image).float().contiguous()
+
+        label = utils.image_open(self._labels[item])
+
+        # scheme 2
+        if self.class_list is not None:
+            label = utils.regenerate_png_label_(label, self.class_list)
+        # label = torch.from_numpy(label).long().squeeze()
+
+        # label = np.array(label)
+
+        #
+        # label = torch.from_numpy(label).long()
+        # label = label.squeeze()
+
+        if self.transform is not None:
+            image = self.transform(image)
+            label = self.transform(label)
+        return image, label
+
+
+class TorchChangeDetectionTD(VisionDataset):
+    def __init__(self, td_list, root, transform):
+        super().__init__(root=root, transform=transform)
+
+        self._basedir = root
+
+        self.td_list = td_list
+
+        self.transform = transform
+
+        self._sample = self._load_sample()
+
+    def __len__(self):
+        return len(self.td_list)
+
+    def _load_sample(self):
+        sample = []
+        for item in self.td_list:
+            data_url = item.data_url
+            label_url = item.labels[0].image_url
+            # if utils.check_object_path(data_url[0]):
+            #     before_img_path = utils.generate_local_file_path(self._basedir, data_url[0])
+            #     after_img_path = utils.generate_local_file_path(self._basedir, data_url[1])
+            #     label_path = utils.generate_local_file_path(self._basedir, label_url)
+            #     sample.append([before_img_path, after_img_path, label_path])
+            # else:
+            #     sample.append([data_url[0], data_url[1], label_url])
+            sample.append([data_url[0], data_url[1], label_url])
+
+        return sample
+
+    def __getitem__(self, item):
+        img_before_path, img_after_path, label_path = self._sample[item]
+        before_img = utils.image_open(img_before_path)
+        after_img = utils.image_open(img_after_path)
+        before_img = utils.channel_processing(before_img)
+        after_img = utils.channel_processing(after_img)
+        label = utils.image_open(label_path)
+        # label = np.array(label)
+
+        # label = torch.from_numpy(label).long()
+        # label = label.squeeze()
+
+        if self.transform is not None:
+            before_img = self.transform(before_img)
+            after_img = self.transform(after_img)
+            label = self.transform(label)
+        return before_img, after_img, label
+
+
+class TorchStereoTD(VisionDataset):
+    def __init__(self, td_list, root, transform=None):
+        super().__init__(root)
+        self.root = root
+
+        self.td_list = td_list
+        self.transform = transform
+        self.target_imgs, self.ref_imgs, self.disp_imgs = self._load_data()  # 加载相机参数
+
+    def _load_data(self):
+
+        target_imgs = [item.data_url[0] for item in self.td_list]
+        ref_imgs = [item.data_url[1] for item in self.td_list]
+        disp_imgs = [item.labels[0].image_url for item in self.td_list]
+        return target_imgs, ref_imgs, disp_imgs
+
+    def __len__(self):
+        return len(self.td_list)
+
+    def __getitem__(self, item):
+        disp_img = utils.image_open(self.disp_imgs[item])
+        target_img = utils.image_open(self.target_imgs[item])
+        ref_img = utils.image_open(self.ref_imgs[item])
+
+        if self.transform is not None:
+            target_img = self.transform(target_img)
+            ref_img = self.transform(ref_img)
+            disp_img = self.transform(disp_img)
+        return target_img, ref_img, disp_img
+
+
+class Torch3DModelReconstructionTD(VisionDataset):
+    def __init__(self, tdml, root, transform=None):
+        super().__init__(root)
+        self.root = root
+        self.cams, self.depths, self.images = self._load_data()   # 加载相机参数
+        self.tdml = tdml
+        self.transform = transform
+
+    def _load_data(self):
+        cams_dir = os.path.join(self.root, self.tdml.name, "Cams")
+        cams = os.listdir(cams_dir)
+
+        depths_dir = os.path.join(self.root, self.tdml.name, "Depths")
+        depths = os.listdir(depths_dir)
+
+        imgs_dir = os.path.join(self.root, self.tdml.name, "Images")
+        imgs = [os.listdir(item) for item in os.listdir(imgs_dir)]
+        imgs = list(zip(*imgs))
+
+        return cams, depths, imgs
+
+    def __len__(self):
+
+        return len(self.tdml.data)
+
+    def __getitem__(self, item):
+        cam = self.cams[item]
+        depth = self.depths[item]
+        image_list = self.images[item]  # 对于每个样本，使用不同的视角图像，即取模操作
+        images = [utils.image_open(i) for i in image_list]
+        depth_imgs = [utils.image_open(i) for i in depth]
+        cam_txt = []
+        for i in cam:
+            with open(i) as f:
+                lines = f.readlines()
+                cam_txt.append(lines)
+        if self.transform is not None:
+            images = [self.transform(image) for image in images]
+        return images, depth_imgs, cam_txt
 
 
 def base_transform(image, size, mean, std):

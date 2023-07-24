@@ -32,8 +32,11 @@ import argparse
 import json
 import os
 import sys
+import math
+import numpy as np
 
 import cv2
+from geojson import Feature, Polygon
 
 from pytdml.io import read_from_json
 from pytdml.type import EOTrainingDataset, EOTrainingData, PixelLabel
@@ -91,6 +94,177 @@ def image_crop(data_url, save_dir, sub_size):
                 cv2.imwrite(crop_image_path, crop_image)
                 crop_image_path_list.append(crop_image_path)
     return crop_image_path_list
+
+
+class CropWithImage:
+    def __init__(self, crop_size=512, overlap=0.25):
+        self.crop_size = crop_size
+        self.overlap = overlap
+
+    def __call__(self, img, dir, file_name):
+        height, width, channel = img.shape
+        # 计算滑动窗口的步长
+        stride = int(self.crop_size * (1 - self.overlap))
+
+        # 计算需要填充的大小，使得图片可以被整除成多个crop_size大小的块
+        pad_h = math.ceil((stride - (height - self.crop_size) % stride) % stride)
+        pad_w = math.ceil((stride - (width - self.crop_size) % stride) % stride)
+        # 对图像进行填充
+        img_pad = np.pad(img, [(0, pad_h), (0, pad_w), (0, 0)], mode='constant', constant_values=0)
+        crop_coords_paths = []
+
+        # 依次对每个crop进行处理
+        index = 0
+        for y in range(0, height + pad_h - stride, stride):
+            for x in range(0, width + pad_w - stride, stride):
+                # 计算当前crop的边界
+                x1, y1 = x, y
+                x2, y2 = x + self.crop_size, y + self.crop_size
+                # 对crop进行裁剪
+                dot_index = file_name.find(".")
+                file_name_crop = file_name[:dot_index] + "_cropped_by_" + str(
+                    self.crop_size) + "_" + str(int(y / stride)) + "_" + str(int(x / stride)) + \
+                                 file_name[dot_index:]
+                crop_image_path = os.path.join(dir, file_name_crop)
+
+                if not os.path.exists(crop_image_path):
+                    crop = img_pad[y1:y2, x1:x2, :]
+                    cv2.imwrite(crop_image_path, crop)
+
+                crop_coords_paths.append(crop_image_path)
+                index += 1
+        return crop_coords_paths
+
+
+class CropWithTargetImage(object):
+    def __init__(self, crop_size=512, overlap=0.25, threshold=0.35):
+        self.crop_size = crop_size
+        self.overlap = overlap
+        self.threshold = threshold
+
+    def __call__(self, img, target, dir, file_name):
+        height, width, channel = img.shape
+
+        # 计算滑动窗口的步长
+        stride = int(self.crop_size * (1 - self.overlap))
+
+        # 计算需要填充的大小，使得图片可以被整除成多个crop_size大小的块
+        pad_h = math.ceil((stride - (height - self.crop_size) % stride) % stride)
+        pad_w = math.ceil((stride - (width - self.crop_size) % stride) % stride)
+
+        # 对图像进行填充
+
+        img_pad = np.pad(img, [(0, pad_h), (0, pad_w), (0, 0)], mode='constant', constant_values=0)
+
+        crop_coords_paths = []
+        targets_crops = []
+
+        # 依次对每个crop进行处理
+        for y in range(0, height + pad_h - stride, stride):
+            for x in range(0, width + pad_w - stride, stride):
+                # 计算当前crop的边界
+                x1, y1 = x, y
+                x2, y2 = x + self.crop_size, y + self.crop_size
+
+                # 对crop进行裁剪
+                dot_index = file_name.find(".")
+                file_name_crop = file_name[:dot_index] + "_cropped_by_" + str(self.crop_size) + "_" + str(int(y / stride)) + "_" + str(int(x / stride)) \
+                                 + file_name[dot_index:]
+                crop_image_path = os.path.join(dir, file_name_crop)
+                if not os.path.exists(crop_image_path):
+                    crop = img_pad[y1:y2, x1:x2, :]
+                    cv2.imwrite(crop_image_path, crop)
+
+                crop_coords_paths.append(crop_image_path)
+
+                targets = []
+                for t in target:
+
+                    # 获取目标框的坐标
+                    # xmin, ymin, xmax, ymax = t[:4]
+                    coordinates = t.object.geometry.coordinates[0]
+                    xmin, ymin = coordinates[0]
+                    xmax, ymax = coordinates[2]
+
+                    if xmax - xmin == 0:
+                        xmax = xmax + 1
+                    if ymax - ymin == 0:
+                        ymax = ymax + 1
+
+                    # 判断目标框是否在当前crop中
+                    if xmin >= x2 or xmax <= x1 or ymin >= y2 or ymax <= y1:
+                        continue
+
+                    # 对目标框进行裁剪，并计算其在crop中的坐标
+                    crop_x_min = max(xmin - x1, 0)
+                    crop_y_min = max(ymin - y1, 0)
+                    crop_x_max = min(xmax - x1, self.crop_size)
+                    crop_y_max = min(ymax - y1, self.crop_size)
+
+                    crop_width = crop_x_max - crop_x_min
+                    crop_height = crop_y_max - crop_y_min
+
+                    # 计算目标框在crop中的面积占比
+                    area_intersection = crop_width * crop_height
+
+                    area_bbox = (xmax - xmin) * (ymax - ymin)
+                    area_ratio = area_intersection / area_bbox
+
+                    # 如果目标框的面积占比小于阈值，则舍弃这个目标框
+                    if area_ratio < self.threshold:
+                        continue
+
+                    # 计算目标框在crop中的相对坐标和大小
+                    # x_center_crop = (crop_x_min + crop_x_max) / 2 / self.crop_size
+                    # y_center_crop = (crop_y_min + crop_y_max) / 2 / self.crop_size
+                    # width_crop = crop_width / self.crop_size
+                    # height_crop = crop_height / self.crop_size
+                    feature = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [[[xmin, ymin], [xmin,ymax], [xmax,ymax], [xmax, ymin], [xmin, ymin]]]
+                        },
+                        "properties": {
+                            "name": ""
+                        }
+                    }
+
+                    targets.append({
+                        "object": feature,
+                        "class": t.label_class,
+                        "area": area_intersection / area_bbox,
+                        "isNegative": t.is_negative,
+                        "bboxType": t.bbox_type
+                    })
+
+                if targets:
+                    targets_crops.append(targets)
+                else:
+                    feature_zero = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [[[0, 0], [0, 0], [0, 0], [0, 0]]]
+                        },
+                        "properties": {
+                            "name": ""
+                        }
+                    }
+                    targets_crops.append([{
+                        "object": feature_zero,
+                        "class": "",
+                        "area": "",
+                        "isNegative": "",
+                        "isDiffDetectable": "",
+                        "bboxType": ""
+                    }])
+                write_object_label(dir, targets_crops)
+        return crop_coords_paths, targets_crops
+
+
+def write_object_label(dir, target):
+    pass
 
 
 def main():

@@ -30,6 +30,8 @@
 # ------------------------------------------------------------------------------
 import random
 
+import torch
+
 from pytdml.type import TrainingDataset
 
 
@@ -52,7 +54,7 @@ def split_train_valid_test(td: TrainingDataset, train_ratio=0.7, valid_ratio=0.0
     return train_td, valid_td, test_td
 
 
-def creat_class_map(td: TrainingDataset):
+def create_class_map(td: TrainingDataset):
     """
     Creates a map from class labels to indices.
     """
@@ -65,3 +67,24 @@ def creat_class_map(td: TrainingDataset):
         else:
             class_map[_class] = i
     return class_map
+
+
+def create_classes_map_(classes):
+    """
+    Creates a map from class labels to indices for luojiaSet.
+    """
+    assert classes is not None, "Training dataset has no classes"
+    class_map = {}
+    for i, _class in enumerate(classes):
+        if isinstance(_class, dict):
+            for item in _class.items():
+                class_map[item[0]] = item[1]
+        else:
+            class_map[_class] = i
+    return class_map
+
+
+def collate_fn(batch):
+    img, targets = list(zip(*batch))
+    return torch.stack(img, 0), list(targets)
+

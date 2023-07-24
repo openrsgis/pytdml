@@ -1,9 +1,10 @@
+
 # ------------------------------------------------------------------------------
 #
 # Project: pytdml
-# Authors: Boyi Shangguan, Kaixuan Wang
-# Created: 2022-05-04
-# Email: sgby@whu.edu.cn
+# Authors: Shuaiqi Liu
+# Created: 2023-02-04
+# Email: sqi_liu@whu.edu.cn
 #
 # ------------------------------------------------------------------------------
 #
@@ -28,7 +29,5 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-from pytdml.io.tdml_readers import read_from_json, parse_json
-from pytdml.io.tdml_writers import write_to_json
-from pytdml.io.internal import read_from_server, datasets_load, task_load
+from datalibrary.s3Client import S3Client
 

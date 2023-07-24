@@ -28,14 +28,15 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-from dataclasses import dataclass, field
+import json
+from dataclasses import dataclass, field, asdict
 from typing import List, Union
 
 import geojson
 from geojson import Feature
 from pytdml.type.basic_types import Label, TrainingData, TrainingDataset, DataQuality, Task, \
     MetricsInLiterature, \
-    KeyValuePair, Labeling, Changeset
+    KeyValuePair, Labeling, Changeset, Scope
 
 
 @dataclass
@@ -92,7 +93,9 @@ class ObjectLabel(Label):
     @staticmethod
     def from_dict(json_dict: dict):
         if json_dict.__contains__("object") and json_dict["type"] == "ObjectLabel":
-            label = ObjectLabel(object=geojson.loads(json_dict["object"].__str__().replace("'", "\"")))
+            # label = ObjectLabel(object=geojson.loads(json_dict["object"].__str__().replace("'", "\"")))
+            label = ObjectLabel(object=geojson.loads(json.dumps(json_dict["object"])))
+
             if json_dict.__contains__("isNegative"):
                 label.is_negative = json_dict["isNegative"]
             if json_dict.__contains__("confidence"):
@@ -257,18 +260,23 @@ class EOTrainingData(TrainingData):
                 training_data.labeling = [Labeling.from_dict(ll) for ll in json_dict["labeling"]]
             if json_dict.__contains__("labels"):
                 # Different type of labels
-                if json_dict["labels"][0]["type"] == "SceneLabel":
-                    training_data.labels = [SceneLabel.from_dict(label) for label in json_dict["labels"]]
-                elif json_dict["labels"][0]["type"] == "ObjectLabel":
-                    training_data.labels = [ObjectLabel.from_dict(label) for label in json_dict["labels"]]
-                elif json_dict["labels"][0]["type"] == "PixelLabel":
-                    training_data.labels = [PixelLabel.from_dict(label) for label in json_dict["labels"]]
+                if len(json_dict["labels"]) > 0:
+                    if json_dict["labels"][0]["type"] == "SceneLabel":
+                        training_data.labels = [SceneLabel.from_dict(label) for label in json_dict["labels"]]
+                    elif json_dict["labels"][0]["type"] == "ObjectLabel":
+                        training_data.labels = [ObjectLabel.from_dict(label) for label in json_dict["labels"]]
+                    elif json_dict["labels"][0]["type"] == "PixelLabel":
+                        training_data.labels = [PixelLabel.from_dict(label) for label in json_dict["labels"]]
+                else:
+                    training_data.labels = []
             if json_dict.__contains__("extent"):
                 training_data.extent = json_dict["extent"]
             if json_dict.__contains__("dateTime"):
                 training_data.date_time = json_dict["dateTime"]
             if json_dict.__contains__("dataURL"):
                 training_data.data_url = json_dict["dataURL"]
+            if json_dict.__contains__("datasetId"):
+                training_data.dataset_id = json_dict["datasetId"]
             return training_data
         else:
             raise ValueError("The given json_dict is not a valid EOTrainingData")
@@ -316,8 +324,10 @@ class EOTrainingDataset(TrainingDataset):
     @staticmethod
     def from_dict(json_dict: dict):
         if json_dict.__contains__("id") and json_dict.__contains__("name") \
-                and json_dict.__contains__("description") and json_dict.__contains__("license") \
+                and json_dict.__contains__("description") \
+                and json_dict.__contains__("license") \
                 and json_dict["type"] == "EOTrainingDataset":
+
             td = EOTrainingDataset(json_dict["id"], json_dict["name"], json_dict["description"], json_dict["license"])
             if json_dict.__contains__("doi"):
                 td.doi = json_dict["doi"]
