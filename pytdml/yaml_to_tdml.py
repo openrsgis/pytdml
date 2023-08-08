@@ -36,6 +36,7 @@ import sys
 import yaml
 import pandas as pd
 from geojson import Polygon, Feature
+import s3fs
 
 from pytdml.io import write_to_json
 from pytdml.type import EOTask, EOTrainingDataset, EOTrainingData, SceneLabel, PixelLabel, ObjectLabel, Scope
@@ -93,7 +94,6 @@ def load_data(data_dict):
     task_type = data_dict['task_type']
     label_type = data_dict['label_type']
     data_path = data_dict['data_path']
-
     if label_type == 'SceneLabel' and task_type == 'SceneClassification':
         for data in data_path:
             if data['type'] == 'image':
@@ -175,7 +175,7 @@ def load_data_semantic_segmentation(image_set, label_set):
     for image_url, label_url in zip(image_dir, label_dir):
         td = EOTrainingData(
             id=str(index),
-            labels=[PixelLabel(image_url=label_url)],
+            labels=[PixelLabel(image_url=label_url, image_format=image_set['format'])],
             data_url=str(image_url)
         )
         index = index + 1
@@ -333,6 +333,24 @@ def traverse_folder(file_path, file_format):
         return IOError("Failed to load dataset")
 
 
+def traverse_s3(object_path, file_format):
+    """
+    Traverse s3 object path
+    """
+    try:
+        s3_object = []
+        s3 = s3fs.S3FileSystem(anon=True)
+        split = object_path.split("/")
+        bucket = split[2]
+        for root, dirs, files in s3.walk(bucket):
+                for f in files:
+                    if (split[3] in root) and (split[4] in root) and (split[5] in root) and (file_format == os.path.splitext(f)[-1]):
+                        s3_object.append(os.path.join("s://"+root, f))
+        return s3_object
+    except IOError:
+        return IOError("Failed to load dataset")
+
+
 def get_image_label_url(image_set, label_set):
     """
     Get image url and label url from image set and label set
@@ -352,6 +370,9 @@ def get_image_label_url(image_set, label_set):
             image_dir.extend(traverse_folder(os.path.join(image_root_path, image_sub_path), image_format))
         for label_sub_path in label_sub_paths:
             label_dir.extend(traverse_folder(os.path.join(label_root_path, label_sub_path), label_format))
+    elif "s3" in image_root_path: # s3 buckets being used
+        image_dir = traverse_s3(image_root_path, image_format)
+        label_dir = traverse_s3(label_root_path, label_format)
     else:
         image_dir = traverse_folder(image_root_path, image_format)
         label_dir = traverse_folder(label_root_path, label_format)
