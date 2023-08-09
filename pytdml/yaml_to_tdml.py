@@ -77,6 +77,7 @@ def yaml_to_eo_tdml(yaml_path):
             providers=yaml_dict["providers"],
             keywords=yaml_dict["keywords"],
             classification_schema=yaml_dict['classification_schema'],
+            number_of_classes=yaml_dict['number_of_classes'],
             classes=yaml_dict['classes'],
             tasks=tasks,
             extent=yaml_dict['extent'],
