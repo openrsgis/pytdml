@@ -346,7 +346,7 @@ def traverse_s3(object_path, file_format):
         for root, dirs, files in s3.walk(bucket):
                 for f in files:
                     if (split[3] in root) and (split[4] in root) and (split[5] in root) and (file_format == os.path.splitext(f)[-1]):
-                        s3_object.append(os.path.join("s://"+root, f))
+                        s3_object.append(os.path.join("s3://"+root, f))
         return s3_object
     except IOError:
         return IOError("Failed to load dataset")
