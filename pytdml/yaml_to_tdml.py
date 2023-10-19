@@ -326,7 +326,7 @@ def traverse_folder(file_path, file_format):
     try:
         file_dir = []
         for root, dirs, files in os.walk(file_path):
-            for f in files:
+            for f in sorted(files):
                 if file_format == os.path.splitext(f)[-1]:
                     file_dir.append(os.path.join(root, f))
         return file_dir
