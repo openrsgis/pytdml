@@ -35,7 +35,7 @@ import geojson
 from geojson import Feature
 from pytdml.type.basic_types import Label, TrainingData, TrainingDataset, DataQuality, Task, \
     MetricsInLiterature, \
-    KeyValuePair, Labeling, Changeset
+    KeyValuePair, Labeling, Changeset, Scope
 
 
 @dataclass
@@ -71,6 +71,7 @@ class ObjectLabel(Label):
     """
     Extended label type for object level training data
     """
+    type: str = "ObjectLabel"
     object: Feature = field(default=None)
     label_class: str = field(default=None)
     bbox_type: str = field(default=None)
@@ -115,6 +116,7 @@ class PixelLabel(Label):
     """
     Extended label type for pixel level training data
     """
+    type: str = "PixelLabel"
     image_url: Union[str, List[str]] = field(default=None)
     image_format: Union[str, List[str]] = field(default=None)
 
@@ -191,6 +193,7 @@ class EOTask(Task):
     """
     Extended task type for EO training data
     """
+    type: str = "EOTask"
     task_type: str = field(default=None)
 
     def to_dict(self):
@@ -222,6 +225,7 @@ class EOTrainingData(TrainingData):
     """
     Extended training data type for EO training data
     """
+    type: str  = "EOTrainingData"
     extent: List[float] = field(default_factory=list)
     date_time: Union[str, List[str]] = field(default=None)
     data_url: Union[str, List[str]] = field(default=None)
