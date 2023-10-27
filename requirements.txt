@@ -6,6 +6,4 @@ Pillow
 PyYAML
 numpy
 pandas
-opencv-python
-tensorflow
-tensorflow-io
+pydantic

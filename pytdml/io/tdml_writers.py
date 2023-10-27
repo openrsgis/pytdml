@@ -1,8 +1,9 @@
 # ------------------------------------------------------------------------------
 #
 # Project: pytdml
-# Authors: Boyi Shangguan, Kaixuan Wang
+# Authors: Boyi Shangguan, Kaixuan Wang, Zhaoyan Wu
 # Created: 2022-05-04
+# Modified: 2023-10-27
 # Email: sgby@whu.edu.cn
 #
 # ------------------------------------------------------------------------------
@@ -39,4 +40,5 @@ def write_to_json(td: TrainingDataset, file_path: str, indent: Union[None, int, 
     Writes a TrainingDataset to a JSON file.
     """
     with open(file_path, "w", encoding='utf-8') as f:
-        json.dump(remove_empty(td.to_dict()), f, indent=indent, ensure_ascii=False)
+        json.dump(td.dict(by_alias=True,exclude_none=True), f, indent=indent, ensure_ascii=False)
+        # json.dump(remove_empty(td.dict()), f, indent=indent, ensure_ascii=False)
