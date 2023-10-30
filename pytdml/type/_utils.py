@@ -1,9 +1,8 @@
 # ------------------------------------------------------------------------------
 #
 # Project: pytdml
-# Authors: Boyi Shangguan, Kaixuan Wang, Zaoyan Wu
-# Created: 2022-05-04
-# Modified: 2023-10-27
+# Authors: Boyi Shangguan, Kaixuan Wang, Zhaoyan Wu
+# Created: 2023-10-27
 # Email: sgby@whu.edu.cn
 #
 # ------------------------------------------------------------------------------
@@ -29,33 +28,60 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-from .basic_types import BaseCamelModel
-from .basic_types import KeyValuePair
-from .basic_types import MD_ScopeDescription
-from .basic_types import MD_Band
-from .basic_types import MD_Scope
-from .basic_types import CIDate
-from .basic_types import MD_BrowseGraphic
-from .basic_types import CICitation
-from .basic_types import MD_Identifier
-from .basic_types import MetricsPair
-from .basic_types import MetricsInLiterature
-from .basic_types import Task
-from .basic_types import Labeler
-from .basic_types import LabelingProcedure
-from .basic_types import Labeling
-from .basic_types import QualityElement
-from .basic_types import DataQuality
-from .basic_types import Label
-from .basic_types import TrainingData
-from .basic_types import Changeset
-from .basic_types import StatisticsInfo
-from .basic_types import TrainingDataset
 
 
-from .extended_types import EOTrainingDataset
-from .extended_types import EOTrainingData
-from .extended_types import SceneLabel
-from .extended_types import ObjectLabel
-from .extended_types import PixelLabel
-from .extended_types import EOTask
+from datetime import datetime
+import re
+
+
+class InvalidDatetimeError(ValueError):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+
+def _validate_date(v: str) -> str:
+    """validate date string and return datetime object
+
+    Args:
+        v (str): date string
+
+    Raises:
+        ValidationError: date string does not match any allowed format
+
+    Returns:
+        str: valid date string
+    """
+    formats = [
+        "%Y-%m-%dT%H:%M:%S",  # date-time
+        "%Y-%m-%d",  # date
+        "%H:%M:%S",  # time
+    ]
+    year_pattern = "^(19|20)\\d{2}$"
+    year_month_pattern = "^(19|20)\\d{2}-(0[1-9]|1[0-2])$"
+
+    # Try to match date-time, date, or time format
+    for fmt in formats:
+        try:
+            datetime.strptime(v, fmt)
+            return v
+        except ValueError:
+            pass
+
+    # Try to match year or year-month pattern
+    if re.match(year_pattern, v) or re.match(year_month_pattern, v):
+        return v
+
+    raise InvalidDatetimeError(f"String {v} does not match any allowed format")
+
+
+def to_camel(string: str) -> str:
+    """Change snake_case to camelCase
+
+    Args:
+        string (str): snake_case string
+
+    Returns:
+        str: camelCase string
+    """
+    return re.sub(r"_(\w)", lambda match: match.group(1).upper(), string)

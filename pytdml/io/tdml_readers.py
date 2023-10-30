@@ -30,6 +30,8 @@
 # ------------------------------------------------------------------------------
 import json
 
+# from pytdml.type.basic_types_old import TrainingDataset
+# from pytdml.type.extended_types_old import EOTrainingDataset
 from pytdml.type.basic_types import TrainingDataset
 from pytdml.type.extended_types import EOTrainingDataset
 
@@ -41,9 +43,11 @@ def read_from_json(file_path: str):
     with open(file_path, "r", encoding='utf-8') as f:
         json_dict = json.load(f)
         # Different kinds of training datasets are supported
-        if json_dict["type"] == "TrainingDataset":
-            return TrainingDataset.from_dict(json_dict)
-        elif json_dict["type"] == "EOTrainingDataset":
-            return EOTrainingDataset.from_dict(json_dict)
+        if json_dict["type"] == "AI_TrainingDataset":
+            return TrainingDataset(**json_dict)
+            # return TrainingDataset.from_dict(json_dict)
+        elif json_dict["type"] == "AI_EOTrainingDataset":
+            return EOTrainingDataset(**json_dict)
+            # return EOTrainingDataset.from_dict(json_dict)
         else:
             raise ValueError("Unknown TDML type: {}".format(json_dict["type"]))
