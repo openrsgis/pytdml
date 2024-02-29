@@ -31,9 +31,11 @@
 # ------------------------------------------------------------------------------
 
 from typing import List, Union, Optional, Dict, Literal
+
 from pydantic import BaseModel, Field, field_validator, root_validator
 from datetime import datetime
 from pytdml.type._utils import _validate_date, to_camel,_valid_methods
+
 
 
 class BaseCamelModel(BaseModel):
@@ -111,6 +113,7 @@ class CIDate(BaseCamelModel):
     date: str
     dateType: str
 
+
     @field_validator("date")
     def validate_date(cls, v):
         return _validate_date(v)
@@ -181,7 +184,9 @@ class Task(BaseCamelModel):
     """
 
     id: str
+
     type: Literal["AI_AbstractTask"]
+
     dataset_id: Optional[str]
     description: Optional[str]
 
@@ -209,6 +214,7 @@ class LabelingProcedure(BaseCamelModel):
     @field_validator("methods")
     def valid_methods(self, v):
         return _valid_methods(v)
+
 
 class Labeling(BaseCamelModel):
     """
@@ -261,6 +267,7 @@ class TrainingData(BaseCamelModel):
 
     id: str
     type: Literal["AI_AbstractTrainingData"]
+
     labels: List[Label]
     dataset_id: Optional[str]
     training_type: Optional[str]
@@ -289,6 +296,7 @@ class Changeset(BaseCamelModel):
     created_time: Optional[str]
 
     @field_validator("created_time")
+
     def validate_created_time(cls, v):
         return _validate_date(v)
 
@@ -310,6 +318,7 @@ class StatisticsInfo(BaseCamelModel):
     type: Optional[List[StatisticsInfoType]] = Field(min_items=1)
 
 
+
 class AI_TDChangeset(BaseCamelModel):
     type: Literal["AI_TDChangeset"]
     id: str
@@ -327,6 +336,7 @@ class AI_TDChangeset(BaseCamelModel):
         return _validate_date(v)
 
 
+
 class TrainingDataset(BaseCamelModel):
     """
     Basic training dataset type
@@ -338,11 +348,13 @@ class TrainingDataset(BaseCamelModel):
     license: str
     tasks: List[Task]
     data: Union[List[TrainingData], str]  # That one should be uri-format
+
     type: Literal["AI_AbstractTrainingDataset"]
     classes: [List[Union[KeyValuePair, str, Dict]]] = Field(min_items=1)
 
     amount_of_training_data: Optional[int]
     number_of_classes: Optional[int]
+
     classification_schema: Optional[str]  # That one should be uri-format
     created_time: Optional[str]
     dataSources: Optional[
@@ -350,6 +362,7 @@ class TrainingDataset(BaseCamelModel):
     ]  # That string one should be uri-format
     doi: Optional[str]
     keywords: Optional[List[str]]
+
     scope: Optional[MD_Scope]
     version: Optional[str]
     updated_time: Optional[str]
@@ -358,6 +371,7 @@ class TrainingDataset(BaseCamelModel):
     quality: Optional[DataQuality]
     providers: Optional[List[str]]
     statistics_info: Optional[StatisticsInfo]
+
     changesets: Optional[List[AI_TDChangeset]]
 
     @field_validator("created_time")
@@ -365,5 +379,6 @@ class TrainingDataset(BaseCamelModel):
         return _validate_date(v)
 
     @field_validator("updated_time")
+
     def validate_updated_time(cls, v):
         return _validate_date(v)

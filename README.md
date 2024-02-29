@@ -91,7 +91,9 @@ write_to_json(dataset, "dataset.json")
 
 ```python
 # get training data from s3
+
 s3_client = pytdml.datalibrary.S3Client('s3', "your_server", "your_ak", "your_sk")
+
 td_list = []
 bucket_name = "my-bucket"
 obj_list = s3_client.list_objects(Bucket=bucket_name, Prefix="whu_rs19/")
@@ -269,6 +271,7 @@ pytdml/tdml_image_crop.py  --input=<Input original TrainingDML-AU file path> --o
                           --output_images=<Output dir of result cropped images> --size=<Crop size of images>
 ```
 
+
 ###　Load datasets to provide training-ready training data
 
 - View available datasets according to different tasks and categories
@@ -356,6 +359,7 @@ for e in range(100):
             for data in val_dataloader:
                 # ...
 ```
+
 
 
 
