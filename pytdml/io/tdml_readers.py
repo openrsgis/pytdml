@@ -30,8 +30,8 @@
 # ------------------------------------------------------------------------------
 import json
 
-from pytdml.type.basic_types import TrainingDataset
-from pytdml.type.extended_types import EOTrainingDataset
+from pytdml.type.basic_types_old import TrainingDataset
+from pytdml.type.extended_types_old import EOTrainingDataset
 
 
 def read_from_json(file_path: str):

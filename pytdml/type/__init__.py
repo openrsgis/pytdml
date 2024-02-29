@@ -1,8 +1,9 @@
 # ------------------------------------------------------------------------------
 #
 # Project: pytdml
-# Authors: Boyi Shangguan, Kaixuan Wang
+# Authors: Boyi Shangguan, Kaixuan Wang, Zaoyan Wu
 # Created: 2022-05-04
+# Modified: 2023-10-27
 # Email: sgby@whu.edu.cn
 #
 # ------------------------------------------------------------------------------
@@ -28,7 +29,33 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-from pytdml.type.basic_types import TrainingDataset, TrainingData, DataQuality, Task, Label, Labeling, Labeler, \
-    LabelingProcedure, Changeset, Scope, ScopeDescription
-from pytdml.type.extended_types import EOTrainingDataset, EOTrainingData, SceneLabel, ObjectLabel, PixelLabel, \
-    EOTask
+from .basic_types import BaseCamelModel
+from .basic_types import KeyValuePair
+from .basic_types import MD_ScopeDescription
+from .basic_types import MD_Band
+from .basic_types import MD_Scope
+from .basic_types import CIDate
+from .basic_types import MD_BrowseGraphic
+from .basic_types import CICitation
+from .basic_types import MD_Identifier
+from .basic_types import MetricsPair
+from .basic_types import MetricsInLiterature
+from .basic_types import Task
+from .basic_types import Labeler
+from .basic_types import LabelingProcedure
+from .basic_types import Labeling
+from .basic_types import QualityElement
+from .basic_types import DataQuality
+from .basic_types import Label
+from .basic_types import TrainingData
+from .basic_types import Changeset
+from .basic_types import StatisticsInfo
+from .basic_types import TrainingDataset
+
+
+from .extended_types import EOTrainingDataset
+from .extended_types import EOTrainingData
+from .extended_types import SceneLabel
+from .extended_types import ObjectLabel
+from .extended_types import PixelLabel
+from .extended_types import EOTask

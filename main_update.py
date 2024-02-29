@@ -53,7 +53,7 @@ target_transform = transform_target.Compose([
     transform_target.RandomResize((512, 512))
 ])
 
-
+path = "."
 
 def datasetsForSceneTask():
     ds_lib = EOTrainingDatasetCollection()
@@ -142,8 +142,18 @@ def datasetsForChangeTask():
         # pass
 
 
+import pytdml
+
+def format_test():
+
+    training_dataset = pytdml.io.read_from_json(r"C:\Users\corona\Desktop\tdmldataset-语义分割.json")  # read from TDML json file
+    print("Load training dataset: " + training_dataset.name)
+    print("Number of training samples: " + str(training_dataset.amount_of_training_data))
+    print("Number of classes: " + str(training_dataset.number_of_classes))
+
+
 if __name__ == "__main__":
-    datasetsForObjectTask()
+    datasetsForSceneTask()
 
 
 
