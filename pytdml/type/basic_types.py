@@ -31,7 +31,7 @@
 # ------------------------------------------------------------------------------
 
 from typing import List, Union, Optional, Dict, Literal
-from pydantic import BaseModel, Field, field_validator, root_validator
+from pydantic import BaseModel, Field, field_validator, root_validator,validator
 from datetime import datetime
 from pytdml.type._utils import _validate_date, to_camel,_valid_methods
 
@@ -44,7 +44,8 @@ class BaseCamelModel(BaseModel):
     """
     class Config:
         alias_generator = to_camel
-        allow_population_by_field_name = True
+        populate_by_name = True
+        arbitrary_types_allowed = True
 
     def json(self, **kwargs):
         return super().json(by_alias=True, **kwargs)
@@ -207,8 +208,9 @@ class LabelingProcedure(BaseCamelModel):
     tools: Optional[List[str]]
 
     @field_validator("methods")
-    def valid_methods(self, v):
+    def valid_methods(cls, v):
         return _valid_methods(v)
+
 
 class Labeling(BaseCamelModel):
     """
@@ -265,10 +267,10 @@ class TrainingData(BaseCamelModel):
     dataset_id: Optional[str]
     training_type: Optional[str]
     number_of_labels: Optional[int]
-    data_sources: Optional[Union[List[str], List[CICitation]]]
-    quality: Optional[DataQuality]
-    labeling: Optional[List[Labeling]]
-    quality: Optional[DataQuality]
+    data_sources: Optional[Union[List[str], List[CICitation]]]=None
+    quality: Optional[DataQuality]=None
+    labeling: Optional[List[Labeling]]=None
+    quality: Optional[DataQuality]=None
 
 
 class Changeset(BaseCamelModel):
@@ -339,26 +341,26 @@ class TrainingDataset(BaseCamelModel):
     tasks: List[Task]
     data: Union[List[TrainingData], str]  # That one should be uri-format
     type: Literal["AI_AbstractTrainingDataset"]
-    classes: [List[Union[KeyValuePair, str, Dict]]] = Field(min_items=1)
+    classes: List[Union[KeyValuePair, str, Dict]] = Field(min_items=1)
 
     amount_of_training_data: Optional[int]
     number_of_classes: Optional[int]
-    classification_schema: Optional[str]  # That one should be uri-format
-    created_time: Optional[str]
+    classification_schema: Optional[str] = "" # That one should be uri-format
+    created_time: Optional[str] = ""
     dataSources: Optional[
         Union[List[str], List[CICitation]]
-    ]  # That string one should be uri-format
-    doi: Optional[str]
+    ] = [] # That string one should be uri-format
+    doi: Optional[str]=""
     keywords: Optional[List[str]]
-    scope: Optional[MD_Scope]
+    scope: Optional[MD_Scope]=None
     version: Optional[str]
-    updated_time: Optional[str]
-    labeling: Optional[List[Labeling]]
-    metrics_in_LIT: Optional[List[MetricsInLiterature]]
-    quality: Optional[DataQuality]
-    providers: Optional[List[str]]
-    statistics_info: Optional[StatisticsInfo]
-    changesets: Optional[List[AI_TDChangeset]]
+    updated_time: Optional[str]=""
+    labeling: Optional[List[Labeling]]=[]
+    metrics_in_LIT: Optional[List[MetricsInLiterature]]=None
+    quality: Optional[DataQuality]=None
+    providers: Optional[List[str]]=[]
+    statistics_info: Optional[StatisticsInfo]=None
+    changesets: Optional[List[AI_TDChangeset]]=None
 
     @field_validator("created_time")
     def validate_created_time(cls, v):

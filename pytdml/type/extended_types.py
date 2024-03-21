@@ -48,7 +48,7 @@ class PixelLabel(Label):
     image_format: List[str] = Field(min_items=1)
 
     @field_validator("image_format")
-    def validate_image_format(self, v):
+    def validate_image_format(cls, v):
         return _validate_image_format(v)
 
 
@@ -62,9 +62,9 @@ class ObjectLabel(Label):
     date_time: Optional[str]
     bbox_type: Optional[str]
     
-    @field_validator("date_time")
-    def validate_date_time(cls, v):
-        return _validate_date(v)
+    # @field_validator("date_time")
+    # def validate_date_time(cls, v):
+    #     return _validate_date(v)
 
     
 class SceneLabel(Label):
@@ -90,10 +90,10 @@ class EOTrainingData(TrainingData):
     type: Literal["AI_EOTrainingData"]
     data_URL: List[str] = Field(min_items=1)
     extent: Optional[List[float]] = Field(min_items=4)
-    data_time: Optional[List[str]]
+    date_time: Optional[List[str]]
     labels: List[Union[PixelLabel, ObjectLabel, SceneLabel]]
     
-    @field_validator("data_time")
+    @field_validator("date_time")
     def validate_data_time(cls, v):
         validated_data = []
         for item in v:
@@ -107,9 +107,9 @@ class EOTrainingDataset(TrainingDataset):
     """
     type: Literal["AI_EOTrainingDataset"]
     # For Convinience, we allow the user to specify the bands by name
-    bands: Optional[List[Union[str, MD_Band]]]
+    bands: Optional[List[Union[str, MD_Band]]]=[]
     extent: Optional[List[float]] = Field(min_items=4)
-    imageSize: Optional[str]
+    imageSize: Optional[str]=""
     tasks: Optional[List[EOTask]]
     data: List[EOTrainingData]
     
