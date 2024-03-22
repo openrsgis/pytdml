@@ -1,8 +1,9 @@
 # ------------------------------------------------------------------------------
 #
 # Project: pytdml
-# Authors: Boyi Shangguan, Kaixuan Wang
+# Authors: Boyi Shangguan, Kaixuan Wang, Zhaoyan Wu
 # Created: 2022-05-04
+# Modified: 2023-10-27
 # Email: sgby@whu.edu.cn
 #
 # ------------------------------------------------------------------------------
