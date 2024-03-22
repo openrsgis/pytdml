@@ -1,0 +1,41 @@
+dataset_type: EOTrainingDataset
+id:
+name:
+description:
+version:
+created_time:
+updated_time:
+providers:
+  -
+keywords:
+  -
+data_sources:
+  - id:
+    data_type:
+    platform:
+    sensor:
+    resolution:
+    citation:
+    format:
+classes:
+  - Car # *Scene Classification, *Object Detection
+  - Car: RGB(0,0,255) # *Semantic Segmentation, *Change Detection
+bands:
+  - red
+  - green
+  - blue
+image_size: 1242x375
+tasks:
+  - description:
+    task_type:
+data:
+  task_type: #Identify the task type ["SceneClassification","ObjectDetection","SemanticSegmentation","ChangeDetection "]
+  label_type: #["SceneLabel", "PixelLabel" ,"ObjectLabel"]
+  data_time: # *Change Detection
+  data_path:
+    - type: #[image,image_before,image_after,label]
+      format:
+      separate: #Object Detection [\s \t ,]
+      column: #Object Detection
+      root_path:
+      sub_path:

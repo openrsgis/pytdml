@@ -1,0 +1,42 @@
+dataset_type: EOTrainingDataset
+id: gid_5c
+name: GID-Large-scale Classification
+description: The dataset...
+version: 1.0
+created_time: 2018
+updated_time: 2018
+providers:
+  - Wuhan University
+keywords:
+  - Semantic Segmentation
+data_sources:
+  - id: gf2
+    data_type: Optical Image
+    platform: GaoFen-2
+    resolution: 4m
+classes:
+  - built-up: RGC(255,0,0)
+  - farmland: RGC(0,255,0)
+  - forest: RGC(0,255,255)
+  - meadow: RGC(255,255,0)
+  - water: RGC(0,0,255)
+bands:
+  - red
+  - green
+  - blue
+image_size: 512x512
+tasks:
+  - description: Land-cover Classification
+    task_type: Land-cover Classification
+data:
+  task_type: SemanticSegmentation
+  label_type: PixelLabel
+  data_path:
+    - type: image
+      format: .tif
+      root_path: D:\TrainingDatasets\GID\Large-scale Classification_5classes\test_image
+      sub_path:
+    - type: label
+      format: .tif
+      root_path: D:\TrainingDatasets\GID\Large-scale Classification_5classes\test_label
+      sub_path:
