@@ -143,6 +143,7 @@ def datasetsForChangeTask():
 
 
 import pytdml
+from pytdml.convert_utils import convert_coco_to_tdml,convert_stac_to_tdml
 
 def format_test():
 
@@ -152,8 +153,11 @@ def format_test():
     print("Number of classes: " + str(training_dataset.number_of_classes))
 
 
+def convert_format_to_tdml():
+    convert_stac_to_tdml(r'D:\LiuSQi\Download\Chrome\Download\collection.json', "converted_dataset.json")
+
 if __name__ == "__main__":
-    datasetsForSceneTask()
+    convert_format_to_tdml()
 
 
 

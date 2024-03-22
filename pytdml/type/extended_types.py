@@ -31,6 +31,7 @@
 # ------------------------------------------------------------------------------
 
 import json
+
 from geojson import Feature
 from typing import List, Union, Optional, Literal
 from pydantic import Field, field_validator
@@ -49,7 +50,10 @@ class PixelLabel(Label):
 
     @field_validator("image_format")
     def validate_image_format(cls, v):
-        return _validate_image_format(v)
+        valid_format = []
+        for item in v:
+            valid_format.append(_validate_image_format(item))
+        return valid_format
 
 
 class ObjectLabel(Label):
@@ -90,7 +94,7 @@ class EOTrainingData(TrainingData):
     type: Literal["AI_EOTrainingData"]
     data_URL: List[str] = Field(min_items=1)
     extent: Optional[List[float]] = Field(min_items=4)
-    date_time: Optional[List[str]]
+    date_time: Optional[List[str]] = []
     labels: List[Union[PixelLabel, ObjectLabel, SceneLabel]]
     
     @field_validator("date_time")

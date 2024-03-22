@@ -360,6 +360,16 @@ for e in range(100):
                 # ...
 ```
 
+### Convert other EO dataset formats to TrainingDML-AI format
 
+- convert coco format to TrainingDMl-AI format:
 
+```python
+from pytdml.convert_utils import convert_coco_to_tdml,convert_stac_to_tdml
+
+coco_path = "/mnt/example/coco_file.json"
+output_path = "convert_result.json"
+
+convert_coco_to_tdml(coco_path, output_path)
+```
 

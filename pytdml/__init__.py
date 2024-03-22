@@ -32,4 +32,5 @@ import pytdml.type
 import pytdml.io
 
 name = 'pytdml'
-__version__ = '1.1.3'
+__version__ = '1.1.5'
+

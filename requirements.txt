@@ -8,7 +8,7 @@ PyYAML~=6.0
 numpy~=1.21.0
 pandas~=1.3.5
 opencv-python~=4.5.5.64
-tensorflow~=2.10.1
+tensorflow~=2.16.1
 tensorflow-io
 pytdml~=1.1.2
 torchvision~=0.14.1

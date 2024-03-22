@@ -184,7 +184,7 @@ class Task(BaseCamelModel):
     id: str
     type: Literal["AI_AbstractTask"]
     dataset_id: Optional[str]
-    description: Optional[str]
+    description: Optional[str]=""
 
 
 class Labeler(BaseCamelModel):
@@ -250,7 +250,7 @@ class Label(BaseCamelModel):
     Basic label type
     """
 
-    is_negative: Optional[bool]  # Optional without default value
+    is_negative: Optional[bool] = False  # Optional without default value
     confidence: Optional[float] = Field(
         ge=0.0, le=1.0
     )  # Optional without default value
@@ -267,10 +267,10 @@ class TrainingData(BaseCamelModel):
     dataset_id: Optional[str]
     training_type: Optional[str]
     number_of_labels: Optional[int]
-    data_sources: Optional[Union[List[str], List[CICitation]]]=None
-    quality: Optional[DataQuality]=None
-    labeling: Optional[List[Labeling]]=None
-    quality: Optional[DataQuality]=None
+    data_sources: Optional[Union[List[str], List[CICitation]]] = None
+    quality: Optional[DataQuality] = None
+    labeling: Optional[List[Labeling]] = None
+    quality: Optional[DataQuality] = None
 
 
 class Changeset(BaseCamelModel):
@@ -354,7 +354,7 @@ class TrainingDataset(BaseCamelModel):
     keywords: Optional[List[str]]
     scope: Optional[MD_Scope]=None
     version: Optional[str]
-    updated_time: Optional[str]=""
+    updated_time: Optional[str] = ""
     labeling: Optional[List[Labeling]]=[]
     metrics_in_LIT: Optional[List[MetricsInLiterature]]=None
     quality: Optional[DataQuality]=None
@@ -368,4 +368,7 @@ class TrainingDataset(BaseCamelModel):
 
     @field_validator("updated_time")
     def validate_updated_time(cls, v):
-        return _validate_date(v)
+        if v is not None:
+            return _validate_date(v)
+        else:
+            return v

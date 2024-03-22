@@ -168,10 +168,12 @@ def convert_stac_to_tdml(stac_dataset_path, output_json_path):
     license_str = stac_collection_dataset.get("license")
     extents = stac_collection_dataset.get("extent")
 
-    extent = extents.get("spatial").get("bbox")
+    extent = extents.get("spatial").get("bbox")[0]
+    print(extent, type(extent))
+
     providers = [item["name"] for item in stac_collection_dataset.get("providers")]
 
-    created_time = extents.get("temporal").get("interval")[0][0]
+    created_time = extents.get("temporal").get("interval")[0][0][:-1]
     updated_time = extents.get("temporal").get("interval")[0][1]
     datas = [item for item in stac_collection_dataset.get("links") if item["rel"] == "item"]
     amount_of_training_data = len(datas)
@@ -200,10 +202,11 @@ def convert_stac_to_tdml(stac_dataset_path, output_json_path):
             data_url.append(img_path)
             label_url = label_path
             image_type = label_type
-            labels = [PixelLabel(confidence=1.0,type="PixelLabel",image_url=label_url,image_format=image_type)]
+            labels = [PixelLabel(confidence=1.0,type="AI_PixelLabel",image_URL=[label_url],image_format=[image_type])]
             td_list.append(
-                EOTrainingData(id=item_id, dataset_id=dataset_id,number_of_labels=1,labels=labels,extent=item_extent,
-                               data_url=data_url))
+                EOTrainingData(id=item_id,type="AI_EOTrainingData",training_type="Train", dataset_id=dataset_id,number_of_labels=1,labels=labels,extent=item_extent,
+                               data_URL=data_url))
+
 
     for class_dict in label_classes:
         class_dict['value'] = class_dict.pop('classes')
@@ -218,12 +221,13 @@ def convert_stac_to_tdml(stac_dataset_path, output_json_path):
     # Calculation of total and average time
     total_time = end_time - start_time
     average_time = total_time / amount_of_training_data
-    print(f"Total time for {amount_of_training_data} training isntances: {total_time:.5f} seconds")
+    print(f"Total time for {amount_of_training_data} training instances: {total_time:.5f} seconds")
     print(f"Average time per training instance: {average_time * 60:.5f} ms")
 
     dataset = EOTrainingDataset(
         id=str(dataset_id),
         name=dataset_name,
+        type="AI_EOTrainingDataset",
         description=dataset_description,
         tasks=tasks,
         version=dataset_version,
@@ -235,7 +239,8 @@ def convert_stac_to_tdml(stac_dataset_path, output_json_path):
         classes=label_classes,
         number_of_classes=len(label_classes),
         license=license_str,
-        data=td_list
+        data=td_list,
+        extent=extent
     )
     # write to json
     write_to_json(dataset, output_json_path)
