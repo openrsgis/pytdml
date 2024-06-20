@@ -39,6 +39,8 @@ import pytdml.utils as utils
 from torch.utils.data import Dataset
 from torchvision.datasets.vision import VisionDataset
 
+from pytdml.config import BUCKET
+
 
 class TorchEOImageSceneTD(Dataset):
     """
@@ -159,6 +161,8 @@ class TorchSceneClassificationTD(VisionDataset):
     def __getitem__(self, item):
 
         img_path = self.imgs[item]
+        if img_path.startswith(BUCKET.SC):
+            img_path = utils.generate_local_file_path(self.root, img_path)
         img = utils.image_open(img_path)
         # single band check
         img = utils.channel_processing(img)
@@ -251,6 +255,8 @@ class TorchSemanticSegmentationTD(VisionDataset):
         return img_paths, label_paths
 
     def __getitem__(self, item):
+        if self._imgs[item].startswith(BUCKET.LC):
+            self._imgs[item] = utils.generate_local_file_path(self.root, self._imgs[item])
         image = utils.image_open(self._imgs[item])
 
         # image = torch.from_numpy(image).float().contiguous()

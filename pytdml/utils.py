@@ -42,6 +42,8 @@ import numpy as np
 from io import BytesIO
 import re
 import torch
+from minio import S3Error
+from threading import Lock
 
 from datalibrary.s3Client import minio_client as client
 
@@ -160,14 +162,42 @@ def get_label_pixel_list_(label_path):
         return pixel_list
 
 
+# def get_mapping_(file):
+#     mapping_data = client.get_object("pytdml", "mapping/" + file + "_mapping.json")
+#     mapping = json.load(BytesIO(mapping_data.read()))
+#     return mapping
+lock = Lock()
+
+
 def get_mapping_(file):
-    mapping_data = client.get_object("pytdml", "mapping/" + file + "_mapping.json")
-    map = json.load(BytesIO(mapping_data.read()))
-    return map
+    # 在读取文件前获取锁
+    lock.acquire()
+    try:
+        # 检查对象是否存在
+        stat = client.stat_object("pytdml", f"mapping/{file}_mapping.json")
+        # 如果存在则继续
+        if stat:
+            response = client.get_object("pytdml", f"mapping/{file}_mapping.json")
+            mapping_data = response.read()
+            if mapping_data:
+                return json.load(BytesIO(mapping_data))
+
+    except json.JSONDecodeError as e:
+        print(f"JSON解析错误: {e}")
+    except S3Error as e:
+        print(f"MinIO S3错误: {e}")
+    except Exception as e:
+        print(f"发生其他错误: {e}")
+    finally:
+        lock.release()
+    return None
 
 
-pixel_map = get_mapping_("pixel")
-name_map = get_mapping_("name")
+try:
+    pixel_map = get_mapping_("pixel")
+    name_map = get_mapping_("name")
+except e:
+    print("S3 server running wrong...")
 
 
 def label_class_list_(pixel_list):
@@ -229,7 +259,7 @@ def regenerate_png_label_(label_array: Image, cls_list):
     """
     Zero the pixels in the png label that are not in the category offered by the user
     """
-    pixel_map = get_mapping_("pixel")
+    # pixel_map = get_mapping_("pixel")
 
     pixel_list = [int(item["pngValue"]) for item in pixel_map if item["type"] in cls_list]
 
@@ -254,6 +284,8 @@ def dataset_name_map_(obs_name):
     """
     convert obs path name to dataset name
     """
+    # name_map = get_mapping_("name")
+    # print(type(name_map))
     return [d for d in name_map if d["obs_path"] == obs_name][0]["name"]
 
 
@@ -467,6 +499,7 @@ def s3_path_to_data(user_client, data_url):
 
 
 import random
+import copy
 
 
 def split_data(dataset, split_type=None, split_ratio=None):
@@ -494,9 +527,12 @@ def split_data(dataset, split_type=None, split_ratio=None):
         return dataset
 
     if split_ratio:
-        assert split_ratio[0] + split_ratio[1] + split_ratio[2] == 1.0
+        # assert split_ratio[0] + split_ratio[1] + split_ratio[2] == 1.0
+        tolerance = 1e-6  # 例如，可以使用 0.000001 作为容差值
+        assert abs(sum(split_ratio) - 1.0) <= tolerance, "The sum of the split ratios must equal 1.0"
         total_count = len(td_data)
         train_count = int(split_ratio[0] * total_count)
+
         validation_count = int(split_ratio[1] * total_count)
         test_count = total_count - train_count - validation_count
 
@@ -510,14 +546,14 @@ def split_data(dataset, split_type=None, split_ratio=None):
         test_set = shuffled_data[train_count + validation_count:]
 
         # 返回划分后的三个数据集
-        dataset.data = train_set
-        data1 = dataset
-        dataset.data = valid_set
-        data2 = dataset
-        dataset.data = test_set
-        data3 = dataset
+        # 创建dataset对象的深拷贝并分配数据
+        train_dataset = copy.deepcopy(dataset)
+        train_dataset.data = train_set
+        valid_dataset = copy.deepcopy(dataset)
+        valid_dataset.data = valid_set
+        test_dataset = copy.deepcopy(dataset)
+        test_dataset.data = test_set
 
-        return data1, data2, data3
-
+        return train_dataset, valid_dataset, test_dataset
 
     return td_data  # Return original data if no split type or ratio is provided

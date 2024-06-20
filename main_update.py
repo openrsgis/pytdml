@@ -92,12 +92,34 @@ def datasetsForObjectTask():
     # my_dataset_TD = ds_lib.training_data_collection(Task.object_detection, [dota_ml, rsod_ml], ["Plane"])
     # print(len(my_dataset_TD.data))
     my_pipeline = PipeLine(dota_ml, path, crop=(500,0,0))
-    NWPU_VHR10_torchPipe = my_pipeline.torch_dataset(download=True, transform=target_transform)
-    # my_torchPipe = my_pipeline.torch_data_pipe(transform=target_transform)
-    dataloader = DataLoader2(NWPU_VHR10_torchPipe, batch_size=4, num_workers=4, collate_fn=collate_fn)
+    # NWPU_VHR10_torchPipe = my_pipeline.torch_dataset(download=True, transform=target_transform)
+    my_torchPipe = my_pipeline.torch_data_pipe(transform=target_transform)
+    dataloader = DataLoader2(my_torchPipe, batch_size=4, num_workers=4, collate_fn=collate_fn)
 
     for batch in dataloader:
         print(batch)
+    # print("start..")
+    # ds_lib = EOTrainingDatasetCollection()
+    # ds_lib.dataset_list(Task.object_detection)
+    # dota_ml = ds_lib["DOTA-v2.0"]
+    # # 获取 DOTA-v2.0 数据集的元数据信息
+    # print("Load training dataset: " + str(dota_ml.tasks))
+    # print("Number of training samples: " + str(dota_ml.amount_of_training_data))
+    # print("Number of classes: " + str(dota_ml.number_of_classes))
+    #
+    # # across dataset
+    # dior_ml  =ds_lib["DIOR"]
+    #
+    # rsod_ml = ds_lib["RSOD"]
+    # my_dataset_TD = ds_lib.training_data_collection(Task.object_detection, [dota_ml, rsod_ml, dior_ml], ["Plane"])
+    # print(len(my_dataset_TD.data))
+    # my_pipeline = PipeLine(my_dataset_TD, path, (512, 0.25, 0.25))
+    # NWPU_VHR10_torchPipe = my_pipeline.torch_dataset(download=True, transform=target_transform)
+    # # my_torchPipe = my_pipeline.torch_data_pipe(transform=target_transform)
+    # # dataloader = DataLoader2(NWPU_VHR10_torchPipe, batch_size=4, num_workers=4, collate_fn=collate_fn)
+    #
+    # # for batch in dataloader:
+    #  #   print(batch)
 
 
 def datasetsForSegmentationTask():
@@ -154,7 +176,7 @@ def format_test():
 
 
 if __name__ == "__main__":
-    format_test()
+    datasetsForChangeTask()
 
 
 

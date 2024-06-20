@@ -9,9 +9,20 @@ _SECRET_KEY = 'HTJIEGCLPKUZBQYAVWMFXNRDOVS'
 
 
 class MinioClient:
-    def __init__(self, server, access_key, secret_key):
+    _instance = None
+
+    def __new__(cls, server, access_key, secret_key):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.server = server
+            cls._instance.access_key = access_key
+            cls._instance.secret_key = secret_key
+            cls._instance._create_client()
+        return cls._instance
+
+    def _create_client(self):
         try:
-            self.client = Minio(server, access_key=access_key, secret_key=secret_key, secure=False)
+            self.client = Minio(self.server, access_key=self.access_key, secret_key=self.secret_key, secure=False)
         except S3Error as e:
             print("error:", e)
 

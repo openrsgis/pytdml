@@ -10,7 +10,7 @@
 # from pytdml.type import EOTrainingDataset, EOTask
 # import pytdml.ml.object_transforms as transform_target
 # from pytdml.ml.ml_operators import collate_fn
-from datalibrary.s3Client import minio_client
+# from datalibrary.s3Client import minio_client
 
 # transform = transforms.Compose(  # transform for the dataset
 #     [
@@ -270,11 +270,11 @@ from datalibrary.s3Client import minio_client
 #     print("Number of classes: " + str(tdml_encoding.number_of_classes))
 #
 
-def s3test():
-    minio_client.fget_object("scene-classification", "//AID/Airport/Airport_version1_1.jpg", "./Airport_version1_9.jpg")
+# def s3test():
+    # minio_client.fget_object("scene-classification", "//AID/Airport/Airport_version1_1.jpg", "./Airport_version1_9.jpg")
     # minio_client.fput_objct("scene-classification", "test.txt", "./Airport_version1_9.jpg",)
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # 下载数据和加载数据分离
     # datasetsForSceneTask()
     # 数据管道加载
@@ -284,6 +284,6 @@ if __name__ == "__main__":
     # 测试二
     # datasetsForSegmentationTask()
     # tdml_test()
-    s3test()
+    # s3test()
 
 

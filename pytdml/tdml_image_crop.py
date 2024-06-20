@@ -129,6 +129,7 @@ class CropWithImage:
 
                 if not os.path.exists(crop_image_path):
                     crop = img_pad[y1:y2, x1:x2, :]
+                    crop = crop.astype(np.uint8)
                     cv2.imwrite(crop_image_path, crop)
 
                 crop_coords_paths.append(crop_image_path)
@@ -171,6 +172,8 @@ class CropWithTargetImage(object):
                 file_name_crop = file_name[:dot_index] + "_cropped_by_" + str(self.crop_size) + "_" + str(int(y / stride)) + "_" + str(int(x / stride)) \
                                  + file_name[dot_index:]
                 crop_image_path = os.path.join(dir, file_name_crop)
+                if not os.path.isdir(dir):
+                    os.makedirs(dir)
                 if not os.path.exists(crop_image_path):
                     crop = img_pad[y1:y2, x1:x2, :]
                     cv2.imwrite(crop_image_path, crop)

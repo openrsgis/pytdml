@@ -32,11 +32,12 @@ import geojson
 from tqdm import tqdm
 import multiprocessing
 from minio.error import MinioException
-
+from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datalibrary.datasetcollection import Task
 from pytdml.utils import *
 from pytdml.tdml_image_crop import CropWithImage, CropWithTargetImage
-from pytdml.type import EOTrainingData, SceneLabel, ObjectLabel, PixelLabel
+from pytdml.type.extended_types_old import EOTrainingData, SceneLabel, ObjectLabel, PixelLabel
 
 # Creating a Mutual Exclusion Lock
 lock = multiprocessing.Lock()
@@ -75,7 +76,7 @@ def download_scene_data(args):
             A data item object with the updated data_url field.
     """
 
-    data_item, download_dir = args
+    data_item, download_dir, _ = args
     assert data_item.data_url is not None, "data_url cannot be None"
     sample_url = data_item.data_url[0]
 
@@ -98,27 +99,59 @@ def download_scene_data(args):
         return data_item
 
 
+# def download_object_data(args):
+#
+#     dataset_name, data_item, download_dir, lock, crop = args
+#     sample_url = data_item.data_url[0]
+#     labels = data_item.labels
+#
+#     bucket_name, image_object_name = split_data_url(sample_url)
+#     file_path = generate_local_file_path(download_dir, sample_url)
+#
+#     with lock:
+#         try:
+#             if not os.path.exists(os.path.dirname(file_path)):
+#                 os.makedirs(os.path.dirname(file_path))
+#
+#         except OSError as error:
+#             print(error)
+#
+#     if crop is None:
+#         # download training data
+#         download_file(bucket_name, image_object_name, file_path)
+#         data_item.data_url = [file_path]
+#         return [data_item]
 def download_object_data(args):
-
-    dataset_name, data_item, download_dir, lock, crop = args
+    dataset_name, data_item, download_dir, crop = args
     sample_url = data_item.data_url[0]
     labels = data_item.labels
 
     bucket_name, image_object_name = split_data_url(sample_url)
     file_path = generate_local_file_path(download_dir, sample_url)
 
-    with lock:
-        try:
-            if not os.path.exists(os.path.dirname(file_path)):
-                os.makedirs(os.path.dirname(file_path))
+    # 检查并创建目录
+    if not os.path.exists(os.path.dirname(file_path)):
 
+        try:
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
         except OSError as error:
             print(error)
-
+            return []  # 如果目录创建失败，则跳过当前项
     if crop is None:
-        # download training data
-        download_file(bucket_name, image_object_name, file_path)
-        data_item.data_url = [file_path]
+        # 检查文件是否已经存在，避免重复下载
+        if not os.path.exists(file_path):
+            # 函数中应捕获可能的异常，防止进程崩溃
+            try:
+                download_file(bucket_name, image_object_name, file_path)
+                data_item.data_url = [file_path]
+            except Exception as error:
+                print(f"Failed to download {image_object_name}: {error}")
+                return []  # 下载失败，返回空列表
+        else:
+            print(f"File already exists: {file_path}")
+            # 即使是已经下载的文件，也应该更新data_item的URL
+            data_item.data_url = [file_path]
+
         return [data_item]
     else:
         new_td_list = []
@@ -155,7 +188,7 @@ def download_object_data(args):
 
 
 def download_segmentation_data(args):
-    dataset_name, data_item, download_dir, lock, crop = args
+    dataset_name, data_item, download_dir, crop = args
     sample_url = data_item.data_url[0]
     label_url = data_item.labels[0].image_url
 
@@ -340,22 +373,53 @@ def DatasetDownload(taskType, data_list, download_dir, num_processes=8):
         return list(result_list)
 
 
-def DatasetDownload2(task_type, dataset, download_dir, crop, num_processes=8):
+# def DatasetDownload2(task_type, dataset, download_dir, crop, num_processes=8):
+#
+#     with multiprocessing.Manager() as manager:
+#         result_list = manager.list()
+#         lock = manager.Lock()
+#         with multiprocessing.Pool(processes=num_processes) as pool:
+#
+#             args = [(dataset.name, data_item, download_dir, lock, crop) for data_item in dataset.data]
+#             if task_type == Task.object_detection:
+#                 for result in tqdm(pool.imap_unordered(download_object_data, args), total=len(args)):
+#                     result_list.extend(result)
+#             if task_type == Task.semantic_segmentation:
+#                 for result in tqdm(pool.imap_unordered(download_segmentation_data, args), total=len(args)):
+#                     result_list.extend(result)
+#             if task_type == Task.change_detection:
+#                 for result in tqdm(pool.imap_unordered(download_changeDetection_data, args), total=len(args)):
+#                     result_list.extend(result)
+#
+#         return list(result_list)
 
-    with multiprocessing.Manager() as manager:
-        result_list = manager.list()
-        lock = manager.Lock()
-        with multiprocessing.Pool(processes=num_processes) as pool:
+def DatasetDownload2(task_type, dataset, download_dir, crop, num_threads=8):
+    result_list = []
 
-            args = [(dataset.name, data_item, download_dir, lock, crop) for data_item in dataset.data]
-            if task_type == Task.object_detection:
-                for result in tqdm(pool.imap_unordered(download_object_data, args), total=len(args)):
-                    result_list.extend(result)
-            if task_type == Task.semantic_segmentation:
-                for result in tqdm(pool.imap_unordered(download_segmentation_data, args), total=len(args)):
-                    result_list.extend(result)
-            if task_type == Task.change_detection:
-                for result in tqdm(pool.imap_unordered(download_changeDetection_data, args), total=len(args)):
-                    result_list.extend(result)
+    # 准备args参数
+    args = [(dataset.name, data_item, download_dir, crop) for data_item in dataset.data]
 
-        return list(result_list)
+    # 使用ThreadPoolExecutor进行线程池管理
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        # 根据任务类型分配下载函数
+        if task_type == Task.object_detection:
+            download_function = download_object_data
+        elif task_type == Task.semantic_segmentation:
+            download_function = download_segmentation_data
+        elif task_type == Task.change_detection:
+            download_function = download_changeDetection_data
+        else:
+            raise ValueError(f"Unsupported task type: {task_type}")
+
+        # 将任务提交到线程池
+        futures = {executor.submit(download_function, arg): arg for arg in args}
+
+        # 使用 tqdm 显示进度条
+        for future in tqdm(as_completed(futures), total=len(futures)):
+            try:
+                result = future.result()
+                result_list.extend(result)
+            except Exception as exc:
+                print(f"Generated an exception: {exc}")
+
+    return result_list

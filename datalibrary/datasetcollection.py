@@ -34,7 +34,7 @@ from typing import List
 from urllib.parse import urlparse
 from datalibrary.downloader import *
 from pytdml.io import internal, read_from_json, parse_json
-from pytdml.type import EOTrainingDataset, EOTask
+from pytdml.type.extended_types_old import EOTrainingDataset, EOTask
 
 
 @dataclass
@@ -108,7 +108,7 @@ class EOTrainingDatasetCollection:
             # return dataset_td_encode
             # except jsonschema.exceptions.ValidationError as error:
             #     print("Json 不符合json schema: ", error)
-            #     return
+            #     returnmob
 
             # If the URL points to a local file, read the JSON content from the file
             return dataset_td_encode

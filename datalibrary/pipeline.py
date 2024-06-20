@@ -28,6 +28,8 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
+import time
+
 from datalibrary.downloader import DatasetDownload, DatasetDownload2
 from datalibrary.datasetcollection import Task
 from pytdml import utils
@@ -97,7 +99,16 @@ class SceneClassificationTDPipeline:
             td_list = self.dataset.data
 
         if download:
+            import time
+
+            # 记录开始时间
+            # start_time = time.time()
             td_list = DatasetDownload(Task.scene_classification, self.dataset, self.root)
+            # 记录结束时间
+            # end_time = time.time()
+
+            # 计算并打印执行时间
+            # print(f"Code block execution time: {end_time - start_time} seconds")
             utils.cache_dump(cache_file_path, self.root, td_list)
 
         if len(td_list) == 0:
@@ -115,10 +126,10 @@ class SceneClassificationTDPipeline:
             Returns:
                 TorchDPEOImageSceneTD: A data pipe object that can be used for training or inference on a scene dataset.
                 """
-        if isinstance(self.dataset, EOTrainingDataset):
-            class_map = create_classes_map_(self.dataset.classes)
-            cache_path = utils.generate_cache_file_path(self.root, self.dataset.name)
-            return tdml_torch_data_pipe.TorchSceneClassificationDataPipe(self.dataset.data, self.root, cache_path, class_map, transform)
+        # if isinstance(self.dataset, EOTrainingDataset):
+        class_map = create_classes_map_(self.dataset.classes)
+        cache_path = utils.generate_cache_file_path(self.root, self.dataset.name)
+        return tdml_torch_data_pipe.TorchSceneClassificationDataPipe(self.dataset.data, self.root, cache_path, class_map, transform)
 
     def tensorflow_data_pipe(self):
 
@@ -160,7 +171,10 @@ class ObjectDetectionTDPipeline:
         if len(td_list) == 0:
             td_list = self.dataset.data
         if download:
+            start = time.time()
             td_list = DatasetDownload2(Task.object_detection, self.dataset, self.root, self.crop)
+            end = time.time()
+            print("total download time: " + str(end-start))
             utils.cache_dump(cache_file_path, self.root, td_list)
         if len(td_list) == 0:
             raise ValueError("No dataset found in the directory {}, "
@@ -233,19 +247,19 @@ class SemanticSegmentationTDPipeline:
             Returns:
                 Torch Dataset for EO image object detection training dataset.
         """
-        if isinstance(self.dataset, EOTrainingDataset):
+        # if isinstance(self.dataset, EOTrainingDataset):
 
-            cache_file_path = utils.generate_cache_file_path(self.root, self.dataset.name, self.crop)
-            td_list = utils.load_cached_training_data(cache_file_path)
-            # if the dataset is initially local
-            if len(td_list) == 0:
-                td_list = self.dataset.data
-            if download:
-                td_list = DatasetDownload2(Task.semantic_segmentation, self.dataset, self.root, self.crop)
+        cache_file_path = utils.generate_cache_file_path(self.root, self.dataset.name, self.crop)
+        td_list = utils.load_cached_training_data(cache_file_path)
+        # if the dataset is initially local
+        if len(td_list) == 0:
+            td_list = self.dataset.data
+        if download:
 
-                utils.cache_dump(cache_file_path, self.root, td_list)
-            print(td_list)
-            return tdml_torch.TorchSemanticSegmentationTD(td_list, self.root, self.dataset.classes, transform)
+            td_list = DatasetDownload2(Task.semantic_segmentation, self.dataset, self.root, self.crop)
+
+            utils.cache_dump(cache_file_path, self.root, td_list)
+        return tdml_torch.TorchSemanticSegmentationTD(td_list, self.root, self.dataset.classes, transform)
 
 
 class ChangeDetectionTDPipeline:

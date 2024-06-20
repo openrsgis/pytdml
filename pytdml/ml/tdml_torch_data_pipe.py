@@ -198,7 +198,7 @@ class TorchSemanticSegmentationDataPipe(IterDataPipe, ABC):
                 if self.transform is not None:
                     img = self.transform(img)
                     label = self.transform(label)
-                yield img, label
+                yield img, label.squeeze(1)
         else:
             iterator = worker_load_process(self.td_list)
 
@@ -219,7 +219,7 @@ class TorchSemanticSegmentationDataPipe(IterDataPipe, ABC):
                     item.data_url = [image_path]
                     item.labels[0].image_url = label_path
                     self._cache_file_list.append(item)
-                    yield img, label
+                    yield img, label.squeeze(1)
                 else:
 
                     crop_object = CropWithImage(*self.crop)  # 补充参数
@@ -236,7 +236,7 @@ class TorchSemanticSegmentationDataPipe(IterDataPipe, ABC):
                         item.data_url = [image_path]
                         item.labels[0].image_url = label_path
                         self._cache_file_list.append(item)
-                        yield img, label
+                        yield img, label.squeeze(1)
             save_cache(self.cache_path, self._cache_file_list)
 
 
