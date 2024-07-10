@@ -36,8 +36,8 @@ from geojson import Feature
 from typing import List, Union, Optional, Literal
 from pydantic import Field, field_validator
 
-from pytdml.type._utils import _validate_image_format
-from pytdml.type.basic_types import Label, TrainingDataset, TrainingData, _validate_date, Task, MD_Band
+from pytdml.type._utils import _validate_image_format, _validate_date
+from pytdml.type.basic_types import Label, TrainingDataset, TrainingData, Task, MD_Band, Extent, BoundingBox
 
 
 class PixelLabel(Label):
@@ -63,14 +63,15 @@ class ObjectLabel(Label):
     type: Literal["AI_ObjectLabel"]
     object: Feature
     label_class: str = Field(alias="class")
+
     date_time: Optional[str]
     bbox_type: Optional[str]
-    
-    # @field_validator("date_time")
-    # def validate_date_time(cls, v):
-    #     return _validate_date(v)
 
-    
+    @field_validator("date_time")
+    def validate_date_time(cls, v):
+        return _validate_date(v)
+
+
 class SceneLabel(Label):
     """
     Extended label type for scene level training data
@@ -84,7 +85,7 @@ class EOTask(Task):
     Extended task type for EO training data
     """
     type: Literal["AI_EOTask"]
-    task_type: str
+    taskType: str
 
 
 class EOTrainingData(TrainingData):
@@ -92,11 +93,11 @@ class EOTrainingData(TrainingData):
     Extended training data type for EO training data
     """
     type: Literal["AI_EOTrainingData"]
-    data_URL: List[str] = Field(min_items=1)
-    extent: Optional[List[float]] = Field(min_items=4)
+    dataURL: List[str] = Field(min_items=1)  # That one should be uri-format
+
+    extent: Optional[Union[Extent, BoundingBox]]
     date_time: Optional[List[str]] = []
-    labels: List[Union[PixelLabel, ObjectLabel, SceneLabel]]
-    
+
     @field_validator("date_time")
     def validate_data_time(cls, v):
         validated_data = []
@@ -111,18 +112,19 @@ class EOTrainingDataset(TrainingDataset):
     """
     type: Literal["AI_EOTrainingDataset"]
     # For Convinience, we allow the user to specify the bands by name
-    bands: Optional[List[Union[str, MD_Band]]]=[]
-    extent: Optional[List[float]] = Field(min_items=4)
-    imageSize: Optional[str]=""
-    tasks: Optional[List[EOTask]]
-    data: List[EOTrainingData]
-    
+
+    bands: Optional[List[MD_Band]] = []
+    extent: Optional[Extent]
+    imageSize: Optional[str] = ""
+    tasks: List[EOTask] = Field(min_items=1)
+    data: List[EOTrainingData] = Field(min_items=1)
+
 
 if __name__ == "__main__":
     tdml_path = r"C:\Users\zhaoyan\Desktop\TrainingDML-AI-master-use-cases-examples\use-cases\examples\1.0\WHU-building.json"
     with open(tdml_path, 'r') as f:
         data = json.load(f)
-    
+
     td = EOTrainingDataset(**data).dict(by_alias=True,exclude_none=True)
     print(td['data'])
-    # Union[str, MD_Band]
+    Union[str, MD_Band]
