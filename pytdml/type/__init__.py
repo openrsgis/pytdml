@@ -34,9 +34,9 @@ from .basic_types import KeyValuePair
 from .basic_types import MD_ScopeDescription
 from .basic_types import MD_Band
 from .basic_types import MD_Scope
-from .basic_types import CIDate
+from .basic_types import CI_Date
 from .basic_types import MD_BrowseGraphic
-from .basic_types import CICitation
+from .basic_types import CI_Citation
 from .basic_types import MD_Identifier
 from .basic_types import MetricsPair
 from .basic_types import MetricsInLiterature

@@ -31,9 +31,9 @@
 # ------------------------------------------------------------------------------
 
 from typing import List, Union, Optional, Dict, Literal
-from pydantic import BaseModel, Field, field_validator, root_validator,validator
-from datetime import datetime
-from pytdml.type._utils import _validate_date, to_camel,_valid_methods
+from pydantic import BaseModel, Field, field_validator, root_validator, validator
+from pytdml.type._utils import _validate_date, to_camel, _valid_methods, _validate_training_type
+from pytdml.type.extended_types import EOTask, EOTrainingData, PixelLabel, ObjectLabel, SceneLabel
 
 
 class BaseCamelModel(BaseModel):
@@ -42,6 +42,7 @@ class BaseCamelModel(BaseModel):
     Since python use snake case as default
     We need to convert it to camel case for JSON
     """
+
     class Config:
         alias_generator = to_camel
         populate_by_name = True
@@ -60,6 +61,15 @@ class KeyValuePair(BaseCamelModel):
     value: Union[str, int, float, bool, None]
 
 
+class NamedValue(BaseCamelModel):
+    """
+    From ISO 19156: 2023(E) NamedValue
+    """
+
+    key: str
+    value: Union[str, object, int, list, bool, None]
+
+
 class MD_ScopeDescription(BaseCamelModel):
     """
     From ISO 19115-1 MD_ScopeDescription
@@ -73,6 +83,7 @@ class MD_Band(BaseCamelModel):
     """
     From ISO 19115-1 MD_Band
     """
+
     bound_max: Optional[float]
     bound_min: Optional[float]
     bound_units: Optional[Literal["nm", "um", "cm", "dm", "m", "km"]]
@@ -104,7 +115,7 @@ class MD_Scope(BaseCamelModel):
     level_description: Optional[MD_ScopeDescription]
 
 
-class CIDate(BaseCamelModel):
+class CI_Date(BaseCamelModel):
     """
     From ISO 19115-1 CI_Date
     """
@@ -118,21 +129,23 @@ class CIDate(BaseCamelModel):
 
 
 class MD_BrowseGraphic(BaseCamelModel):
-    """From ISO 19115-1 MD_BrowseGraphic"""
+    """
+    From ISO 19115-1 MD_BrowseGraphic
+    """
 
     file_name: str
     file_description: Optional[str]
     file_type: Optional[str]
 
 
-class CICitation(BaseCamelModel):
+class CI_Citation(BaseCamelModel):
     """
     From ISO 19115-1 CI_Citation
     """
 
     title: str
     alternateTitle: Optional[List[str]]
-    date: Optional[CIDate]
+    date: Optional[CI_Date]
     edition: Optional[str]
     edition_date: Optional[str]
     graphic: Optional[List[MD_BrowseGraphic]]
@@ -145,16 +158,191 @@ class CICitation(BaseCamelModel):
         return _validate_date(v)
 
 
+class LinearRing(BaseCamelModel):
+    """
+    gml: LinearRing - NIEM 2.1
+    """
+
+    posList: List[int] = Field(min_items=4)
+
+
+class LinearRing_Object(BaseCamelModel):
+    """
+    LinearRing Object Type
+    """
+
+    linearRing: LinearRing = Field(alias="LinearRing")
+
+
+class Polygon(BaseCamelModel):
+    """
+    gml: Polygon - NIEM 2.1
+    """
+
+    description: Optional[str]
+    description_Reference: Optional[str]
+    identifier: Optional[str]
+    name: Optional[List[str]]
+    exterior: Optional[LinearRing_Object]
+    interior: Optional[List[LinearRing_Object]]
+
+
 class MD_Identifier(BaseCamelModel):
     """
     From ISO 19115-1 MD_Identifier
     """
 
     code: str
-    authority: Optional[CICitation]
+    authority: Optional[CI_Citation]
     code_space: Optional[str]
     version: Optional[str]
     description: Optional[str]
+
+
+class BoundingPolygon(BaseCamelModel):
+    """
+    From ISO 19115:2003
+    """
+
+    polygon: List[Polygon] = Field(min_items=1)
+    extentTypeCode: Optional[bool]
+
+
+class GeographicBoundingBox(BaseCamelModel):
+    """
+    From ISO 19168-2:2022
+    """
+
+    westBoundLongitude: int
+    eastBoundLongitude: int
+    southBoundLatitude: int
+    northBoundLatitude: int
+
+    extentTypeCode: Optional[bool]
+
+
+class GeographicDescription(BaseCamelModel):
+    """
+    From ISO 19115: 2003 Metadata
+    """
+    geographicIdentifier: MD_Identifier
+
+    extentTypeCode: Optional[bool]
+
+
+class TimeInstant(BaseCamelModel):
+    """
+    Time Instant Type
+    """
+
+    timePosition: str
+
+    description: Optional[str]
+    descriptionReference: Optional[str]
+    identifier: Optional[str]
+    name: Optional[List[str]]
+    relatedTime: Optional[List[KeyValuePair]]
+
+
+class TimePeriod(BaseCamelModel):
+    """
+    Time Period Type
+    """
+
+    beginPosition: str
+    endPosition: str
+
+    description: Optional[str]
+    descriptionReference: Optional[str]
+    identifier: Optional[str]
+    name: Optional[List[str]]
+    duration: Optional[str]
+    timeInterval: Optional[int]
+    relatedTime: Optional[List[KeyValuePair]]
+
+    @field_validator("beginPosition")
+    def validate_date_time(cls, v):
+        return _validate_date(v)
+
+    @field_validator("endPosition")
+    def validate_date_time(cls, v):
+        return _validate_date(v)
+
+
+class TemporalExtent(BaseCamelModel):
+    """
+    From ISO 19108:2002
+    """
+
+    extent: Union[TimeInstant, TimePeriod]
+
+
+class ReferenceSystem(BaseCamelModel):
+    """
+    From ISO 19111: 2019
+    """
+
+    referenceSystemIdentifier: Optional[MD_Identifier]
+    referenceSystemType: Optional[str]
+
+
+class VerticalCRS(BaseCamelModel):
+    """
+    From ISO 19111 edition 2
+    """
+
+    identifier: str
+    scope: List[str] = Field(min_items=1)
+    verticalCS: List[str] = Field(min_items=1)
+    verticalDatum: List[str] = Field(min_items=1)
+
+    description: Optional[str]
+    description_Reference: Optional[str]
+    name: Optional[List[str]]
+    remarks: Optional[List[str]]
+    domain_Of_Validity: Optional[List[str]]
+
+
+class VerticalExtent(BaseCamelModel):
+    """
+    From ISO 19115 SpiralTracker Report
+    """
+
+    minimumValue: int
+    maximumValue: int
+
+    verticalCRSId: Optional[ReferenceSystem]
+    verticalCRS: Optional[VerticalCRS]
+
+
+class SpatialTemporalExtent(BaseCamelModel):
+    """
+    From ISO 19115: 2003 Metadata
+    """
+
+    extent: Union[TimeInstant, TimePeriod]
+    spatialExtent: Union[BoundingPolygon, GeographicBoundingBox, GeographicDescription]
+
+    verticalExtent: Optional[VerticalExtent]
+
+
+class Extent(BaseCamelModel):
+    """
+    From ISO 19115: 2003 Metadata
+    """
+
+    description: str
+    geographicElement: List[Union[BoundingPolygon, GeographicBoundingBox, GeographicDescription]]
+    temporalElement: List[Union[TemporalExtent, SpatialTemporalExtent]]
+    verticalElement: List[VerticalExtent]
+
+
+class BoundingBox(BaseCamelModel):
+    """
+    From GeoJSON bounding box
+    """
+
+    extent: List[int] = Field(min_items=4)
 
 
 class MetricsPair(BaseCamelModel):
@@ -183,8 +371,9 @@ class Task(BaseCamelModel):
 
     id: str
     type: Literal["AI_AbstractTask"]
+
     dataset_id: Optional[str]
-    description: Optional[str]=""
+    description: Optional[str] = ""
 
 
 class Labeler(BaseCamelModel):
@@ -204,7 +393,8 @@ class LabelingProcedure(BaseCamelModel):
 
     type: Literal["AI_LabelingProcedure"]
     id: str
-    methods: List[str] = []
+    methods: List[str] = Field(min_items=1)
+
     tools: Optional[List[str]]
 
     @field_validator("methods")
@@ -250,10 +440,10 @@ class Label(BaseCamelModel):
     Basic label type
     """
 
+    type: Literal["AI_AbstractLabel"]
+
     is_negative: Optional[bool] = False  # Optional without default value
-    confidence: Optional[float] = Field(
-        ge=0.0, le=1.0
-    )  # Optional without default value
+    confidence: Optional[float] = Field(ge=0.0, le=1.0)  # Optional without default value
 
 
 class TrainingData(BaseCamelModel):
@@ -261,16 +451,23 @@ class TrainingData(BaseCamelModel):
     Basic training data type
     """
 
-    id: str
     type: Literal["AI_AbstractTrainingData"]
-    labels: List[Label]
+    id: str
+    labels: List[Union[Label, PixelLabel, ObjectLabel, SceneLabel]]
+
     dataset_id: Optional[str]
-    training_type: Optional[str]
+    data_sources: Optional[List[CI_Citation]] = None
     number_of_labels: Optional[int]
-    data_sources: Optional[Union[List[str], List[CICitation]]] = None
-    quality: Optional[DataQuality] = None
     labeling: Optional[List[Labeling]] = None
-    quality: Optional[DataQuality] = None
+    training_type: Optional[str] = None
+    quality: Optional[List[DataQuality]] = None
+
+    @field_validator("training_type")
+    def validate_training_type(cls, v):
+        valid_format = []
+        for item in v:
+            valid_format.append(_validate_training_type(item))
+        return valid_format
 
 
 class Changeset(BaseCamelModel):
@@ -320,9 +517,9 @@ class AI_TDChangeset(BaseCamelModel):
     dataset_id: Optional[str]
     version: Optional[str]
     created_time: Optional[str]
-    add: Optional[List[TrainingData]]
-    modify: Optional[List[TrainingData]]
-    delete: Optional[List[TrainingData]]
+    add: Optional[List[Union[TrainingData, EOTrainingData]]]
+    modify: Optional[List[Union[TrainingData, EOTrainingData]]]
+    delete: Optional[List[Union[TrainingData, EOTrainingData]]]
 
     @field_validator("created_time")
     def validate_created_time(cls, v):
@@ -338,29 +535,27 @@ class TrainingDataset(BaseCamelModel):
     name: str
     description: str
     license: str
-    tasks: List[Task]
-    data: Union[List[TrainingData], str]  # That one should be uri-format
+    tasks: List[Task, EOTask] = Field(min_items=1)
+    data: List[TrainingData, EOTrainingData] = Field(min_items=1)  # That one should be uri-format
     type: Literal["AI_AbstractTrainingDataset"]
-    classes: List[Union[KeyValuePair, str, Dict]] = Field(min_items=1)
 
-    amount_of_training_data: Optional[int]
-    number_of_classes: Optional[int]
-    classification_schema: Optional[str] = "" # That one should be uri-format
-    created_time: Optional[str] = ""
-    dataSources: Optional[
-        Union[List[str], List[CICitation]]
-    ] = [] # That string one should be uri-format
-    doi: Optional[str]=""
+    amount_Of_TrainingData: Optional[int]
+    classes: Optional[List[NamedValue]]
+    classification_schema: Optional[str] = ""  # That one should be uri-format
+    created_time: Optional[str]
+    dataSources: Optional[List[CI_Citation]] = []  # That string one should be uri-format
+    doi: Optional[str] = ""
     keywords: Optional[List[str]]
-    scope: Optional[MD_Scope]=None
-    version: Optional[str]
+    number_of_classes: Optional[int]
+    providers: Optional[List[str]] = []
+    scope: Optional[MD_Scope] = None
+    statistics_info: Optional[List[NamedValue]] = None
     updated_time: Optional[str] = ""
-    labeling: Optional[List[Labeling]]=[]
-    metrics_in_LIT: Optional[List[MetricsInLiterature]]=None
-    quality: Optional[DataQuality]=None
-    providers: Optional[List[str]]=[]
-    statistics_info: Optional[StatisticsInfo]=None
-    changesets: Optional[List[AI_TDChangeset]]=None
+    version: Optional[str]
+    labeling: Optional[List[Labeling]] = []
+    metrics_in_LIT: Optional[List[MetricsInLiterature]] = None
+    quality: Optional[List[DataQuality]] = None
+    changesets: Optional[List[AI_TDChangeset]] = None
 
     @field_validator("created_time")
     def validate_created_time(cls, v):

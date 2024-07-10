@@ -32,8 +32,6 @@
 
 from datetime import datetime
 import re
-import mimetypes
-
 
 
 
@@ -80,16 +78,109 @@ def _validate_date(v: str) -> str:
     raise InvalidDatetimeError(f"String {v} does not match any allowed format")
 
 
-
-def _validate_image_format(mime_type: str):
+def _validate_image_format(image_format: str):
     # Inverse the mimetypes.types_map to get extensions from MIME types
-    extensions_for_mimetype = {v: k for k, v in mimetypes.types_map.items()}
-    return mime_type in extensions_for_mimetype
+    image_format_list = {
+        "image/aces",
+        "image/apng",
+        "image/avci",
+        "image/avcs",
+        "image/avif",
+        "image/bmp",
+        "image/cgm",
+        "image/dicom-rle",
+        "image/dpx",
+        "image/emf",
+        "image/example",
+        "image/fits",
+        "image/g3fax",
+        "image/gif",
+        "image/heic",
+        "image/heic-sequence",
+        "image/heif",
+        "image/heif-sequence",
+        "image/hej2k",
+        "image/hsj2",
+        "image/ief",
+        "image/j2c",
+        "image/jls",
+        "image/jp2",
+        "image/jpeg",
+        "image/jph",
+        "image/jphc",
+        "image/jpm",
+        "image/jpx",
+        "image/jxr",
+        "image/jxrA",
+        "image/jxrS",
+        "image/jxs",
+        "image/jxsc",
+        "image/jxsi",
+        "image/jxss",
+        "image/ktx",
+        "image/ktx2",
+        "image/naplps",
+        "image/png",
+        "image/prs.btif",
+        "image/prs.pti",
+        "image/pwg-raster",
+        "image/svg+xml",
+        "image/t38",
+        "image/tiff",
+        "image/tiff-fx",
+        "image/tiff; application=geotiff",
+        "image/vnd.adobe.photoshop",
+        "image/vnd.airzip.accelerator.azv",
+        "image/vnd.cns.inf2",
+        "image/vnd.dece.graphic",
+        "image/vnd.djvu",
+        "image/vnd.dwg",
+        "image/vnd.dxf",
+        "image/vnd.dvb.subtitle",
+        "image/vnd.fastbidsheet",
+        "image/vnd.fpx",
+        "image/vnd.fst",
+        "image/vnd.fujixerox.edmics-mmr",
+        "image/vnd.fujixerox.edmics-rlc",
+        "image/vnd.globalgraphics.pgb",
+        "image/vnd.microsoft.icon",
+        "image/vnd.mix",
+        "image/vnd.ms-modi",
+        "image/vnd.mozilla.apng",
+        "image/vnd.net-fpx",
+        "image/vnd.pco.b16",
+        "image/vnd.radiance",
+        "image/vnd.sealed.png",
+        "image/vnd.sealedmedia.softseal.gif",
+        "image/vnd.sealedmedia.softseal.jpg",
+        "image/vnd.svf",
+        "image/vnd.tencent.tap",
+        "image/vnd.valve.source.texture",
+        "image/vnd.wap.wbmp",
+        "image/vnd.xiff",
+        "image/vnd.zbrush.pcx",
+        "image/webp",
+        "image/wmf",
+        "image/x-emf",
+        "image/x-wmf",
+        "application/json",
+        "application/xml",
+        "application/xhtml+xml",
+        "application/x-netcdf",
+        "application/geopackage+sqlite3"
+    }
+    return image_format in image_format_list
 
 
 def _valid_methods(labeling_methods: str):
-    labeling_methods_list = ["manual", "automatic", "semi-automatic"]
+    labeling_methods_list = ["manual", "automatic", "semi-automatic", "unknown"]
     return labeling_methods in labeling_methods_list
+
+
+def _validate_training_type(training_type: str):
+    training_type_list = ["training", "validation", "test", "retraining"]
+    return training_type in training_type_list
+
 
 def to_camel(string: str) -> str:
     """Change snake_case to camelCase
