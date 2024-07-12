@@ -113,7 +113,7 @@ class EOTrainingDataset(TrainingDataset):
     type: Literal["AI_EOTrainingDataset"]
     # For Convinience, we allow the user to specify the bands by name
 
-    bands: Optional[List[MD_Band]] = []
+    bands: Optional[List[Union[str, MD_Band]]] = []
     extent: Optional[Extent]
     imageSize: Optional[str] = ""
     tasks: List[EOTask] = Field(min_items=1)
@@ -127,4 +127,3 @@ if __name__ == "__main__":
 
     td = EOTrainingDataset(**data).dict(by_alias=True,exclude_none=True)
     print(td['data'])
-    Union[str, MD_Band]

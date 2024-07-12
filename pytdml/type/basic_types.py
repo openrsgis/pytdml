@@ -30,10 +30,9 @@
 #
 # ------------------------------------------------------------------------------
 
-from typing import List, Union, Optional, Dict, Literal
-from pydantic import BaseModel, Field, field_validator, root_validator, validator
+from typing import List, Union, Optional, Literal
+from pydantic import BaseModel, Field, field_validator, model_validator
 from pytdml.type._utils import _validate_date, to_camel, _valid_methods, _validate_training_type
-from pytdml.type.extended_types import EOTask, EOTrainingData, PixelLabel, ObjectLabel, SceneLabel
 
 
 class BaseCamelModel(BaseModel):
@@ -90,11 +89,11 @@ class MD_Band(BaseCamelModel):
     peak_response: Optional[float]
     tone_gradation: Optional[int]
 
-    @root_validator(pre=True)
-    def check_dependent_required(cls, v):
-        bound_units = v.get("boundUnits")
-        bound_max = v.get("boundMax")
-        bound_min = v.get("boundMin")
+    @model_validator(mode="before")
+    def check_dependent_required(self):
+        bound_units = self.get("boundUnits")
+        bound_max = self.get("boundMax")
+        bound_min = self.get("boundMin")
 
         # check dependRequired in jsonschema
         if bound_units is not None and (bound_max is None or bound_min is None):
@@ -102,7 +101,7 @@ class MD_Band(BaseCamelModel):
                 "boundMax and boundMin are required when boundUnits is present"
             )
 
-        return v
+        return self
 
 
 class MD_Scope(BaseCamelModel):
@@ -453,7 +452,7 @@ class TrainingData(BaseCamelModel):
 
     type: Literal["AI_AbstractTrainingData"]
     id: str
-    labels: List[Union[Label, PixelLabel, ObjectLabel, SceneLabel]]
+    labels: List[Union[Label, "PixelLabel", "ObjectLabel", "SceneLabel"]]
 
     dataset_id: Optional[str]
     data_sources: Optional[List[CI_Citation]] = None
@@ -517,9 +516,9 @@ class AI_TDChangeset(BaseCamelModel):
     dataset_id: Optional[str]
     version: Optional[str]
     created_time: Optional[str]
-    add: Optional[List[Union[TrainingData, EOTrainingData]]]
-    modify: Optional[List[Union[TrainingData, EOTrainingData]]]
-    delete: Optional[List[Union[TrainingData, EOTrainingData]]]
+    add: Optional[List[Union[TrainingData, "EOTrainingData"]]]
+    modify: Optional[List[Union[TrainingData, "EOTrainingData"]]]
+    delete: Optional[List[Union[TrainingData, "EOTrainingData"]]]
 
     @field_validator("created_time")
     def validate_created_time(cls, v):
@@ -535,8 +534,8 @@ class TrainingDataset(BaseCamelModel):
     name: str
     description: str
     license: str
-    tasks: List[Task, EOTask] = Field(min_items=1)
-    data: List[TrainingData, EOTrainingData] = Field(min_items=1)  # That one should be uri-format
+    tasks: List[Union[Task, "EOTask"]] = Field(min_items=1)
+    data: List[Union[TrainingData, "EOTrainingData"]] = Field(min_items=1)  # That one should be uri-format
     type: Literal["AI_AbstractTrainingDataset"]
 
     amount_Of_TrainingData: Optional[int]
