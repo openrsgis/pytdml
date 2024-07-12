@@ -89,11 +89,11 @@ class MD_Band(BaseCamelModel):
     peak_response: Optional[float]
     tone_gradation: Optional[int]
 
-    @root_validator(pre=True)
-    def check_dependent_required(cls, v):
-        bound_units = v.get("boundUnits")
-        bound_max = v.get("boundMax")
-        bound_min = v.get("boundMin")
+    @model_validator(mode="before")
+    def check_dependent_required(self):
+        bound_units = self.get("boundUnits")
+        bound_max = self.get("boundMax")
+        bound_min = self.get("boundMin")
 
         # check dependRequired in jsonschema
         if bound_units is not None and (bound_max is None or bound_min is None):
@@ -101,7 +101,7 @@ class MD_Band(BaseCamelModel):
                 "boundMax and boundMin are required when boundUnits is present"
             )
 
-        return v
+        return self
 
 
 class MD_Scope(BaseCamelModel):

@@ -51,9 +51,11 @@ def read_from_json(file_path: str):
 def parse_json(json_dict):
     # Different kinds of training datasets are supported
     if json_dict["type"] == "TrainingDataset":
-        return TrainingDataset.from_dict(json_dict)
+        return TrainingDataset(**json_dict)
     elif json_dict["type"] == "EOTrainingDataset":
-        return EOTrainingDataset.from_dict(json_dict)
+        return EOTrainingDataset(**json_dict)
+    elif json_dict["type"] == "AI_EOTrainingDataset":
+        return EOTrainingDataset(**json_dict)
     else:
         raise ValueError("Unknown TDML type: {}".format(json_dict["type"]))
 
