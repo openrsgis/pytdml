@@ -193,17 +193,17 @@ def get_mapping_(file):
     return None
 
 
-try:
-    pixel_map = get_mapping_("pixel")
-    name_map = get_mapping_("name")
-except e:
-    print("S3 server running wrong...")
+pixel_map = None
+name_map = None
 
 
 def label_class_list_(pixel_list):
     """
         transform label pixel list to label class list
     """
+    global pixel_map
+    if pixel_map is None:
+        pixel_map = get_mapping_("pixel")
     if len(pixel_list) > 0:
 
         label_class_list = [item["type"] for item in pixel_map if int(item["pngValue"]) in pixel_list]
@@ -259,7 +259,9 @@ def regenerate_png_label_(label_array: Image, cls_list):
     """
     Zero the pixels in the png label that are not in the category offered by the user
     """
-    # pixel_map = get_mapping_("pixel")
+    global pixel_map
+    if pixel_map is None:
+        pixel_map = get_mapping_("pixel")
 
     pixel_list = [int(item["pngValue"]) for item in pixel_map if item["type"] in cls_list]
 
@@ -284,8 +286,10 @@ def dataset_name_map_(obs_name):
     """
     convert obs path name to dataset name
     """
-    # name_map = get_mapping_("name")
-    # print(type(name_map))
+    global name_map
+
+    if name_map is None:
+        name_map = get_mapping_("name")
     return [d for d in name_map if d["obs_path"] == obs_name][0]["name"]
 
 
