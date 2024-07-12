@@ -53,6 +53,12 @@ with open(os.path.join(os.path.dirname(__file__), 'pytdml/__init__.py')) as f:
             version = version.strip("'")
             break
 
+
+# get dependencies
+with open("requirements.txt") as f:
+    install_requires = [line for line in f if line and line[0] not in "#-"]
+
+
 # use README.md for project long_description
 long_description = read('README.md')
 
@@ -69,7 +75,7 @@ setup(
     license='MIT',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=["dataclasses", "geojson"],
+    install_requires=install_requires,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
