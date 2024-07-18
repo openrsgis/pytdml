@@ -31,21 +31,13 @@
 # ------------------------------------------------------------------------------
 import json
 from typing import Union
-from pytdml.type.basic_types import TrainingDataset
-from pytdml.utils import remove_empty
+from pytdml.type import TrainingDataset, EOTrainingDataset
 
 
-# def write_to_json(td: TrainingDataset, file_path: str, indent: Union[None, int, str] = 4):
-#     """
-#     Writes a TrainingDataset to a JSON file.
-#     """
-#     with open(file_path, "w", encoding='utf-8') as f:
-#         json.dump(remove_empty(td.to_dict()), f, indent=indent, ensure_ascii=False)
-
-def write_to_json(td: TrainingDataset, file_path: str, indent: Union[None, int, str] = 4):
+def write_to_json(td: TrainingDataset or EOTrainingDataset, file_path: str, indent: Union[int, str] = 4):
     """
     Writes a TrainingDataset to a JSON file.
     """
     with open(file_path, "w", encoding='utf-8') as f:
-        json.dump(td.dict(by_alias=True,exclude_none=True), f, indent=indent, ensure_ascii=False)
+        json.dump(td.to_dict(), f, indent=indent, ensure_ascii=False)
         # json.dump(remove_empty(td.dict()), f, indent=indent, ensure_ascii=False)

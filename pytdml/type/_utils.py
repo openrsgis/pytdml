@@ -34,9 +34,6 @@ from datetime import datetime
 import re
 
 
-
-
-
 class InvalidDatetimeError(ValueError):
     def __init__(self, message):
         self.message = message
@@ -169,17 +166,34 @@ def _validate_image_format(image_format: str):
         "application/x-netcdf",
         "application/geopackage+sqlite3"
     }
-    return image_format in image_format_list
+    if image_format in image_format_list:
+        return image_format
+    else:
+        pass
 
 
 def _valid_methods(labeling_methods: str):
     labeling_methods_list = ["manual", "automatic", "semi-automatic", "unknown"]
-    return labeling_methods in labeling_methods_list
+    if labeling_methods in labeling_methods_list:
+        return labeling_methods
+    else:
+        pass
 
 
 def _validate_training_type(training_type: str):
     training_type_list = ["training", "validation", "test", "retraining"]
-    return training_type in training_type_list
+    if training_type in training_type_list:
+        return training_type
+    else:
+        pass
+
+
+def _validate_evaluation_method_type(evaluation_method_type: str):
+    evaluation_method_type_list = ["directInternal", "directExternal", "indirect"]
+    if evaluation_method_type in evaluation_method_type_list:
+        return evaluation_method_type
+    else:
+        pass
 
 
 def to_camel(string: str) -> str:
@@ -192,3 +206,15 @@ def to_camel(string: str) -> str:
         str: camelCase string
     """
     return re.sub(r"_(\w)", lambda match: match.group(1).upper(), string)
+
+
+def to_interior_class(data_dict, name, class_name):
+    new_dic = data_dict[name]
+    new_dic = class_name.from_dict(new_dic)
+    data_dict[name] = new_dic
+
+
+def list_to_interior_class(data_dict, name, class_name):
+    new_dic = data_dict[name]
+    new_dic = [class_name.from_dict(i) for i in new_dic]
+    data_dict[name] = new_dic
