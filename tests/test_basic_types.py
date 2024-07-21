@@ -1,5 +1,5 @@
 import pytest
-from pydantic import ValidationError, BaseModel, validator
+from pydantic import ValidationError, BaseModel, field_validator
 import jsonschema
 import requests
 
@@ -11,7 +11,7 @@ base_url = "https://raw.githubusercontent.com/opengeospatial/TrainingDML-AI_SWG/
 class test_date_model(BaseModel):
     date: str
 
-    @validator("date")
+    @field_validator("date")
     def validate_date(cls, v):
         return _validate_date(v)
 
@@ -135,4 +135,4 @@ def test_valid_Labeler_schema():
     response = requests.get(remote_schema_url)
     remote_schema = response.json()
 
-    jsonschema.validate(instance=labeler.dict(), schema=remote_schema)
+    jsonschema.validate(instance=labeler.model_dump(), schema=remote_schema)
