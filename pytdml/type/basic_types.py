@@ -29,9 +29,11 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-
+import json
 from typing import List, Union, Optional, Literal
-from pydantic import BaseModel, Field, field_validator, model_validator
+
+import yaml
+from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 from pytdml.type._utils import _validate_date, to_camel, _valid_methods, _validate_training_type
 
 
@@ -42,13 +44,39 @@ class BaseCamelModel(BaseModel):
     We need to convert it to camel case for JSON
     """
 
-    class Config:
-        alias_generator = to_camel
-        populate_by_name = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+    )
 
-    def json(self, **kwargs):
-        return super().json(by_alias=True, **kwargs)
+    def model_dump_json(self, **kwargs):
+        return super().model_dump_json(by_alias=True, **kwargs)
+    
+    def model_dump(self, **kwargs):
+        if "exclude_none" not in kwargs:
+            kwargs["exclude_none"] = True
+        return super().model_dump(**kwargs)
+
+    @classmethod
+    def read_json(cls, file_path: str):
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+        return cls(**data)
+
+    @classmethod
+    def read_yaml(cls, file_path: str):
+        with open(file_path, 'r') as file:
+            data = yaml.safe_load(file)
+        return cls(**data)
+
+    def write_json(self, file_path: str) -> None:
+        with open(file_path, 'w') as file:
+            json.dump(self.model_dump(), file)
+
+    def write_yaml(self, file_path: str) -> None:
+        with open(file_path, 'w') as file:
+            yaml.dump(self.model_dump(), file, default_flow_style=False)
 
 
 class KeyValuePair(BaseCamelModel):
@@ -75,7 +103,7 @@ class MD_ScopeDescription(BaseCamelModel):
     """
 
     dataset: str
-    features: Optional[List[str]]
+    features: Optional[List[str]] = None
 
 
 class MD_Band(BaseCamelModel):
@@ -83,11 +111,12 @@ class MD_Band(BaseCamelModel):
     From ISO 19115-1 MD_Band
     """
 
-    bound_max: Optional[float]
-    bound_min: Optional[float]
-    bound_units: Optional[Literal["nm", "um", "cm", "dm", "m", "km"]]
-    peak_response: Optional[float]
-    tone_gradation: Optional[int]
+    name: Optional[List["MD_Identifier"]] = Field(default=None)
+    bound_max: Optional[float] = None
+    bound_min: Optional[float] = None
+    bound_units: Optional[Literal["nm", "um", "cm", "dm", "m", "km"]] = None
+    peak_response: Optional[float] = None
+    tone_gradation: Optional[int] = None
 
     @model_validator(mode="before")
     def check_dependent_required(self):
@@ -110,8 +139,8 @@ class MD_Scope(BaseCamelModel):
     """
 
     level: str
-    extent: Optional[List[float]] = Field(min_items=4)
-    level_description: Optional[MD_ScopeDescription]
+    extent: Optional[List[float]] = Field(min_length=4, default=None)
+    level_description: Optional[MD_ScopeDescription] = None
 
 
 class CI_Date(BaseCamelModel):
@@ -120,7 +149,7 @@ class CI_Date(BaseCamelModel):
     """
 
     date: str
-    dateType: str
+    date_type: str
 
     @field_validator("date")
     def validate_date(cls, v):
@@ -133,8 +162,8 @@ class MD_BrowseGraphic(BaseCamelModel):
     """
 
     file_name: str
-    file_description: Optional[str]
-    file_type: Optional[str]
+    file_description: Optional[str] = None
+    file_type: Optional[str] = None
 
 
 class CI_Citation(BaseCamelModel):
@@ -143,14 +172,14 @@ class CI_Citation(BaseCamelModel):
     """
 
     title: str
-    alternateTitle: Optional[List[str]]
-    date: Optional[CI_Date]
-    edition: Optional[str]
-    edition_date: Optional[str]
-    graphic: Optional[List[MD_BrowseGraphic]]
-    identifier: Optional[List[KeyValuePair]]
-    ISBN: Optional[str]
-    ISSN: Optional[str]
+    alternate_title: Optional[List[str]] = None
+    date: Optional[CI_Date] = None
+    edition: Optional[str] = None
+    edition_date: Optional[str] = None
+    graphic: Optional[List[MD_BrowseGraphic]] = None
+    identifier: Optional[List[KeyValuePair]] = None
+    ISBN: Optional[str] = None
+    ISSN: Optional[str] = None
 
     @field_validator("edition_date")
     def validate_edition_date(cls, v):
@@ -162,7 +191,7 @@ class LinearRing(BaseCamelModel):
     gml: LinearRing - NIEM 2.1
     """
 
-    posList: List[int] = Field(min_items=4)
+    posList: List[int] = Field(min_length=4)
 
 
 class LinearRing_Object(BaseCamelModel):
@@ -170,7 +199,7 @@ class LinearRing_Object(BaseCamelModel):
     LinearRing Object Type
     """
 
-    linearRing: LinearRing = Field(alias="LinearRing")
+    linear_ring: LinearRing = Field(alias="LinearRing")  # Why are all the rest camel case and this one is not?
 
 
 class Polygon(BaseCamelModel):
@@ -178,12 +207,12 @@ class Polygon(BaseCamelModel):
     gml: Polygon - NIEM 2.1
     """
 
-    description: Optional[str]
-    description_Reference: Optional[str]
-    identifier: Optional[str]
-    name: Optional[List[str]]
-    exterior: Optional[LinearRing_Object]
-    interior: Optional[List[LinearRing_Object]]
+    description: Optional[str] = None
+    description_reference: Optional[str] = None
+    identifier: Optional[str] = None
+    name: Optional[List[str]] = None
+    exterior: Optional[LinearRing_Object] = None
+    interior: Optional[List[LinearRing_Object]] = None
 
 
 class MD_Identifier(BaseCamelModel):
@@ -192,10 +221,10 @@ class MD_Identifier(BaseCamelModel):
     """
 
     code: str
-    authority: Optional[CI_Citation]
-    code_space: Optional[str]
-    version: Optional[str]
-    description: Optional[str]
+    authority: Optional[CI_Citation] = None
+    code_space: Optional[str] = None
+    version: Optional[str] = None
+    description: Optional[str] = None
 
 
 class BoundingPolygon(BaseCamelModel):
@@ -203,8 +232,8 @@ class BoundingPolygon(BaseCamelModel):
     From ISO 19115:2003
     """
 
-    polygon: List[Polygon] = Field(min_items=1)
-    extentTypeCode: Optional[bool]
+    polygon: List[Polygon] = Field(min_length=1)
+    extent_type_code: Optional[bool] = None
 
 
 class GeographicBoundingBox(BaseCamelModel):
@@ -212,21 +241,20 @@ class GeographicBoundingBox(BaseCamelModel):
     From ISO 19168-2:2022
     """
 
-    westBoundLongitude: int
-    eastBoundLongitude: int
-    southBoundLatitude: int
-    northBoundLatitude: int
+    west_bound_longitude: int
+    east_bound_longitude: int
+    south_bound_latitude: int
+    north_bound_latitude: int
 
-    extentTypeCode: Optional[bool]
+    extent_type_code: Optional[bool] = None
 
 
 class GeographicDescription(BaseCamelModel):
     """
     From ISO 19115: 2003 Metadata
     """
-    geographicIdentifier: MD_Identifier
-
-    extentTypeCode: Optional[bool]
+    geographic_identifier: MD_Identifier
+    extent_type_code: Optional[bool] = None
 
 
 class TimeInstant(BaseCamelModel):
@@ -236,11 +264,11 @@ class TimeInstant(BaseCamelModel):
 
     timePosition: str
 
-    description: Optional[str]
-    descriptionReference: Optional[str]
-    identifier: Optional[str]
-    name: Optional[List[str]]
-    relatedTime: Optional[List[KeyValuePair]]
+    description: Optional[str] = None
+    description_reference: Optional[str] = None
+    identifier: Optional[str] = None
+    name: Optional[List[str]] = None
+    related_time: Optional[List[KeyValuePair]] = None
 
 
 class TimePeriod(BaseCamelModel):
@@ -248,23 +276,23 @@ class TimePeriod(BaseCamelModel):
     Time Period Type
     """
 
-    beginPosition: str
-    endPosition: str
+    begin_position: str
+    end_position: str
 
-    description: Optional[str]
-    descriptionReference: Optional[str]
-    identifier: Optional[str]
-    name: Optional[List[str]]
-    duration: Optional[str]
-    timeInterval: Optional[int]
-    relatedTime: Optional[List[KeyValuePair]]
+    description: Optional[str] = None
+    description_reference: Optional[str] = None
+    identifier: Optional[str] = None
+    name: Optional[List[str]] = None
+    duration: Optional[str] = None
+    time_interval: Optional[int] = None
+    related_time: Optional[List[KeyValuePair]] = None
 
-    @field_validator("beginPosition")
-    def validate_date_time(cls, v):
+    @field_validator("begin_position")
+    def validate_begin_date_time(cls, v):
         return _validate_date(v)
 
-    @field_validator("endPosition")
-    def validate_date_time(cls, v):
+    @field_validator("end_position")
+    def validate_end_date_time(cls, v):
         return _validate_date(v)
 
 
@@ -276,13 +304,13 @@ class TemporalExtent(BaseCamelModel):
     extent: Union[TimeInstant, TimePeriod]
 
 
-class ReferenceSystem(BaseCamelModel):
+class ReferenceSystem(BaseCamelModel):  # TODO: can both be None?
     """
     From ISO 19111: 2019
     """
 
-    referenceSystemIdentifier: Optional[MD_Identifier]
-    referenceSystemType: Optional[str]
+    reference_system_identifier: Optional[MD_Identifier] = None
+    reference_system_type: Optional[str] = None
 
 
 class VerticalCRS(BaseCamelModel):
@@ -291,15 +319,15 @@ class VerticalCRS(BaseCamelModel):
     """
 
     identifier: str
-    scope: List[str] = Field(min_items=1)
-    verticalCS: List[str] = Field(min_items=1)
-    verticalDatum: List[str] = Field(min_items=1)
+    scope: List[str] = Field(min_length=1)
+    verticalCS: List[str] = Field(min_length=1)
+    vertical_datum: List[str] = Field(min_length=1)
 
-    description: Optional[str]
-    description_Reference: Optional[str]
-    name: Optional[List[str]]
-    remarks: Optional[List[str]]
-    domain_Of_Validity: Optional[List[str]]
+    description: Optional[str] = None
+    description_Reference: Optional[str] = None
+    name: Optional[List[str]] = None
+    remarks: Optional[List[str]] = None
+    domain_Of_Validity: Optional[List[str]] = None  # Is this casing intentional?
 
 
 class VerticalExtent(BaseCamelModel):
@@ -307,11 +335,11 @@ class VerticalExtent(BaseCamelModel):
     From ISO 19115 SpiralTracker Report
     """
 
-    minimumValue: int
-    maximumValue: int
+    minimum_value: int
+    maximum_value: int
 
-    verticalCRSId: Optional[ReferenceSystem]
-    verticalCRS: Optional[VerticalCRS]
+    verticalCRSId: Optional[ReferenceSystem] = None
+    verticalCRS: Optional[VerticalCRS] = None
 
 
 class SpatialTemporalExtent(BaseCamelModel):
@@ -320,9 +348,9 @@ class SpatialTemporalExtent(BaseCamelModel):
     """
 
     extent: Union[TimeInstant, TimePeriod]
-    spatialExtent: Union[BoundingPolygon, GeographicBoundingBox, GeographicDescription]
+    spatial_extent: Union[BoundingPolygon, GeographicBoundingBox, GeographicDescription]
 
-    verticalExtent: Optional[VerticalExtent]
+    vertical_extent: Optional[VerticalExtent] = None
 
 
 class Extent(BaseCamelModel):
@@ -331,9 +359,9 @@ class Extent(BaseCamelModel):
     """
 
     description: str
-    geographicElement: List[Union[BoundingPolygon, GeographicBoundingBox, GeographicDescription]]
-    temporalElement: List[Union[TemporalExtent, SpatialTemporalExtent]]
-    verticalElement: List[VerticalExtent]
+    geographic_element: List[Union[BoundingPolygon, GeographicBoundingBox, GeographicDescription]]
+    temporal_element: List[Union[TemporalExtent, SpatialTemporalExtent]]
+    vertical_element: List[VerticalExtent]
 
 
 class BoundingBox(BaseCamelModel):
@@ -341,7 +369,7 @@ class BoundingBox(BaseCamelModel):
     From GeoJSON bounding box
     """
 
-    extent: List[int] = Field(min_items=4)
+    extent: List[Union[int, float]] = Field(min_length=4)
 
 
 class MetricsPair(BaseCamelModel):
@@ -356,11 +384,11 @@ class MetricsPair(BaseCamelModel):
 class MetricsInLiterature(BaseCamelModel):
     """
     Metrics in literature type
-    """
+    """  # Why are the properties of this class specified in camel case?
 
     doi: str
-    algorithm: str = None
-    metrics: Optional[List[MetricsPair]] = Field(min_items=1)
+    algorithm: Optional[str] = None
+    metrics: Optional[List[MetricsPair]] = Field(min_length=1, default=None)
 
 
 class Task(BaseCamelModel):
@@ -371,8 +399,8 @@ class Task(BaseCamelModel):
     id: str
     type: Literal["AI_AbstractTask"]
 
-    dataset_id: Optional[str]
-    description: Optional[str] = ""
+    dataset_id: Optional[str] = None
+    description: Optional[str] = None
 
 
 class Labeler(BaseCamelModel):
@@ -392,9 +420,9 @@ class LabelingProcedure(BaseCamelModel):
 
     type: Literal["AI_LabelingProcedure"]
     id: str
-    methods: List[str] = Field(min_items=1)
+    methods: List[str] = Field(min_length=1)
 
-    tools: Optional[List[str]]
+    tools: Optional[List[str]] = None
 
     @field_validator("methods")
     def valid_methods(cls, v):
@@ -409,8 +437,8 @@ class Labeling(BaseCamelModel):
     id: str
     scope: MD_Scope
     type: Literal["AI_Labeling"]
-    labelers: Optional[List[Labeler]]
-    procedure: Optional[LabelingProcedure]
+    labelers: Optional[List[Labeler]] = None
+    procedure: Optional[LabelingProcedure] = None
 
 
 class QualityElement(BaseCamelModel):
@@ -431,7 +459,7 @@ class DataQuality(BaseCamelModel):
 
     type: Literal["DataQuality"]
     scope: MD_Scope
-    report: Optional[List[QualityElement]]
+    report: Optional[List[QualityElement]] = None
 
 
 class Label(BaseCamelModel):
@@ -441,8 +469,8 @@ class Label(BaseCamelModel):
 
     type: Literal["AI_AbstractLabel"]
 
-    is_negative: Optional[bool] = False  # Optional without default value
-    confidence: Optional[float] = Field(ge=0.0, le=1.0)  # Optional without default value
+    is_negative: Optional[bool] = None  # Optional without default value
+    confidence: Optional[float] = Field(ge=0.0, le=1.0, default=None)  # Optional without default value
 
 
 class TrainingData(BaseCamelModel):
@@ -452,11 +480,11 @@ class TrainingData(BaseCamelModel):
 
     type: Literal["AI_AbstractTrainingData"]
     id: str
-    labels: List[Union[Label, "PixelLabel", "ObjectLabel", "SceneLabel"]]
+    labels: List[Union[Label, "AI_PixelLabel", "ObjectLabel", "SceneLabel"]] = None
 
-    dataset_id: Optional[str]
+    dataset_id: Optional[str] = None
     data_sources: Optional[List[CI_Citation]] = None
-    number_of_labels: Optional[int]
+    number_of_labels: Optional[int] = None
     labeling: Optional[List[Labeling]] = None
     training_type: Optional[str] = None
     quality: Optional[List[DataQuality]] = None
@@ -478,13 +506,13 @@ class Changeset(BaseCamelModel):
     id: str
     change_count: int
 
-    add: Optional[List[TrainingData]]
-    change_count: Optional[int]
-    dataset_id: Optional[str]
-    delete: Optional[List[TrainingData]]
-    modify: Optional[List[TrainingData]]
-    version: Optional[str]
-    created_time: Optional[str]
+    add: Optional[List[TrainingData]] = None
+    change_count: Optional[int] = None
+    dataset_id: Optional[str] = None
+    delete: Optional[List[TrainingData]] = None
+    modify: Optional[List[TrainingData]] = None
+    version: Optional[str] = None
+    created_time: Optional[str] = None
 
     @field_validator("created_time")
     def validate_created_time(cls, v):
@@ -505,7 +533,7 @@ class StatisticsInfo(BaseCamelModel):
     Statistics info
     """
 
-    type: Optional[List[StatisticsInfoType]] = Field(min_items=1)
+    type: Optional[List[StatisticsInfoType]] = None
 
 
 class AI_TDChangeset(BaseCamelModel):
@@ -513,12 +541,12 @@ class AI_TDChangeset(BaseCamelModel):
     id: str
     change_count: int
 
-    dataset_id: Optional[str]
-    version: Optional[str]
-    created_time: Optional[str]
-    add: Optional[List[Union[TrainingData, "EOTrainingData"]]]
-    modify: Optional[List[Union[TrainingData, "EOTrainingData"]]]
-    delete: Optional[List[Union[TrainingData, "EOTrainingData"]]]
+    dataset_id: Optional[str] = None
+    version: Optional[str] = None
+    created_time: Optional[str] = None
+    add: Optional[List[Union[TrainingData, "EOTrainingData"]]] = None
+    modify: Optional[List[Union[TrainingData, "EOTrainingData"]]] = None
+    delete: Optional[List[Union[TrainingData, "EOTrainingData"]]] = None
 
     @field_validator("created_time")
     def validate_created_time(cls, v):
@@ -534,24 +562,24 @@ class TrainingDataset(BaseCamelModel):
     name: str
     description: str
     license: str
-    tasks: List[Union[Task, "EOTask"]] = Field(min_items=1)
-    data: List[Union[TrainingData, "EOTrainingData"]] = Field(min_items=1)  # That one should be uri-format
+    tasks: List[Union[Task, "EOTask"]] = Field(min_length=1)
+    data: List[Union[TrainingData, "EOTrainingData"]] = Field(min_length=1)  # That one should be uri-format
     type: Literal["AI_AbstractTrainingDataset"]
 
-    amount_Of_TrainingData: Optional[int]
-    classes: Optional[List[NamedValue]]
-    classification_schema: Optional[str] = ""  # That one should be uri-format
-    created_time: Optional[str]
-    dataSources: Optional[List[CI_Citation]] = []  # That string one should be uri-format
-    doi: Optional[str] = ""
-    keywords: Optional[List[str]]
-    number_of_classes: Optional[int]
-    providers: Optional[List[str]] = []
+    amount_of_training_data: Optional[int] = None
+    classes: Optional[List[NamedValue]] = None
+    classificationSchema: Optional[str] = None
+    created_time: Optional[str] = None
+    data_sources: Optional[List[CI_Citation]] = None  # That string one should be uri-format
+    doi: Optional[str] = None
+    keywords: Optional[List[str]] = None
+    number_of_classes: Optional[int] = None
+    providers: Optional[List[str]] = None
     scope: Optional[MD_Scope] = None
     statistics_info: Optional[List[NamedValue]] = None
-    updated_time: Optional[str] = ""
-    version: Optional[str]
-    labeling: Optional[List[Labeling]] = []
+    updated_time: Optional[str] = None
+    version: Optional[str] = None
+    labeling: Optional[List[Labeling]] = None
     metrics_in_LIT: Optional[List[MetricsInLiterature]] = None
     quality: Optional[List[DataQuality]] = None
     changesets: Optional[List[AI_TDChangeset]] = None

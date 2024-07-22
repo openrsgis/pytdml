@@ -40,19 +40,20 @@ from pytdml.type._utils import _validate_image_format, _validate_date
 from pytdml.type.basic_types import Label, TrainingDataset, TrainingData, Task, MD_Band, Extent, BoundingBox
 
 
-class PixelLabel(Label):
+class AI_PixelLabel(Label):
     """
     Extended label type for pixel level training data
     """
     type: Literal["AI_PixelLabel"]
-    image_URL: List[str] = Field(min_items=1)
-    image_format: List[str] = Field(min_items=1)
+    image_URL: List[str] = Field(min_length=1)
+    image_format: List[str] = Field(min_length=1)
 
     @field_validator("image_format")
     def validate_image_format(cls, v):
         valid_format = []
         for item in v:
-            valid_format.append(_validate_image_format(item))
+            if _validate_image_format(item):
+                valid_format.append(item)
         return valid_format
 
 
@@ -64,8 +65,8 @@ class ObjectLabel(Label):
     object: Feature
     label_class: str = Field(alias="class")
 
-    date_time: Optional[str]
-    bbox_type: Optional[str]
+    date_time: Optional[str] = None
+    bbox_type: Optional[str] = None
 
     @field_validator("date_time")
     def validate_date_time(cls, v):
@@ -93,12 +94,12 @@ class EOTrainingData(TrainingData):
     Extended training data type for EO training data
     """
     type: Literal["AI_EOTrainingData"]
-    dataURL: List[str] = Field(min_items=1)  # That one should be uri-format
+    dataURL: List[str] = Field(min_length=1)  # That one should be uri-format
 
-    extent: Optional[Union[Extent, BoundingBox]]
-    date_time: Optional[List[str]] = []
+    extent: Optional[Union[Extent, List[Union[int, float]]]] = None  # FIXME: formally define the type
+    data_time: Optional[List[str]] = None  # FIXME: should be date-time string
 
-    @field_validator("date_time")
+    @field_validator("data_time")
     def validate_data_time(cls, v):
         validated_data = []
         for item in v:
@@ -113,17 +114,8 @@ class EOTrainingDataset(TrainingDataset):
     type: Literal["AI_EOTrainingDataset"]
     # For Convinience, we allow the user to specify the bands by name
 
-    bands: Optional[List[Union[str, MD_Band]]] = []
-    extent: Optional[Extent]
-    imageSize: Optional[str] = ""
-    tasks: List[EOTask] = Field(min_items=1)
-    data: List[EOTrainingData] = Field(min_items=1)
-
-
-if __name__ == "__main__":
-    tdml_path = r"C:\Users\zhaoyan\Desktop\TrainingDML-AI-master-use-cases-examples\use-cases\examples\1.0\WHU-building.json"
-    with open(tdml_path, 'r') as f:
-        data = json.load(f)
-
-    td = EOTrainingDataset(**data).dict(by_alias=True,exclude_none=True)
-    print(td['data'])
+    bands: Optional[List[Union[str, MD_Band]]] = None
+    extent: Optional[Union[Extent, List[Union[int, float]]]] = None  # FIXME: formally define the type
+    imageSize: Optional[str] = None
+    tasks: List[EOTask] = Field(min_length=1)
+    data: List[EOTrainingData] = Field(min_length=1)
