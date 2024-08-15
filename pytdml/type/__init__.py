@@ -29,16 +29,16 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-from .all_types import BaseCamelModel
-from .all_types import KeyValuePair
-from .all_types import MD_ScopeDescription
-from .all_types import MD_Band
-from .all_types import MD_Scope
-from .all_types import CI_Date
-from .all_types import MD_BrowseGraphic
-from .all_types import CI_Citation
-from .all_types import MD_Identifier
-from .all_types import QualityElement
-from .all_types import DataQuality
-from .all_types import TrainingDataset
-from .all_types import EOTrainingDataset
+from .basic_types import BaseCamelModel
+from .basic_types import KeyValuePair
+from .basic_types import MD_ScopeDescription
+from .basic_types import MD_Band
+from .basic_types import MD_Scope
+from .basic_types import CI_Date
+from .basic_types import MD_BrowseGraphic
+from .basic_types import CI_Citation
+from .basic_types import MD_Identifier
+from .basic_types import QualityElement
+from .basic_types import DataQuality
+from .basic_types import TrainingDataset
+from .extended_types import EOTrainingDataset
