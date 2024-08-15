@@ -169,7 +169,7 @@ def _validate_image_format(image_format: str):
     if image_format in image_format_list:
         return image_format
     else:
-        pass
+        return None
 
 
 def _valid_methods(labeling_methods: str):
@@ -177,7 +177,7 @@ def _valid_methods(labeling_methods: str):
     if labeling_methods in labeling_methods_list:
         return labeling_methods
     else:
-        pass
+        return None
 
 
 def _validate_training_type(training_type: str):
@@ -185,7 +185,7 @@ def _validate_training_type(training_type: str):
     if training_type in training_type_list:
         return training_type
     else:
-        pass
+        return None
 
 
 def _validate_evaluation_method_type(evaluation_method_type: str):
@@ -193,7 +193,7 @@ def _validate_evaluation_method_type(evaluation_method_type: str):
     if evaluation_method_type in evaluation_method_type_list:
         return evaluation_method_type
     else:
-        pass
+        return None
 
 
 def to_camel(string: str) -> str:
