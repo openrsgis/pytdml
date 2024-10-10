@@ -3,7 +3,7 @@ from pydantic import ValidationError, BaseModel, validator
 import jsonschema
 import requests
 
-from pytdml.type.basic_types import _validate_date, to_camel,Labeler
+from pytdml.type.basic_types import _validate_date, to_camel, AI_Labeler
 
 base_url = "https://raw.githubusercontent.com/opengeospatial/TrainingDML-AI_SWG/main/schemas/1.0/json_schema/{}.json"
 
@@ -120,7 +120,7 @@ def test_required_elements_with_Labeler():
         "name": "zhaoyan"
     }
     with pytest.raises( ValidationError):
-        Labeler(**data)
+        AI_Labeler(**data)
 
 # Test valid Labeler and with remote schema
 def test_valid_Labeler_schema():
@@ -129,7 +129,7 @@ def test_valid_Labeler_schema():
         "id": "1",
         "name": "zhaoyan"
     }
-    labeler = Labeler(**data)
+    labeler = AI_Labeler(**data)
 
     remote_schema_url = base_url.format("ai_labeler")
     response = requests.get(remote_schema_url)

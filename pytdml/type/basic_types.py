@@ -1289,8 +1289,8 @@ class AI_Label(BaseCamelModel):
 
     type: Literal["AI_AbstractLabel"]
 
-    is_negative: Optional[bool] = False  # Optional without default value
-    confidence: Optional[float] = Field(1.0, ge=0.0, le=1.0)
+    is_negative: Optional[bool] = None
+    confidence: Optional[float] = Field(None, ge=0.0, le=1.0)
 
     def to_dict(self):
         return self.model_dump(by_alias=True, exclude_none=True)
