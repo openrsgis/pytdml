@@ -39,7 +39,7 @@ import cv2
 from geojson import Feature, Polygon
 
 from pytdml.io import read_from_json
-from pytdml.type import EOTrainingDataset, EOTrainingData, PixelLabel
+from pytdml.type import EOTrainingDataset, AI_EOTrainingData, AI_PixelLabel
 from pytdml.utils import remove_empty
 
 
@@ -62,9 +62,9 @@ def td_image_crop(td: EOTrainingDataset, save_tdml_path: str, save_crop_dir: str
             crop_image_list = image_crop(image_url, image_dir, sub_size)
             crop_label_list = image_crop(label_url, label_dir, sub_size)
             for crop_image_url, crop_label_url in zip(crop_image_list, crop_label_list):
-                new_d = EOTrainingData(
+                new_d = AI_EOTrainingData(
                     id=str(index),
-                    labels=[PixelLabel(image_url=crop_label_url)],
+                    labels=[AI_PixelLabel(image_url=crop_label_url)],
                     data_url=crop_image_url,
                 )
                 index = index + 1

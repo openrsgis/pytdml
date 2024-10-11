@@ -12,4 +12,4 @@ def test_read_and_write():
     td = read_from_json(tdml_path)
     with open(tdml_path, 'r') as f:
         data = json.load(f)
-    assert td.dict(by_alias=True,exclude_none=True) == data
+    assert td.to_dict() == data
