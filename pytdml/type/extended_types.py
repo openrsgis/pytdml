@@ -206,11 +206,10 @@ class EOTrainingDataset(TrainingDataset):
         new_dict = copy.deepcopy(json_dict)
         if new_dict.__contains__('extent'):
             extent = new_dict['extent']
-            print(extent)
             for i in range(len(extent)):
                 if EX_Extent.can_build_from_data(extent[i]):
                     extent[i] = EX_Extent.from_dict(extent[i])
                 else:
-                    print(1)
+                    continue
             new_dict['extent'] = extent
         return EOTrainingDataset(**new_dict)
