@@ -100,7 +100,7 @@ setup(
         'Programming Language :: Python :: 3',
     ],
     tests_require=['pytest'],
-    extras_require = {
+    extras_require={
         'dev': ['pytest'],
-    }
+    },
 )
