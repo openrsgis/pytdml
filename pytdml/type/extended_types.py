@@ -195,7 +195,7 @@ class EOTrainingDataset(TrainingDataset):
     # For Convinience, we allow the user to specify the bands by name
 
     bands: Optional[List[MD_Band]] = None
-    extent: Optional[EX_Extent] = None
+    extent: Optional[Union[EX_Extent, List[Union[int, float]]]] = None
     image_size: Optional[str] = None
 
     def to_dict(self):
@@ -204,4 +204,12 @@ class EOTrainingDataset(TrainingDataset):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
+        if new_dict.__contains__('extent'):
+            extent = new_dict['extent']
+            for i in range(len(extent)):
+                if EX_Extent.can_build_from_data(extent[i]):
+                    extent[i] = EX_Extent.from_dict(extent[i])
+                else:
+                    continue
+            new_dict['extent'] = extent
         return EOTrainingDataset(**new_dict)

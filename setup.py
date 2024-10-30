@@ -54,10 +54,28 @@ with open(os.path.join(os.path.dirname(__file__), 'pytdml/__init__.py')) as f:
             break
 
 
-# get dependencies
-with open("requirements.txt") as f:
-    install_requires = [line for line in f if line and line[0] not in "#-"]
+# use README.md for project long_description
+long_description = read('README.md')
 
+from setuptools import find_packages, setup
+import io
+import os.path
+
+def read(filename, encoding='utf-8'):
+    """read file contents"""
+    full_path = os.path.join(os.path.dirname(__file__), filename)
+    with io.open(full_path, encoding=encoding) as fh:
+        contents = fh.read().strip()
+    return contents
+
+# get version number
+with open(os.path.join(os.path.dirname(__file__), 'pytdml/__init__.py')) as f:
+    for line in f:
+        if line.find("__version__") >= 0:
+            version = line.split("=")[1].strip()
+            version = version.strip('"')
+            version = version.strip("'")
+            break
 
 # use README.md for project long_description
 long_description = read('README.md')
@@ -65,8 +83,7 @@ long_description = read('README.md')
 setup(
     name='pytdml',
     version=version,
-    description='Parsing and encoding training datasets based on OGC Training Data Markup Language for AI ('
-                'TrainingDML-AI) standard',
+    description='Parsing and encoding training datasets based on OGC Training Data Markup Language for AI (TrainingDML-AI) standard',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Boyi Shangguan',
@@ -75,7 +92,6 @@ setup(
     license='MIT',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=install_requires,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

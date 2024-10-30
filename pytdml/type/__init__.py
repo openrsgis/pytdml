@@ -41,4 +41,9 @@ from .basic_types import MD_Identifier
 from .basic_types import QualityElement
 from .basic_types import DataQuality
 from .basic_types import TrainingDataset
+from .extended_types import AI_PixelLabel
+from .extended_types import AI_ObjectLabel
+from .extended_types import AI_ObjectLabel
+from .extended_types import AI_EOTask
+from .extended_types import AI_EOTrainingData
 from .extended_types import EOTrainingDataset

@@ -3,7 +3,7 @@ import json
 from geojson import Feature
 
 from pytdml.io import write_to_json
-from pytdml.type import EOTrainingData, EOTrainingDataset, EOTask, ObjectLabel,PixelLabel
+from pytdml.type import AI_EOTrainingData, EOTrainingDataset, AI_EOTask, AI_ObjectLabel, AI_PixelLabel
 import os
 import re
 import time
@@ -102,7 +102,7 @@ def convert_coco_to_tdml(coco_dataset_path, output_json_path):
                 coord = [[points[0], points[1]], [points[0] + points[2], points[1]], [points[0] + points[2],
                                                                                       points[1] + points[3]],
                          [points[0], points[1] + points[2]]]
-                labels = ObjectLabel(is_negative=False, type="AI_ObjectLabel", confidence=1.0, object=Feature(
+                labels = AI_ObjectLabel(is_negative=False, type="AI_ObjectLabel", confidence=1.0, object=Feature(
                     id="feature " + str(i), geometry={
                         "type": "Polygon",
                         "coordinates": coord
@@ -112,7 +112,7 @@ def convert_coco_to_tdml(coco_dataset_path, output_json_path):
             training_type = categorize_string(os.path.basename(os.path.dirname(image_json["coco_url"])))
 
             numbers_of_labels = len(object_labels)
-            td = EOTrainingData(id=str(image_json["id"]),type="AI_EOTrainingData",data_sources=[""],
+            td = AI_EOTrainingData(id=str(image_json["id"]),type="AI_EOTrainingData",data_sources=[""],
                                  dataset_id=dataset_id, training_type=training_type,
                                 number_of_labels=numbers_of_labels, labels=object_labels,
                                 date_time=[image_json["date_captured"].replace(' ', 'T')],extent=None, data_URL=[image_json["coco_url"]])
@@ -131,7 +131,7 @@ def convert_coco_to_tdml(coco_dataset_path, output_json_path):
         type="AI_EOTrainingDataset",
         name=dataset_name,
         description=dataset_description,
-        tasks=[EOTask(task_type="Object Detection",
+        tasks=[AI_EOTask(task_type="Object Detection",
                       id=str(dataset_id) + "_task",
                       dataset_id=str(dataset_id),
                       type='AI_EOTask',
@@ -202,16 +202,16 @@ def convert_stac_to_tdml(stac_dataset_path, output_json_path):
             data_url.append(img_path)
             label_url = label_path
             image_type = label_type
-            labels = [PixelLabel(confidence=1.0,type="AI_PixelLabel",image_URL=[label_url],image_format=[image_type])]
+            labels = [AI_PixelLabel(confidence=1.0,type="AI_PixelLabel",image_URL=[label_url],image_format=[image_type])]
             td_list.append(
-                EOTrainingData(id=item_id,type="AI_EOTrainingData",training_type="Train", dataset_id=dataset_id,number_of_labels=1,labels=labels,extent=item_extent,
+                AI_EOTrainingData(id=item_id,type="AI_EOTrainingData",training_type="Train", dataset_id=dataset_id,number_of_labels=1,labels=labels,extent=item_extent,
                                data_URL=data_url))
 
 
     for class_dict in label_classes:
         class_dict['value'] = class_dict.pop('classes')
 
-    tasks = [EOTask(task_type=task_name,
+    tasks = [AI_EOTask(task_type=task_name,
                       id=str(dataset_id) + "_task",
                     dataset_id= str(dataset_id),
                       type='AI_EOTask')]

@@ -1,9 +1,9 @@
 import pytest
-from pydantic import ValidationError, BaseModel, validator
+from pydantic import ValidationError, BaseModel, validator, field_validator
 import jsonschema
 import requests
 
-from pytdml.type.basic_types import _validate_date, to_camel,Labeler
+from pytdml.type.basic_types import _validate_date, to_camel, AI_Labeler
 
 base_url = "https://raw.githubusercontent.com/opengeospatial/TrainingDML-AI_SWG/main/schemas/1.0/json_schema/{}.json"
 
@@ -11,7 +11,7 @@ base_url = "https://raw.githubusercontent.com/opengeospatial/TrainingDML-AI_SWG/
 class test_date_model(BaseModel):
     date: str
 
-    @validator("date")
+    @field_validator("date")
     def validate_date(cls, v):
         return _validate_date(v)
 
@@ -120,7 +120,7 @@ def test_required_elements_with_Labeler():
         "name": "zhaoyan"
     }
     with pytest.raises( ValidationError):
-        Labeler(**data)
+        AI_Labeler.from_dict(data)
 
 # Test valid Labeler and with remote schema
 def test_valid_Labeler_schema():
@@ -129,10 +129,10 @@ def test_valid_Labeler_schema():
         "id": "1",
         "name": "zhaoyan"
     }
-    labeler = Labeler(**data)
+    labeler = AI_Labeler.from_dict(data)
 
     remote_schema_url = base_url.format("ai_labeler")
     response = requests.get(remote_schema_url)
     remote_schema = response.json()
 
-    jsonschema.validate(instance=labeler.dict(), schema=remote_schema)
+    jsonschema.validate(instance=labeler.to_dict(), schema=remote_schema)
