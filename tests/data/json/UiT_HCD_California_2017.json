@@ -99,6 +99,8 @@
           "imageURL": [
             "change_label.png"
           ],
+          "confidence": 1.0,
+          "isNegative": false,
           "imageFormat": [
             "image/png"
           ]

@@ -321,8 +321,3 @@ def main():
         training_datasets = yaml_to_tdml(yaml_path)
     if training_datasets:
         write_to_json(training_datasets, json_path)
-
-
-if __name__ == '__main__':
-    result = yaml_to_eo_tdml("D:\\Project\\pyTDML3\\pytdml\\pytdml\\type\\UiT_HCD_California_2017.yml")
-    print(result.to_dict())

@@ -1,4 +1,5 @@
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #
 # Project: pytdml
 # Authors: Boyi Shangguan, Kaixuan Wang, Zhaoyan Wu
@@ -1289,8 +1290,8 @@ class AI_Label(BaseCamelModel):
 
     type: Literal["AI_AbstractLabel"]
 
-    is_negative: Optional[bool] = None
-    confidence: Optional[float] = Field(None, ge=0.0, le=1.0)
+    is_negative: Optional[bool] = Field(False)
+    confidence: Optional[float] = Field(1.0, ge=0.0, le=1.0)
 
     def to_dict(self):
         return self.model_dump(by_alias=True, exclude_none=True)
@@ -1328,7 +1329,6 @@ class AI_TrainingData(BaseCamelModel):
     @staticmethod
     def from_dict(json_dict):
         from pytdml.type.extended_types import AI_PixelLabel, AI_ObjectLabel, AI_SceneLabel
-        new_dict = copy.deepcopy(json_dict)
         new_dict = copy.deepcopy(json_dict)
         if new_dict.__contains__('labels'):
             labels = new_dict['labels']

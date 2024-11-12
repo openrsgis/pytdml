@@ -77,6 +77,8 @@
       "labels": [
         {
           "type": "AI_PixelLabel",
+          "confidence": 1.0,
+          "isNegative": false,
           "imageURL": [
             "change_label/change_label.tif"
           ],
