@@ -321,3 +321,6 @@ def main():
         training_datasets = yaml_to_tdml(yaml_path)
     if training_datasets:
         write_to_json(training_datasets, json_path)
+
+if __name__ == '__main__':
+    main()
