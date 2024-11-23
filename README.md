@@ -46,42 +46,53 @@ The training dataset can also be encoded to TrainingDML-AI JSON format with Pyth
 
 ```python
 from pytdml.io import write_to_json
-from pytdml.type import EOTrainingDataset, EOTrainingData, EOTask, EODataSource, SceneLabel
+from pytdml.type import EOTrainingDataset, AI_EOTrainingData, AI_EOTask, AI_SceneLabel
 
 # generate EO training dataset
 dataset = EOTrainingDataset(
     id='...',
     name='...',
     description='...',
-    data=[
-        EOTrainingData(
+    license='...',
+    tasks=[
+        AI_EOTask(
             id='...',
+            task_type='...'),
+        ...
+    ],
+    data=[
+        AI_EOTrainingData(
+            id='...',
+            data_URL='...',
             labels=[
-                SceneLabel(
-                    label_class='...',
-                    data_url='...',
-                    date_time='...'),
+                AI_SceneLabel(
+                    label_class='...'
+                ),
                 ...
             ]),
         ...
     ],
-    version="...",
+    
     amount_of_training_data=...,
-    created_time="...",
-    updated_time="...",
-    providers=["..."],
-    keywords=["...", "..."],
-    tasks=[EOTask(task_type="...",
-                  description="...")],
-    data_sources=[EODataSource(
-        id="...",
-        data_type="...",
-        resolution="..."
-    )],
     classes=["...", "...", "..."],
+    classification_scheme='...',
+    created_time="...",
+    data_sources=['...'],
+    doi='...',
+    keywords=['...', '...'],
     number_of_classes=...,
-    bands=["...", "...", "..."],
-    image_size="..."
+    providers=['...'],
+    scope=...,
+    statistics_info=[...],
+    updated_time='...',
+    version='...',
+    labeling=[...],
+    metrics_in_LIT=[...],
+    quality=[...],
+    changesets=[...],
+    bands=[...],
+    extent=[...],
+    image_size='...'
 )
 # write to json
 write_to_json(dataset, "dataset.json")
@@ -362,14 +373,14 @@ for e in range(100):
 
 ### Convert other EO dataset formats to TrainingDML-AI format
 
-- convert coco format to TrainingDMl-AI format:
+- convert stac format to TrainingDMl-AI format:
 
 ```python
-from pytdml.convert_utils import convert_coco_to_tdml,convert_stac_to_tdml
+from pytdml.io.stac_converter import convert_stac_to_tdml
 
-coco_path = "/mnt/example/coco_file.json"
+stac_path = "/mnt/example/stac_file.json"
 output_path = "convert_result.json"
 
-convert_coco_to_tdml(coco_path, output_path)
+dataset = convert_stac_to_tdml(stac_path)
 ```
 

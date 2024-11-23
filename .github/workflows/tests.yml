@@ -26,7 +26,7 @@ jobs:
           ${{ runner.os }}-pip-
 
     - name: Install dependencies
-      run: pip install .[dev] && pip install .[all]
+      run: pip install pytest && pip install .[all]
 
     - name: Run tests
       run: pytest
