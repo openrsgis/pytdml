@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from future.backports.datetime import datetime
+from datetime import datetime
 from geojson import Feature
 
 from pytdml.type import AI_EOTrainingData, EOTrainingDataset, AI_EOTask, AI_ObjectLabel, AI_PixelLabel, AI_SceneLabel
