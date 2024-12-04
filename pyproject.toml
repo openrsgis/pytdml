@@ -21,7 +21,8 @@ dependencies = [
     "minio~=7.2.7",
     "tqdm~=4.66.4",
     "s3fs~=2024.9.0",
-    "pystac~=1.10.1"
+    "pystac~=1.10.1",
+    "boto3~=1.34.154",
 ]
 
 [project.optional-dependencies]
