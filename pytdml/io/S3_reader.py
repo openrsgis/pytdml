@@ -20,6 +20,10 @@ class LibraryNotInstalledError(Exception):
 
 
 class S3Client:
+    """
+    Read TrainingDML-AI encoded data from S3 object storage.
+    """
+
     def __init__(self, resource, server, access_key, secret_key):
         try:
             import boto3
@@ -42,9 +46,9 @@ class S3Client:
     def list_objects(self, bucket_name, prefix):
         obj_list = []
         try:
-            # 列出存储桶中的对象
+            # List the objects in the bucket
             response = self.s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
-            # 打印对象列表
+            # Print object list
 
             if 'Contents' in response:
                 for obj in response['Contents']:
