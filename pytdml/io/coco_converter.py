@@ -90,8 +90,8 @@ def convert_coco_to_tdml(cocofile):
     return:
         EOTrainingDataset
     """
-
-    coco_dataset = json.load(cocofile)
+    with open(cocofile, 'r') as file:
+        coco_dataset = json.load(file)
 
     try:
         info = coco_dataset["info"]

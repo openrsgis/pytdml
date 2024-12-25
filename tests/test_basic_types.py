@@ -137,8 +137,8 @@ def test_valid_Labeler_schema():
 
     jsonschema.validate(instance=labeler.to_dict(), schema=remote_schema)
 
-# def test_valid_datatime():
-#     remote_schema_url = base_url.format("dateTime")
-#     response = requests.get(remote_schema_url)
-#     remote_schema = response.json()
-#     jsonschema.validate(instance="2023-10-27T14:30:00", schema=remote_schema)
+def test_valid_datatime():
+    remote_schema_url = base_url.format("dateTime")
+    response = requests.get(remote_schema_url)
+    remote_schema = response.json()
+    jsonschema.validate(instance="2023-10-27T14:30:00", schema=remote_schema)
