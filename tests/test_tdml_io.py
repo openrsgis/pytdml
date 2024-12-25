@@ -32,7 +32,7 @@ def test_yaml_to_eo_tdml():
     assert td.to_dict() == data
 
 def test_convert_stac_to_tdml():
-    stac_file_path = r"tests/data/coco/collection.json"
+    stac_file_path = r"tests/data/stac/collection.json"
     td = convert_stac_to_tdml(stac_file_path)
     jsonschema.validate(instance=td.to_dict(), schema=remote_schema)
 
@@ -42,6 +42,6 @@ def test_coco_converter_Panoptic_Segmentation():
     jsonschema.validate(instance=td.to_dict(), schema=remote_schema)
 
 def test_coco_converter_Image_Captioning():
-    coco_file_path = r"tests/data/stac/captions_val2014.json"
+    coco_file_path = r"tests/data/coco/captions_val2014.json"
     td = convert_coco_to_tdml(coco_file_path)
     jsonschema.validate(instance=td.to_dict(), schema=remote_schema)
