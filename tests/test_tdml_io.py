@@ -36,12 +36,14 @@ def test_convert_stac_to_tdml():
     td = convert_stac_to_tdml(stac_file_path)
     jsonschema.validate(instance=td.to_dict(), schema=remote_schema)
 
-# def test_coco_converter_Panoptic_Segmentation():
-#     coco_file_path = r"tests/data/coco/panoptic_val2017.json"
-#     td = convert_coco_to_tdml(coco_file_path)
-#     jsonschema.validate(instance=td.to_dict(), schema=remote_schema)
+def test_coco_converter_Panoptic_Segmentation():
+    coco_file_path = r"tests/data/coco/panoptic_val2017.json"
+    td_dict = convert_coco_to_tdml(coco_file_path).to_dict()
+    td_dict["data"] = td_dict["data"][:2]
+    jsonschema.validate(instance=td_dict, schema=remote_schema)
 
-# def test_coco_converter_Image_Captioning():
-#     coco_file_path = r"tests/data/coco/captions_val2014.json"
-#     td = convert_coco_to_tdml(coco_file_path)
-#     jsonschema.validate(instance=td.to_dict(), schema=remote_schema)
+def test_coco_converter_Image_Captioning():
+    coco_file_path = r"tests/data/coco/captions_val2014.json"
+    td_dict = convert_coco_to_tdml(coco_file_path).to_dict()
+    td_dict["data"] = td_dict["data"][:2]
+    jsonschema.validate(instance=td_dict, schema=remote_schema)

@@ -138,10 +138,12 @@ def convert_coco_to_tdml(cocofile):
                 for i, label_element in enumerate(labels_list):
                     points = label_element.get("bbox")
                     coord = [
-                        [points[0], points[1]],
-                        [points[0] + points[2], points[1]],
-                        [points[0] + points[2], points[1] + points[3]],
-                        [points[0], points[1] + points[2]]
+                        [
+                            [points[0], points[1]],
+                            [points[0] + points[2], points[1]],
+                            [points[0] + points[2], points[1] + points[3]],
+                            [points[0], points[1] + points[2]]
+                        ]
                     ]
                     labels = AI_ObjectLabel(
                         type="AI_ObjectLabel",
@@ -254,10 +256,12 @@ def convert_coco_to_tdml(cocofile):
                 for i, label_element in enumerate(labels_list):
                     points = label_element.get("bbox")
                     coord = [
-                        [points[0], points[1]],
-                        [points[0] + points[2], points[1]],
-                        [points[0] + points[2], points[1] + points[3]],
-                        [points[0], points[1] + points[2]]
+                        [
+                            [points[0], points[1]],
+                            [points[0] + points[2], points[1]],
+                            [points[0] + points[2], points[1] + points[3]],
+                            [points[0], points[1] + points[2]]
+                        ]
                     ]
                     keypoint_counts, label_class = update_keypoint_counts(keypoint_counts, label_element["keypoints"])
                     labels = AI_ObjectLabel(
@@ -352,10 +356,12 @@ def convert_coco_to_tdml(cocofile):
                 for i, label_element in enumerate(labels_list):
                     points = label_element.get("bbox")
                     coord = [
-                        [points[0], points[1]],
-                        [points[0] + points[2], points[1]],
-                        [points[0] + points[2], points[1] + points[3]],
-                        [points[0], points[1] + points[2]]
+                        [
+                            [points[0], points[1]],
+                            [points[0] + points[2], points[1]],
+                            [points[0] + points[2], points[1] + points[3]],
+                            [points[0], points[1] + points[2]]
+                        ]
                     ]
                     labels = AI_ObjectLabel(
                         type="AI_ObjectLabel",
@@ -541,10 +547,12 @@ def convert_coco_to_tdml(cocofile):
                 for i, label_element in enumerate(labels_list):
                     points = label_element.get("bbox")
                     coord = [
-                        [points[0], points[1]],
-                        [points[0] + points[2], points[1]],
-                        [points[0] + points[2], points[1] + points[3]],
-                        [points[0], points[1] + points[2]]
+                        [
+                            [points[0], points[1]],
+                            [points[0] + points[2], points[1]],
+                            [points[0] + points[2], points[1] + points[3]],
+                            [points[0], points[1] + points[2]]
+                        ]
                     ]
                     labels = AI_ObjectLabel(
                         type="AI_ObjectLabel",
