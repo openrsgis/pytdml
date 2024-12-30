@@ -38,6 +38,7 @@ homepage = "https://github.com/TrainingDML/pytdml"
 [tool.setuptools.packages.find]
 where = ["."]
 
-[pytest]
-filterwarnings =
-    ignore::DeprecationWarning
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
