@@ -103,28 +103,6 @@ def download_scene_data(args):
         return data_item
 
 
-# def download_object_data(args):
-#
-#     dataset_name, data_item, download_dir, lock, crop = args
-#     sample_url = data_item.data_url[0]
-#     labels = data_item.labels
-#
-#     bucket_name, image_object_name = split_data_url(sample_url)
-#     file_path = generate_local_file_path(download_dir, sample_url)
-#
-#     with lock:
-#         try:
-#             if not os.path.exists(os.path.dirname(file_path)):
-#                 os.makedirs(os.path.dirname(file_path))
-#
-#         except OSError as error:
-#             print(error)
-#
-#     if crop is None:
-#         # download training data
-#         download_file(bucket_name, image_object_name, file_path)
-#         data_item.data_url = [file_path]
-#         return [data_item]
 def download_object_data(args):
     dataset_name, data_item, download_dir, crop = args
     sample_url = data_item.data_url[0]
@@ -380,26 +358,6 @@ def DatasetDownload(taskType, data_list, download_dir, num_processes=8):
                     result_list.append(result)
         return list(result_list)
 
-
-# def DatasetDownload2(task_type, dataset, download_dir, crop, num_processes=8):
-#
-#     with multiprocessing.Manager() as manager:
-#         result_list = manager.list()
-#         lock = manager.Lock()
-#         with multiprocessing.Pool(processes=num_processes) as pool:
-#
-#             args = [(dataset.name, data_item, download_dir, lock, crop) for data_item in dataset.data]
-#             if task_type == Task.object_detection:
-#                 for result in tqdm(pool.imap_unordered(download_object_data, args), total=len(args)):
-#                     result_list.extend(result)
-#             if task_type == Task.semantic_segmentation:
-#                 for result in tqdm(pool.imap_unordered(download_segmentation_data, args), total=len(args)):
-#                     result_list.extend(result)
-#             if task_type == Task.change_detection:
-#                 for result in tqdm(pool.imap_unordered(download_changeDetection_data, args), total=len(args)):
-#                     result_list.extend(result)
-#
-#         return list(result_list)
 
 def DatasetDownload2(task_type, dataset, download_dir, crop, num_threads=8):
     result_list = []

@@ -173,12 +173,6 @@ class TensorflowEOImageSegmentationTD:
         return dataset
 
 
-from datalibrary.s3Client import minio_client as client
-from io import BytesIO
-from PIL import Image
-import os
-
-
 def _read_image(root, sample_url):
 
     file_path = download_scene_data((sample_url, root))
@@ -339,10 +333,6 @@ class TensorObjectDetectionDataPipe:
             output_types=(tf.float32, tf.float32),
             output_shapes=((None, None, 3), (None, 5)),
         )
-        # dataset = dataset.map()
-        # if shuffle:
-        #     dataset = dataset.shuffle(buffer_size=len(self.tf_imgs))
-        # dataset = dataset.batch(batch_size)
         dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
         return dataset
 
@@ -425,20 +415,10 @@ class TensorSemanticSegmentationDataPipe:
                     yield img, label
 
     def as_dataset(self, batch_size=32, shuffle=True):
-        # dataset = tf.data.Dataset.from_tensor_slices((self.tf_imgs, self.tf_labels))
-        # if shuffle:
-        #     dataset = dataset.shuffle(buffer_size=len(self.tf_imgs))
-        # dataset = dataset.map(
-        #     lambda x, y: (tf.py_function(func=_read_image, inp=[x], Tout=tf.uint8), y),
-        #     num_parallel_calls=tf.data.AUTOTUNE)
-        # dataset = dataset.map(self._process_segmentation_data, num_parallel_calls=tf.data.AUTOTUNE)
-        # dataset = dataset.batch(batch_size)
-        # dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
-        # return dataset
-        dataset = tf.data.Dataset.from_generator(self.generator, output_types=(tf.float32, tf.float32))
-        # dataset = dataset.map()
+        dataset = tf.data.Dataset.from_generator(
+            self.generator, output_types=(tf.float32, tf.float32)
+        )
         if shuffle:
             dataset = dataset.shuffle(buffer_size=len(self.tf_imgs))
-        # dataset = dataset.batch(batch_size)
         dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
         return dataset

@@ -9,9 +9,6 @@ import torch
 import torchvision.transforms as T
 import torchvision.transforms.functional as F
 
-# from util.box_ops import box_xyxy_to_cxcywh
-# from util.misc import interpolate
-
 
 def crop(image, target, region):
     cropped_image = F.crop(image, *region)
@@ -69,9 +66,6 @@ def hflip(image, target):
             boxes = boxes[:, [2, 1, 0, 3]] * torch.as_tensor([-1, 1, -1, 1]) + torch.as_tensor([w, 0, w, 0])
             target["bbox"] = boxes
 
-    # if "masks" in target:
-    #     target['masks'] = target['masks'].flip(-1)
-
     return flipped_image, target
 
 
@@ -105,8 +99,6 @@ def resize(image, target, size, max_size=None):
         else:
             return get_size_with_aspect_ratio(image_size, size, max_size)
 
-    # size = get_size(image.size, size, max_size)
-    # size = (800, 800)
     rescaled_image = F.resize(image, size)
     if target is None:
         return rescaled_image, None
@@ -126,10 +118,6 @@ def resize(image, target, size, max_size=None):
         target["area"] = scaled_area
     h, w = size
     target["size"] = torch.tensor([h, w])
-
-    # if "masks" in target:
-    #     target['masks'] = interpolate(
-    #         target['masks'][:, None].float(), size, mode="nearest")[:, 0] > 0.5
 
     return rescaled_image, target
 
@@ -254,13 +242,6 @@ class Normalize(object):
         if target is None:
             return image, None
         target = target.copy()
-        # h, w = image.shape[-2:]
-        # if "bbox" in target:
-        #     boxes = target["bbox"]
-            # if boxes.shape[0] > 0:
-            #     boxes = box_xyxy_to_cxcywh(boxes)
-            #     boxes = boxes / torch.tensor([w, h, w, h], dtype=torch.float32)
-            #     target["bbox"] = boxes
         return image, target
 
 

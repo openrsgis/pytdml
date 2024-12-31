@@ -161,10 +161,6 @@ def get_label_pixel_list_(label_path):
         return pixel_list
 
 
-# def get_mapping_(file):
-#     mapping_data = client.get_object("pytdml", "mapping/" + file + "_mapping.json")
-#     mapping = json.load(BytesIO(mapping_data.read()))
-#     return mapping
 lock = Lock()
 
 
@@ -227,11 +223,6 @@ def split_data_url(data_url):
 
 
 def object_path_parse_(object_name):
-    # bucket_name = object_name.split("/")[0]
-    # obs_dataset_name = object_name.split("/")[1]
-    # dataset_name = dataset_name_map_(obs_dataset_name)
-    # semantic_name = object_name.split("/")[2]
-    # file_name = object_name.split("/")[3]
     name_list = object_name.split("/")
     name_list[1] = dataset_name_map_(name_list[1])
     name_list.pop(0)
@@ -531,8 +522,10 @@ def split_data(dataset, split_type=None, split_ratio=None):
 
     if split_ratio:
         # assert split_ratio[0] + split_ratio[1] + split_ratio[2] == 1.0
-        tolerance = 1e-6  # 例如，可以使用 0.000001 作为容差值
-        assert abs(sum(split_ratio) - 1.0) <= tolerance, "The sum of the split ratios must equal 1.0"
+        tolerance = 1e-6  # For example, you can use 0.000001 as the tolerance value
+        assert (
+            abs(sum(split_ratio) - 1.0) <= tolerance
+        ), "The sum of the split ratios must equal 1.0"
         total_count = len(td_data)
         train_count = int(split_ratio[0] * total_count)
 
