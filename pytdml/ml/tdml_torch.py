@@ -337,7 +337,9 @@ class TorchStereoTD(VisionDataset):
 
         self.td_list = td_list
         self.transform = transform
-        self.target_imgs, self.ref_imgs, self.disp_imgs = self._load_data()  # 加载相机参数
+        self.target_imgs, self.ref_imgs, self.disp_imgs = (
+            self._load_data()
+        )  # Load camera parameters
 
     def _load_data(self):
 
@@ -365,7 +367,7 @@ class Torch3DModelReconstructionTD(VisionDataset):
     def __init__(self, tdml, root, transform=None):
         super().__init__(root)
         self.root = root
-        self.cams, self.depths, self.images = self._load_data()   # 加载相机参数
+        self.cams, self.depths, self.images = self._load_data()  # Load camera parameters
         self.tdml = tdml
         self.transform = transform
 
@@ -389,7 +391,7 @@ class Torch3DModelReconstructionTD(VisionDataset):
     def __getitem__(self, item):
         cam = self.cams[item]
         depth = self.depths[item]
-        image_list = self.images[item]  # 对于每个样本，使用不同的视角图像，即取模操作
+        image_list = self.images[item]  # For each sample, use different perspective images, i.e., modulo operation
         images = [utils.image_open(i) for i in image_list]
         depth_imgs = [utils.image_open(i) for i in depth]
         cam_txt = []

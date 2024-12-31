@@ -129,27 +129,27 @@ def download_object_data(args):
     bucket_name, image_object_name = split_data_url(sample_url)
     file_path = generate_local_file_path(download_dir, sample_url)
 
-    # 检查并创建目录
+    # Check and create directory
     if not os.path.exists(os.path.dirname(file_path)):
 
         try:
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
         except OSError as error:
             print(error)
-            return []  # 如果目录创建失败，则跳过当前项
+            return []  # If directory creation fails, skip the current item
     if crop is None:
-        # 检查文件是否已经存在，避免重复下载
+        # Check if the file already exists to avoid duplicate downloads
         if not os.path.exists(file_path):
-            # 函数中应捕获可能的异常，防止进程崩溃
+            # The function should catch possible exceptions to prevent process crashes
             try:
                 download_file(bucket_name, image_object_name, file_path)
                 data_item.data_url = [file_path]
             except Exception as error:
                 print(f"Failed to download {image_object_name}: {error}")
-                return []  # 下载失败，返回空列表
+                return []  # Download failed, return an empty list
         else:
             print(f"File already exists: {file_path}")
-            # 即使是已经下载的文件，也应该更新data_item的URL
+            # Even for already downloaded files, the data_item URL should be updated
             data_item.data_url = [file_path]
 
         return [data_item]
@@ -158,9 +158,13 @@ def download_object_data(args):
         data_stream = client.get_object(bucket_name, image_object_name)
         img = image_open(data_stream)
 
-        crop_object = CropWithTargetImage(*crop)  # 补充参数
-        download_dir = os.path.join(download_dir, "EOTrainingDataset", dataset_name, "image")
-        crop_coords, targets = crop_object(img, labels, download_dir, sample_url.split("/")[-1])
+        crop_object = CropWithTargetImage(*crop)  # Supplement parameters
+        download_dir = os.path.join(
+            download_dir, "EOTrainingDataset", dataset_name, "image"
+        )
+        crop_coords, targets = crop_object(
+            img, labels, download_dir, sample_url.split("/")[-1]
+        )
         index = 0
         for i, crop_image_url in enumerate(crop_coords):
 
@@ -396,12 +400,12 @@ def DatasetDownload(taskType, data_list, download_dir, num_processes=8):
 def DatasetDownload2(task_type, dataset, download_dir, crop, num_threads=8):
     result_list = []
 
-    # 准备args参数
+    # Prepare args parameters
     args = [(dataset.name, data_item, download_dir, crop) for data_item in dataset.data]
 
-    # 使用ThreadPoolExecutor进行线程池管理
+    # Use ThreadPoolExecutor for thread pool management
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
-        # 根据任务类型分配下载函数
+        # Assign download function based on task type
         if task_type == Task.object_detection:
             download_function = download_object_data
         elif task_type == Task.semantic_segmentation:
@@ -411,10 +415,10 @@ def DatasetDownload2(task_type, dataset, download_dir, crop, num_threads=8):
         else:
             raise ValueError(f"Unsupported task type: {task_type}")
 
-        # 将任务提交到线程池
+        # Submit tasks to the thread pool
         futures = {executor.submit(download_function, arg): arg for arg in args}
 
-        # 使用 tqdm 显示进度条
+        # Use tqdm to display progress bar
         for future in tqdm(as_completed(futures), total=len(futures)):
             try:
                 result = future.result()

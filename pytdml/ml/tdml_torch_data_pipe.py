@@ -221,10 +221,13 @@ class TorchSemanticSegmentationDataPipe(IterDataPipe, ABC):
                     self._cache_file_list.append(item)
                     yield img, label.squeeze(1)
                 else:
-
-                    crop_object = CropWithImage(*self.crop)  # 补充参数
-                    image_crop_paths = crop_object(img, os.path.dirname(image_path), sample_url.split("/")[-1])
-                    label_crop_paths = crop_object(label, os.path.dirname(label_path), label_url.split("/")[-1])
+                    crop_object = CropWithImage(*self.crop)  # Supplement parameters
+                    image_crop_paths = crop_object(
+                        img, os.path.dirname(image_path), sample_url.split("/")[-1]
+                    )
+                    label_crop_paths = crop_object(
+                        label, os.path.dirname(label_path), label_url.split("/")[-1]
+                    )
 
                     for i in range(len(image_crop_paths)):
                         img = image_open(image_crop_paths[i])
@@ -293,12 +296,20 @@ class TorchChangeDetectionDataPipe(IterDataPipe, ABC):
                     after_img = image_open(after_img_path)
                     label = image_open(label_path)
 
-                    crop_object = CropWithImage(*self.crop)  # 补充参数
-                    before_image_crop_paths = crop_object(before_img, os.path.dirname(before_img_path),
-                                                          data_url[0].split("/")[-1])
-                    after_image_crop_paths = crop_object(after_img, os.path.dirname(after_img_path),
-                                                          data_url[1].split("/")[-1])
-                    label_crop_paths = crop_object(label, os.path.dirname(label_path), label_url.split("/")[-1])
+                    crop_object = CropWithImage(*self.crop)  # Supplement parameters
+                    before_image_crop_paths = crop_object(
+                        before_img,
+                        os.path.dirname(before_img_path),
+                        data_url[0].split("/")[-1],
+                    )
+                    after_image_crop_paths = crop_object(
+                        after_img,
+                        os.path.dirname(after_img_path),
+                        data_url[1].split("/")[-1],
+                    )
+                    label_crop_paths = crop_object(
+                        label, os.path.dirname(label_path), label_url.split("/")[-1]
+                    )
                     for i in range(len(before_image_crop_paths)):
                         before_img = image_open(before_image_crop_paths[i])
                         after_img = image_open(after_image_crop_paths[i])
@@ -392,10 +403,12 @@ class Torch3DModelConstructionDataPipe(IterDataPipe):
 
             cam = np.load(self.cams[item])
             depth = np.load(self.depths[item])
-            image_list = self.images[item]  # 对于每个样本，使用不同的视角图像，即取模操作
+            image_list = self.images[
+                item
+            ]  # For each sample, use different view images, i.e., modulo operation
             images = [Image.open(i).convert("RGB") for i in image_list]
             if self.transform is not None:
-                # 如果定义了transform，就对图像进行处理
+                # If transform is defined, process the images
                 images = [self.transform(image) for image in images]
             yield cam, depth, images
 

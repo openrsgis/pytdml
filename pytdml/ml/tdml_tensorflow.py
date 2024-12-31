@@ -295,15 +295,15 @@ class TensorObjectDetectionDataPipe:
             img = utils.channel_processing(img)
 
             if self.crop is None:
-                # 下载文件
+                # Download file
                 # transform annotations
                 targets = utils.transform_annotation(labels, self.class_map, img_width, img_height)
                 yield img, targets
             else:
-
-                crop_object = CropWithTargetImage(*self.crop)  # 补充参数
-                crop_paths, targets = crop_object(img, labels, os.path.dirname(file_path),
-                                         sample_url.split("/")[-1])
+                crop_object = CropWithTargetImage(*self.crop)  # Supplement parameters
+                crop_paths, targets = crop_object(
+                    img, labels, os.path.dirname(file_path), sample_url.split("/")[-1]
+                )
 
                 for index, crop_path in enumerate(crop_paths):
                     img = image_open(crop_path)
@@ -332,9 +332,12 @@ class TensorObjectDetectionDataPipe:
         # dataset = dataset.batch(batch_size)
         # dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
         # return dataset
-        ## 方案二
-        dataset = tf.data.Dataset.from_generator(self.generator, output_types=(tf.float32, tf.float32),
-                                                 output_shapes=((None, None, 3), (None, 5)))
+        ## Solution 2
+        dataset = tf.data.Dataset.from_generator(
+            self.generator,
+            output_types=(tf.float32, tf.float32),
+            output_shapes=((None, None, 3), (None, 5)),
+        )
         # dataset = dataset.map()
         # if shuffle:
         #     dataset = dataset.shuffle(buffer_size=len(self.tf_imgs))
@@ -407,10 +410,13 @@ class TensorSemanticSegmentationDataPipe:
 
                 yield img, label
             else:
-
-                crop_object = CropWithImage(*self.crop)  # 补充参数
-                image_crop_paths = crop_object(img, os.path.dirname(image_path), sample_url.split("/")[-1])
-                label_crop_paths = crop_object(label, os.path.dirname(label_path), label_url.split("/")[-1])
+                crop_object = CropWithImage(*self.crop)  # Supplement parameters
+                image_crop_paths = crop_object(
+                    img, os.path.dirname(image_path), sample_url.split("/")[-1]
+                )
+                label_crop_paths = crop_object(
+                    label, os.path.dirname(label_path), label_url.split("/")[-1]
+                )
 
                 for i in range(len(image_crop_paths)):
                     img = image_open(image_crop_paths[i])
