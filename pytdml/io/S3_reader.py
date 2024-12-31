@@ -1,6 +1,5 @@
 from io import BytesIO
 import re
-from urllib.parse import quote
 
 
 def parse_s3_path(s3_path):

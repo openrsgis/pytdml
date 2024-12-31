@@ -32,7 +32,6 @@
 import json
 from typing import Union
 
-from pytdml.io import read_from_json
 from pytdml.type import TrainingDataset, EOTrainingDataset
 
 

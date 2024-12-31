@@ -2,14 +2,10 @@ import json
 import requests
 import jsonschema
 
-from pytdml.config import BUCKET
-from pytdml.io import parse_json
-from pytdml.io.S3_reader import S3Client
 from pytdml.io.coco_converter import convert_coco_to_tdml
-from pytdml.io.yaml_converter import yaml_to_eo_tdml
-
-from pytdml.io.tdml_readers import read_from_json
 from pytdml.io.stac_converter import convert_stac_to_tdml
+from pytdml.io.tdml_readers import read_from_json
+from pytdml.io.yaml_converter import yaml_to_eo_tdml
 
 base_url = "https://raw.githubusercontent.com/opengeospatial/TrainingDML-AI_SWG/main/schemas/1.0/json_schema/{}.json"
 remote_schema_url = base_url.format("ai_eoTrainingDataset")

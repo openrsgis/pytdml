@@ -28,11 +28,12 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-import pytdml.utils as utils
+import os
 from dataclasses import dataclass, field
 from typing import List
 from urllib.parse import urlparse
-from datalibrary.downloader import *
+
+import pytdml.utils as utils
 from pytdml.io import internal, read_from_json, parse_json
 from pytdml.type.extended_types_old import EOTrainingDataset, EOTask
 

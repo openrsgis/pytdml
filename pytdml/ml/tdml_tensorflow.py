@@ -29,9 +29,10 @@
 #
 # ------------------------------------------------------------------------------
 import cv2
-import numpy as np
 import tensorflow as tf
 import tensorflow_io as tfio
+from datalibrary.s3Client import minio_client as client
+import os
 
 import pytdml.utils as utils
 from datalibrary.downloader import *

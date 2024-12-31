@@ -28,24 +28,23 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-import pickle
-from typing import Iterable
-import json
 import os
-import urllib3
-from PIL import Image
-from rasterio import RasterioIOError
-
-Image.MAX_IMAGE_PIXELS = 10_000_000_000  # 10 billion
+import re
+import json
+import pickle
+from io import BytesIO
+from threading import Lock
+from typing import Iterable
 
 import numpy as np
-from io import BytesIO
-import re
 import torch
+import urllib3
+from PIL import Image
 from minio import S3Error
-from threading import Lock
 
 from datalibrary.s3Client import minio_client as client
+
+Image.MAX_IMAGE_PIXELS = 10_000_000_000  # 10 billion
 
 
 def json_empty(item):

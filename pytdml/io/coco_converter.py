@@ -2,9 +2,10 @@ import json
 import os
 import re
 from datetime import datetime
+
 from geojson import Feature
 
-from pytdml.type import AI_EOTrainingData, EOTrainingDataset, AI_EOTask, AI_ObjectLabel, AI_PixelLabel, AI_SceneLabel
+from pytdml.type import AI_EOTrainingData, EOTrainingDataset, AI_EOTask, AI_ObjectLabel, AI_SceneLabel
 from pytdml.type.basic_types import NamedValue
 
 

@@ -28,32 +28,24 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-import glob
 import json
+import math
+import os
 import pickle
 from abc import ABC
 
-import cv2
 import geojson
 import numpy as np
 import torch
-import io
 from PIL import Image
-import os
-import math
-
-
-import pytdml.utils as utils
-
-from torch.utils.data import Dataset
-
 from torchdata.datapipes.iter import IterDataPipe
 
-from datalibrary import downloader
-from datalibrary.s3Client import minio_client as client
+import pytdml.utils as utils
 from pytdml.type import ObjectLabel
 from pytdml.utils import image_open, save_cache
 from pytdml.tdml_image_crop import CropWithImage, CropWithTargetImage
+from datalibrary import downloader
+from datalibrary.s3Client import minio_client as client
 
 
 class TorchSceneClassificationDataPipe(IterDataPipe, ABC):

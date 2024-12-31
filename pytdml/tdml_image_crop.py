@@ -30,16 +30,15 @@
 # ------------------------------------------------------------------------------
 import argparse
 import json
+import math
 import os
 import sys
-import math
-import numpy as np
 
 import cv2
-from geojson import Feature, Polygon
+import numpy as np
 
 from pytdml.io import read_from_json
-from pytdml.type import EOTrainingDataset, AI_EOTrainingData, AI_PixelLabel
+from pytdml.type import AI_EOTrainingData, AI_PixelLabel, EOTrainingDataset
 from pytdml.utils import remove_empty
 
 

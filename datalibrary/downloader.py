@@ -28,16 +28,20 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-import geojson
-from tqdm import tqdm
+import json
 import multiprocessing
-from minio.error import MinioException
-from io import BytesIO
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import geojson
+from minio.error import MinioException
+from tqdm import tqdm
+
 from datalibrary.datasetcollection import Task
-from pytdml.utils import *
+from datalibrary.s3Client import minio_client as client
 from pytdml.tdml_image_crop import CropWithImage, CropWithTargetImage
-from pytdml.type.extended_types_old import EOTrainingData, SceneLabel, ObjectLabel, PixelLabel
+from pytdml.type.extended_types_old import EOTrainingData, ObjectLabel, PixelLabel
+from pytdml.utils import split_data_url, generate_local_file_path, image_open
 
 # Creating a Mutual Exclusion Lock
 lock = multiprocessing.Lock()
