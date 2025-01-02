@@ -28,24 +28,23 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-import pickle
-from typing import Iterable
-import json
 import os
-import urllib3
-from PIL import Image
-from rasterio import RasterioIOError
-
-Image.MAX_IMAGE_PIXELS = 10_000_000_000  # 10 billion
+import re
+import json
+import pickle
+from io import BytesIO
+from threading import Lock
+from typing import Iterable
 
 import numpy as np
-from io import BytesIO
-import re
 import torch
+import urllib3
+from PIL import Image
 from minio import S3Error
-from threading import Lock
 
 from datalibrary.s3Client import minio_client as client
+
+Image.MAX_IMAGE_PIXELS = 10_000_000_000  # 10 billion
 
 
 def json_empty(item):
@@ -146,7 +145,7 @@ def gray_to_index_image(label, color_to_index):
 
 def get_label_pixel_list_(label_path):
     """
-        get pxiel value of label pixel class
+    get pixel value of label pixel class
     """
     img = Image.open(label_path)
     pixels = img.getdata()
@@ -162,20 +161,16 @@ def get_label_pixel_list_(label_path):
         return pixel_list
 
 
-# def get_mapping_(file):
-#     mapping_data = client.get_object("pytdml", "mapping/" + file + "_mapping.json")
-#     mapping = json.load(BytesIO(mapping_data.read()))
-#     return mapping
 lock = Lock()
 
 
 def get_mapping_(file):
-    # 在读取文件前获取锁
+    # Acquire lock before reading file
     lock.acquire()
     try:
-        # 检查对象是否存在
+        # Check if object exists
         stat = client.stat_object("pytdml", f"mapping/{file}_mapping.json")
-        # 如果存在则继续
+        # If it exists, continue
         if stat:
             response = client.get_object("pytdml", f"mapping/{file}_mapping.json")
             mapping_data = response.read()
@@ -183,11 +178,11 @@ def get_mapping_(file):
                 return json.load(BytesIO(mapping_data))
 
     except json.JSONDecodeError as e:
-        print(f"JSON解析错误: {e}")
+        print(f"JSON parsing error: {e}")
     except S3Error as e:
-        print(f"MinIO S3错误: {e}")
+        print(f"MinIO S3 error: {e}")
     except Exception as e:
-        print(f"发生其他错误: {e}")
+        print(f"Other error occurred: {e}")
     finally:
         lock.release()
     return None
@@ -228,11 +223,6 @@ def split_data_url(data_url):
 
 
 def object_path_parse_(object_name):
-    # bucket_name = object_name.split("/")[0]
-    # obs_dataset_name = object_name.split("/")[1]
-    # dataset_name = dataset_name_map_(obs_dataset_name)
-    # semantic_name = object_name.split("/")[2]
-    # file_name = object_name.split("/")[3]
     name_list = object_name.split("/")
     name_list[1] = dataset_name_map_(name_list[1])
     name_list.pop(0)
@@ -415,7 +405,7 @@ def channel_processing(img):
     # single band check
     if channel == 1:
         img = convert_grey_to_rgb_(img)
-    # TODO: 通道数处理
+    # TODO: Channel processing
     if channel > 3:
         img = img[:, :, :3]
     return img
@@ -532,8 +522,10 @@ def split_data(dataset, split_type=None, split_ratio=None):
 
     if split_ratio:
         # assert split_ratio[0] + split_ratio[1] + split_ratio[2] == 1.0
-        tolerance = 1e-6  # 例如，可以使用 0.000001 作为容差值
-        assert abs(sum(split_ratio) - 1.0) <= tolerance, "The sum of the split ratios must equal 1.0"
+        tolerance = 1e-6  # For example, you can use 0.000001 as the tolerance value
+        assert (
+            abs(sum(split_ratio) - 1.0) <= tolerance
+        ), "The sum of the split ratios must equal 1.0"
         total_count = len(td_data)
         train_count = int(split_ratio[0] * total_count)
 
@@ -544,13 +536,13 @@ def split_data(dataset, split_type=None, split_ratio=None):
             raise ValueError("Split ratios should be non-negative and sum up to 1.")
 
         shuffled_data = random.sample(td_data, total_count)
-        # 划分数据集
+        # Split the dataset
         train_set = shuffled_data[:train_count]
-        valid_set = shuffled_data[train_count:train_count + validation_count]
-        test_set = shuffled_data[train_count + validation_count:]
+        valid_set = shuffled_data[train_count : train_count + validation_count]
+        test_set = shuffled_data[train_count + validation_count :]
 
-        # 返回划分后的三个数据集
-        # 创建dataset对象的深拷贝并分配数据
+        # Return the three split datasets
+        # Create deep copies of the dataset object and assign data
         train_dataset = copy.deepcopy(dataset)
         train_dataset.data = train_set
         valid_dataset = copy.deepcopy(dataset)

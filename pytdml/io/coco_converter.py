@@ -2,21 +2,23 @@ import json
 import os
 import re
 from datetime import datetime
+
 from geojson import Feature
 
-from pytdml.type import AI_EOTrainingData, EOTrainingDataset, AI_EOTask, AI_ObjectLabel, AI_PixelLabel, AI_SceneLabel
+from pytdml.type import AI_EOTrainingData, EOTrainingDataset, AI_EOTask, AI_ObjectLabel, AI_SceneLabel
 from pytdml.type.basic_types import NamedValue
 
 
 def categorize_string(s):
     """
-    检查字符串 s 是否包含特定单词（train, test, valid），并返回相应类别。
+    Check if the string s contains specific words (train, test, valid)
+    and return the corresponding category.
 
-    参数:
-        s (str): 要检查的字符串。
+    Args:
+        s (str): The string to check.
 
-    返回:
-        str: 匹配的类别。
+    Returns:
+        str: The matching category.
     """
     if re.search(r'train', s, re.IGNORECASE):
         return 'train'

@@ -29,9 +29,10 @@
 #
 # ------------------------------------------------------------------------------
 import cv2
-import numpy as np
 import tensorflow as tf
 import tensorflow_io as tfio
+from datalibrary.s3Client import minio_client as client
+import os
 
 import pytdml.utils as utils
 from datalibrary.downloader import *
@@ -172,12 +173,6 @@ class TensorflowEOImageSegmentationTD:
         return dataset
 
 
-from datalibrary.s3Client import minio_client as client
-from io import BytesIO
-from PIL import Image
-import os
-
-
 def _read_image(root, sample_url):
 
     file_path = download_scene_data((sample_url, root))
@@ -295,15 +290,15 @@ class TensorObjectDetectionDataPipe:
             img = utils.channel_processing(img)
 
             if self.crop is None:
-                # 下载文件
+                # Download file
                 # transform annotations
                 targets = utils.transform_annotation(labels, self.class_map, img_width, img_height)
                 yield img, targets
             else:
-
-                crop_object = CropWithTargetImage(*self.crop)  # 补充参数
-                crop_paths, targets = crop_object(img, labels, os.path.dirname(file_path),
-                                         sample_url.split("/")[-1])
+                crop_object = CropWithTargetImage(*self.crop)  # Supplement parameters
+                crop_paths, targets = crop_object(
+                    img, labels, os.path.dirname(file_path), sample_url.split("/")[-1]
+                )
 
                 for index, crop_path in enumerate(crop_paths):
                     img = image_open(crop_path)
@@ -332,13 +327,12 @@ class TensorObjectDetectionDataPipe:
         # dataset = dataset.batch(batch_size)
         # dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
         # return dataset
-        ## 方案二
-        dataset = tf.data.Dataset.from_generator(self.generator, output_types=(tf.float32, tf.float32),
-                                                 output_shapes=((None, None, 3), (None, 5)))
-        # dataset = dataset.map()
-        # if shuffle:
-        #     dataset = dataset.shuffle(buffer_size=len(self.tf_imgs))
-        # dataset = dataset.batch(batch_size)
+        ## Solution 2
+        dataset = tf.data.Dataset.from_generator(
+            self.generator,
+            output_types=(tf.float32, tf.float32),
+            output_shapes=((None, None, 3), (None, 5)),
+        )
         dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
         return dataset
 
@@ -407,10 +401,13 @@ class TensorSemanticSegmentationDataPipe:
 
                 yield img, label
             else:
-
-                crop_object = CropWithImage(*self.crop)  # 补充参数
-                image_crop_paths = crop_object(img, os.path.dirname(image_path), sample_url.split("/")[-1])
-                label_crop_paths = crop_object(label, os.path.dirname(label_path), label_url.split("/")[-1])
+                crop_object = CropWithImage(*self.crop)  # Supplement parameters
+                image_crop_paths = crop_object(
+                    img, os.path.dirname(image_path), sample_url.split("/")[-1]
+                )
+                label_crop_paths = crop_object(
+                    label, os.path.dirname(label_path), label_url.split("/")[-1]
+                )
 
                 for i in range(len(image_crop_paths)):
                     img = image_open(image_crop_paths[i])
@@ -418,20 +415,10 @@ class TensorSemanticSegmentationDataPipe:
                     yield img, label
 
     def as_dataset(self, batch_size=32, shuffle=True):
-        # dataset = tf.data.Dataset.from_tensor_slices((self.tf_imgs, self.tf_labels))
-        # if shuffle:
-        #     dataset = dataset.shuffle(buffer_size=len(self.tf_imgs))
-        # dataset = dataset.map(
-        #     lambda x, y: (tf.py_function(func=_read_image, inp=[x], Tout=tf.uint8), y),
-        #     num_parallel_calls=tf.data.AUTOTUNE)
-        # dataset = dataset.map(self._process_segmentation_data, num_parallel_calls=tf.data.AUTOTUNE)
-        # dataset = dataset.batch(batch_size)
-        # dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
-        # return dataset
-        dataset = tf.data.Dataset.from_generator(self.generator, output_types=(tf.float32, tf.float32))
-        # dataset = dataset.map()
+        dataset = tf.data.Dataset.from_generator(
+            self.generator, output_types=(tf.float32, tf.float32)
+        )
         if shuffle:
             dataset = dataset.shuffle(buffer_size=len(self.tf_imgs))
-        # dataset = dataset.batch(batch_size)
         dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
         return dataset

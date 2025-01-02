@@ -30,16 +30,15 @@
 # ------------------------------------------------------------------------------
 import argparse
 import json
+import math
 import os
 import sys
-import math
-import numpy as np
 
 import cv2
-from geojson import Feature, Polygon
+import numpy as np
 
 from pytdml.io import read_from_json
-from pytdml.type import EOTrainingDataset, AI_EOTrainingData, AI_PixelLabel
+from pytdml.type import AI_EOTrainingData, AI_PixelLabel, EOTrainingDataset
 from pytdml.utils import remove_empty
 
 
@@ -77,7 +76,7 @@ def td_image_crop(td: EOTrainingDataset, save_tdml_path: str, save_crop_dir: str
 
 def image_crop(data_url, save_dir, sub_size):
     """
-    image crop form data url
+    image crop from data url
     """
     image = cv2.imread(data_url)
     image_name = os.path.basename(data_url)
@@ -103,24 +102,26 @@ class CropWithImage:
 
     def __call__(self, img, dir, file_name):
         height, width, channel = img.shape
-        # 计算滑动窗口的步长
+        # Calculate the stride of the sliding window
         stride = int(self.crop_size * (1 - self.overlap))
 
-        # 计算需要填充的大小，使得图片可以被整除成多个crop_size大小的块
+        # Calculate the size of padding needed to make the image divisible into multiple crop_size blocks
         pad_h = math.ceil((stride - (height - self.crop_size) % stride) % stride)
         pad_w = math.ceil((stride - (width - self.crop_size) % stride) % stride)
-        # 对图像进行填充
-        img_pad = np.pad(img, [(0, pad_h), (0, pad_w), (0, 0)], mode='constant', constant_values=0)
+        # Pad the image
+        img_pad = np.pad(
+            img, [(0, pad_h), (0, pad_w), (0, 0)], mode="constant", constant_values=0
+        )
         crop_coords_paths = []
 
-        # 依次对每个crop进行处理
+        # Process each crop sequentially
         index = 0
         for y in range(0, height + pad_h - stride, stride):
             for x in range(0, width + pad_w - stride, stride):
-                # 计算当前crop的边界
+                # Calculate the boundaries of the current crop
                 x1, y1 = x, y
                 x2, y2 = x + self.crop_size, y + self.crop_size
-                # 对crop进行裁剪
+                # Crop the image
                 dot_index = file_name.find(".")
                 file_name_crop = file_name[:dot_index] + "_cropped_by_" + str(
                     self.crop_size) + "_" + str(int(y / stride)) + "_" + str(int(x / stride)) + \
@@ -146,28 +147,29 @@ class CropWithTargetImage(object):
     def __call__(self, img, target, dir, file_name):
         height, width, channel = img.shape
 
-        # 计算滑动窗口的步长
+        # Calculate the stride of the sliding window
         stride = int(self.crop_size * (1 - self.overlap))
 
-        # 计算需要填充的大小，使得图片可以被整除成多个crop_size大小的块
+        # Calculate the size of padding needed to make the image divisible into multiple crop_size blocks
         pad_h = math.ceil((stride - (height - self.crop_size) % stride) % stride)
         pad_w = math.ceil((stride - (width - self.crop_size) % stride) % stride)
 
-        # 对图像进行填充
-
-        img_pad = np.pad(img, [(0, pad_h), (0, pad_w), (0, 0)], mode='constant', constant_values=0)
+        # Pad the image
+        img_pad = np.pad(
+            img, [(0, pad_h), (0, pad_w), (0, 0)], mode="constant", constant_values=0
+        )
 
         crop_coords_paths = []
         targets_crops = []
 
-        # 依次对每个crop进行处理
+        # Process each crop sequentially
         for y in range(0, height + pad_h - stride, stride):
             for x in range(0, width + pad_w - stride, stride):
-                # 计算当前crop的边界
+                # Calculate the boundaries of the current crop
                 x1, y1 = x, y
                 x2, y2 = x + self.crop_size, y + self.crop_size
 
-                # 对crop进行裁剪
+                # Crop the image
                 dot_index = file_name.find(".")
                 file_name_crop = file_name[:dot_index] + "_cropped_by_" + str(self.crop_size) + "_" + str(int(y / stride)) + "_" + str(int(x / stride)) \
                                  + file_name[dot_index:]
@@ -182,8 +184,7 @@ class CropWithTargetImage(object):
 
                 targets = []
                 for t in target:
-
-                    # 获取目标框的坐标
+                    # Get the coordinates of the bounding box
                     # xmin, ymin, xmax, ymax = t[:4]
                     coordinates = t.object.geometry.coordinates[0]
                     xmin, ymin = coordinates[0]
@@ -194,11 +195,11 @@ class CropWithTargetImage(object):
                     if ymax - ymin == 0:
                         ymax = ymax + 1
 
-                    # 判断目标框是否在当前crop中
+                    # Check if the bounding box is within the current crop
                     if xmin >= x2 or xmax <= x1 or ymin >= y2 or ymax <= y1:
                         continue
 
-                    # 对目标框进行裁剪，并计算其在crop中的坐标
+                    # Crop the bounding box and calculate its coordinates within the crop
                     crop_x_min = max(xmin - x1, 0)
                     crop_y_min = max(ymin - y1, 0)
                     crop_x_max = min(xmax - x1, self.crop_size)
@@ -207,17 +208,17 @@ class CropWithTargetImage(object):
                     crop_width = crop_x_max - crop_x_min
                     crop_height = crop_y_max - crop_y_min
 
-                    # 计算目标框在crop中的面积占比
+                    # Calculate the area ratio of the bounding box within the crop
                     area_intersection = crop_width * crop_height
 
                     area_bbox = (xmax - xmin) * (ymax - ymin)
                     area_ratio = area_intersection / area_bbox
 
-                    # 如果目标框的面积占比小于阈值，则舍弃这个目标框
+                    # If the area ratio of the bounding box is less than the threshold, discard this bounding box
                     if area_ratio < self.threshold:
                         continue
 
-                    # 计算目标框在crop中的相对坐标和大小
+                    # Calculate the relative coordinates and size of the bounding box within the crop
                     # x_center_crop = (crop_x_min + crop_x_max) / 2 / self.crop_size
                     # y_center_crop = (crop_y_min + crop_y_max) / 2 / self.crop_size
                     # width_crop = crop_width / self.crop_size

@@ -28,11 +28,12 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-import pytdml.utils as utils
+import os
 from dataclasses import dataclass, field
 from typing import List
 from urllib.parse import urlparse
-from datalibrary.downloader import *
+
+import pytdml.utils as utils
 from pytdml.io import internal, read_from_json, parse_json
 from pytdml.type.extended_types_old import EOTrainingDataset, EOTask
 
@@ -103,13 +104,6 @@ class EOTrainingDatasetCollection:
         if os.path.exists(url):
             dataset_td_encode = read_from_json(url)
 
-            # try:
-            #     jsonschema.validate(dataset_td_encode, schema)
-            # return dataset_td_encode
-            # except jsonschema.exceptions.ValidationError as error:
-            #     print("Json 不符合json schema: ", error)
-            #     returnmob
-
             # If the URL points to a local file, read the JSON content from the file
             return dataset_td_encode
 
@@ -120,13 +114,6 @@ class EOTrainingDatasetCollection:
                 raise ModuleNotFoundError("Failed to import requests, please install the library first")
             response = requests.get(url).json()
             dataset_td_encode = parse_json(response)
-
-            # try:
-            # jsonschema.validate(dataset_td_encode, schema)
-            # return dataset_td_encode
-            # except jsonschema.exceptions.ValidationError as error:
-            #     print("Json 不符合json schema: ", error)
-            #     return
 
             # If the URL is an HTTP/HTTPS link, send a GET request and retrieve the JSON response
             return dataset_td_encode
