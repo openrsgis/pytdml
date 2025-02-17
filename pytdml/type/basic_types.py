@@ -661,7 +661,7 @@ class MD_Scope(BaseCamelModel):
 
     level: str
     extent: Optional[List[Union[EX_Extent, List[float]]]] = None
-    level_description: Optional[MD_ScopeDescription] = Field(None, min_length=4)
+    level_description: Optional[List[MD_ScopeDescription]] = None
 
     def to_dict(self):
         return self.model_dump(by_alias=True, exclude_none=True)
@@ -1412,7 +1412,7 @@ class TrainingDataset(BaseCamelModel):
     data: List[Union[AI_TrainingData, "AI_EOTrainingData"]] = Field(min_length=1)  # That one should be uri-format
     type: Literal["AI_AbstractTrainingDataset"]
 
-    amount_of_trainingData: Optional[int] = None
+    amount_of_training_data: Optional[int] = None
     classes: Optional[List[NamedValue]] = None
     classification_scheme: Optional[str] = None  # That one should be uri-format
     created_time: Optional[str] = None

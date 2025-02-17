@@ -1,0 +1,549 @@
+{
+    "type": "AI_EOTrainingDataset",
+    "id": "55",
+    "name": "COWC",
+    "description": "The Cars Overhead With Context (COWC) data set is a large set of annotated cars from overhead. It is useful for training a device such as a deep neural network to learn to detect and/or count cars. The dataset has the following attributes:\r\n1.Data from overhead at 15 cm per pixel resolution at ground (all data is EO). \r\n2.Data from six distinct locations: Toronto Canada, Selwyn New Zealand, Potsdam and Vaihingen  Germany, Columbus Ohio and Utah United States. \r\n3.32,716 unique annotated cars. 58,247 unique negative examples.\r\n4.Intentional selection of hard negative examples.\r\n5.Established baseline for detection and counting tasks.\r\n6.Extra testing scenes for use after validation.",
+    "version": "1.0",
+    "amountOfTrainingData": 53,
+    "createdTime": "2016-01-01T00:00:00",
+    "license": "CC BY-SA 4.0",
+    "providers": [
+        "Lawrence Livermore National Laboratory"
+    ],
+    "classes": [
+        {
+            "key": "Sedan",
+            "value": 59714
+        },
+        {
+            "key": "Pick_Up",
+            "value": 10987
+        },
+        {
+            "key": "Vehicle",
+            "value": 72879
+        }
+    ],
+    "classificationSchema": "LuojiaSET Classification Schema",
+    "tasks": [
+        {
+            "type": "AI_EOTask",
+            "datasetId": "55",
+            "id": "COWC-task",
+            "taskType": "Object Detection"
+        }
+    ],
+    "data": [
+        {
+            "type": "AI_EOTrainingData",
+            "id": "55",
+            "dataSetId": "55",
+            "trainingType": "training",
+            "numberOfLabels": 1,
+            "dataURL": [
+                "tests/data/object-detection/COWC-v1/image/Columbus_EO_Run01_s2_301_15_00_31.99319028-Oct-2007_11-00-31.993_Frame_1.5.5.jpg"
+            ],
+            "labels": [
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        92.0,
+                                        13.0
+                                    ],
+                                    [
+                                        124.0,
+                                        13.0
+                                    ],
+                                    [
+                                        124.0,
+                                        45.0
+                                    ],
+                                    [
+                                        92.0,
+                                        45.0
+                                    ],
+                                    [
+                                        92.0,
+                                        13.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "type": "AI_EOTrainingData",
+            "id": "55",
+            "dataSetId": "55",
+            "trainingType": "training",
+            "numberOfLabels": 2,
+            "dataURL": [
+                "object-detection/COWC-v1/image/Vaihingen_Mosaic.30.36.jpg"
+            ],
+            "labels": [
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        37.0,
+                                        -7.0
+                                    ],
+                                    [
+                                        69.0,
+                                        -7.0
+                                    ],
+                                    [
+                                        69.0,
+                                        25.0
+                                    ],
+                                    [
+                                        37.0,
+                                        25.0
+                                    ],
+                                    [
+                                        37.0,
+                                        -7.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        209.0,
+                                        183.0
+                                    ],
+                                    [
+                                        241.0,
+                                        183.0
+                                    ],
+                                    [
+                                        241.0,
+                                        215.0
+                                    ],
+                                    [
+                                        209.0,
+                                        215.0
+                                    ],
+                                    [
+                                        209.0,
+                                        183.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "type": "AI_EOTrainingData",
+            "id": "55",
+            "dataSetId": "55",
+            "trainingType": "training",
+            "numberOfLabels": 3,
+            "dataURL": [
+                "object-detection/COWC-v1/image/Potsdam_3_13_RGB.4.14.jpg"
+            ],
+            "labels": [
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Sedan",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        237.0,
+                                        0.0
+                                    ],
+                                    [
+                                        269.0,
+                                        0.0
+                                    ],
+                                    [
+                                        269.0,
+                                        32.0
+                                    ],
+                                    [
+                                        237.0,
+                                        32.0
+                                    ],
+                                    [
+                                        237.0,
+                                        0.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        165.0,
+                                        165.0
+                                    ],
+                                    [
+                                        197.0,
+                                        165.0
+                                    ],
+                                    [
+                                        197.0,
+                                        197.0
+                                    ],
+                                    [
+                                        165.0,
+                                        197.0
+                                    ],
+                                    [
+                                        165.0,
+                                        165.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        182.0,
+                                        130.0
+                                    ],
+                                    [
+                                        214.0,
+                                        130.0
+                                    ],
+                                    [
+                                        214.0,
+                                        162.0
+                                    ],
+                                    [
+                                        182.0,
+                                        162.0
+                                    ],
+                                    [
+                                        182.0,
+                                        130.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "type": "AI_EOTrainingData",
+            "id": "55",
+            "dataSetId": "55",
+            "trainingType": "training",
+            "numberOfLabels": 2,
+            "dataURL": [
+                "object-detection/COWC-v1/image/Toronto_03747.61.41.jpg"
+            ],
+            "labels": [
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        176.0,
+                                        67.0
+                                    ],
+                                    [
+                                        208.0,
+                                        67.0
+                                    ],
+                                    [
+                                        208.0,
+                                        99.0
+                                    ],
+                                    [
+                                        176.0,
+                                        99.0
+                                    ],
+                                    [
+                                        176.0,
+                                        67.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        16.0,
+                                        114.0
+                                    ],
+                                    [
+                                        48.0,
+                                        114.0
+                                    ],
+                                    [
+                                        48.0,
+                                        146.0
+                                    ],
+                                    [
+                                        16.0,
+                                        146.0
+                                    ],
+                                    [
+                                        16.0,
+                                        114.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "type": "AI_EOTrainingData",
+            "id": "55",
+            "dataSetId": "55",
+            "trainingType": "training",
+            "numberOfLabels": 3,
+            "dataURL": [
+                "object-detection/COWC-v1/image/Toronto_03553.76.45.jpg"
+            ],
+            "labels": [
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Sedan",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        78.0,
+                                        80.0
+                                    ],
+                                    [
+                                        110.0,
+                                        80.0
+                                    ],
+                                    [
+                                        110.0,
+                                        112.0
+                                    ],
+                                    [
+                                        78.0,
+                                        112.0
+                                    ],
+                                    [
+                                        78.0,
+                                        80.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        55.0,
+                                        5.0
+                                    ],
+                                    [
+                                        87.0,
+                                        5.0
+                                    ],
+                                    [
+                                        87.0,
+                                        37.0
+                                    ],
+                                    [
+                                        55.0,
+                                        37.0
+                                    ],
+                                    [
+                                        55.0,
+                                        5.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "AI_ObjectLabel",
+                    "isNegative": false,
+                    "confidence": 1.0,
+                    "bboxType": "Horizontal BBox",
+                    "class": "Vehicle",
+                    "object": {
+                        "type": "Feature",
+                        "properties": null,
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        195.0,
+                                        74.0
+                                    ],
+                                    [
+                                        227.0,
+                                        74.0
+                                    ],
+                                    [
+                                        227.0,
+                                        106.0
+                                    ],
+                                    [
+                                        195.0,
+                                        106.0
+                                    ],
+                                    [
+                                        195.0,
+                                        74.0
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "bands": [
+        {
+            "name": [
+                {
+                    "code": "red"
+                }
+            ]
+        },
+        {
+            "name": [
+                {
+                    "code": "green"
+                }
+            ]
+        },
+        {
+            "name": [
+                {
+                    "code": "blue"
+                }
+            ]
+        }
+    ],
+    "numberOfClasses": 4,
+    "imageSize": "256*256",
+    "scope": {
+        "level": "DATASET",
+        "levelDescription": [
+            {
+                "dataset": "COWC"
+            }
+        ]
+    }
+}

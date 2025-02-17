@@ -65,7 +65,7 @@ def create_class_map(td: TrainingDataset):
             for item in _class.items():
                 class_map[item[0]] = item[1]
         else:
-            class_map[_class] = i
+            class_map[_class.key] = _class.value
     return class_map
 
 

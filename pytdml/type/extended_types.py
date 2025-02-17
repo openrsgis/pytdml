@@ -79,6 +79,13 @@ class AI_ObjectLabel(AI_Label):
     date_time: Optional[str] = None
     bbox_type: Optional[str] = None
 
+    @field_validator("object", mode="before")
+    def parse_feature(cls, v):
+        if isinstance(v, dict):
+            # 使用 geojson 库解析字典为 Feature 对象
+            return Feature(**v)
+        return v
+
     @field_validator("date_time")
     def validate_date_time(cls, v):
         return _validate_date(v)
