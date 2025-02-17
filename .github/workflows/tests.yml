@@ -1,32 +1,32 @@
 name: Python application
-
 on: [push, pull_request]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
+      with:
+        lfs: true
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.9'
-
     - name: Cache pip dependencies
       id: cache-pip
       uses: actions/cache@v4
       with:
-        path: ~/.cache/pip
+        path: \~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
-
         restore-keys: |
           ${{ runner.os }}-pip-
-
-    - name: Install dependencies
-      run: pip install pytest && pip install .[all]
-
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev libssl-dev
+    - name: Install Python dependencies
+      run: |
+        pip install pytest
+        pip install .[torch] --no-cache-dir
     - name: Run tests
       run: pytest
