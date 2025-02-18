@@ -56,7 +56,7 @@ class TorchEOImageSceneTD(Dataset):
         return len(self.td_list)
 
     def __getitem__(self, item):
-        img_path = self.td_list[item].data_URL[0]
+        img_path = self.td_list[item].data_url[0]
         img = Image.open(img_path)
         img.load()
         label = self.class_map[self.td_list[item].labels[0].label_class]
@@ -79,7 +79,7 @@ class TorchEOImageObjectTD(Dataset):
         return len(self.td_list)
 
     def __getitem__(self, index):
-        img_path = self.td_list[index].data_URL[0]
+        img_path = self.td_list[index].data_url[0]
         img = cv2.imread(img_path)
         img_height, img_width, channels = img.shape
         targets = []
@@ -117,12 +117,12 @@ class TorchEOImageSegmentationTD(Dataset):
         return len(self.td_list)
 
     def __getitem__(self, item):
-        img_path = self.td_list[item].data_URL[0]
+        img_path = self.td_list[item].data_url[0]
         img = Image.open(img_path)
         img.load()
         if self.transform is not None:
             img = self.transform(img)
-        label_path = self.td_list[item].labels[0].image_URL
+        label_path = self.td_list[item].labels[0].image_url
         label = cv2.imread(label_path, cv2.COLOR_BGR2RGB)
         index_label = utils.label_to_index(label, self.color_to_index)
         index_label = np.asarray(index_label, dtype=np.int64)

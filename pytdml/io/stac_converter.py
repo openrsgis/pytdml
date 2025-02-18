@@ -90,7 +90,7 @@ def convert_stac_to_tdml(stac_dataset_path):
             type = "AI_EOTrainingData",
             id = link_id,
             labels = [label],
-            data_URL = link_href,
+            data_url = link_href,
             data_time = data_time
         )
         datalist.append(data)
