@@ -206,15 +206,3 @@ def to_camel(string: str) -> str:
         str: camelCase string
     """
     return re.sub(r"_(\w)", lambda match: match.group(1).upper(), string)
-
-
-def to_interior_class(data_dict, name, class_name):
-    new_dic = data_dict[name]
-    new_dic = class_name.from_dict(new_dic)
-    data_dict[name] = new_dic
-
-
-def list_to_interior_class(data_dict, name, class_name):
-    new_dic = data_dict[name]
-    new_dic = [class_name.from_dict(i) for i in new_dic]
-    data_dict[name] = new_dic

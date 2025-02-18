@@ -35,7 +35,7 @@ import copy
 from typing_extensions import TypedDict
 from typing import List, Union, Optional, Literal
 from pydantic import BaseModel, Field, field_validator, model_validator
-from pytdml.type._utils import _validate_date, to_camel, _valid_methods, _validate_training_type, _validate_evaluation_method_type, to_interior_class, list_to_interior_class
+from pytdml.type._utils import _validate_date, to_camel, _valid_methods, _validate_training_type, _validate_evaluation_method_type
 
 
 class BaseCamelModel(BaseModel):
@@ -59,16 +59,6 @@ class KeyValuePair(BaseCamelModel):
     key: list
     value: list
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        key = json_dict.keys()
-        value = json_dict.values()
-        key_value_pair = {"key": key, "value": value}
-        return KeyValuePair(**key_value_pair)
-
 
 class NamedValue(BaseCamelModel):
     """
@@ -77,14 +67,6 @@ class NamedValue(BaseCamelModel):
 
     key: str
     value: Union[str, object, int, float, list, bool, None]
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return NamedValue(**new_dict)
 
 
 class CI_Date(BaseCamelModel):
@@ -98,14 +80,6 @@ class CI_Date(BaseCamelModel):
     @field_validator("date")
     def validate_date(cls, v):
         return _validate_date(v)
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return CI_Date(**new_dict)
 
 
 class CI_Citation(BaseCamelModel):
@@ -127,14 +101,6 @@ class CI_Citation(BaseCamelModel):
     def validate_edition_date(cls, v):
         return _validate_date(v)
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return CI_Citation(**new_dict)
-
 
 class LinearRing(BaseCamelModel):
     """
@@ -143,14 +109,6 @@ class LinearRing(BaseCamelModel):
 
     pos_list: List[float] = Field(min_length=4)
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return LinearRing(**new_dict)
-
 
 class LinearRing_Object(BaseCamelModel):
     """
@@ -158,14 +116,6 @@ class LinearRing_Object(BaseCamelModel):
     """
 
     linear_ring: LinearRing
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return LinearRing_Object(**new_dict)
 
 
 class Polygon(BaseCamelModel):
@@ -180,14 +130,6 @@ class Polygon(BaseCamelModel):
     exterior: Optional[LinearRing_Object] = None
     interior: Optional[List[LinearRing_Object]] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return Polygon(**new_dict)
-
 
 class MD_Identifier(BaseCamelModel):
     """
@@ -200,14 +142,6 @@ class MD_Identifier(BaseCamelModel):
     version: Optional[str] = None
     description: Optional[str] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_Identifier(**new_dict)
-
 
 class MemberName(BaseCamelModel):
     """
@@ -216,14 +150,6 @@ class MemberName(BaseCamelModel):
 
     a_name: str
     attribute_type: str
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MemberName(**new_dict)
 
 
 class MI_RangeElementDescription(BaseCamelModel):
@@ -234,14 +160,6 @@ class MI_RangeElementDescription(BaseCamelModel):
     name: str
     definition: str
     range_element: List[str] = Field(min_length=1)
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MI_RangeElementDescription(**new_dict)
 
 
 class MD_Band(BaseCamelModel):
@@ -284,14 +202,6 @@ class MD_Band(BaseCamelModel):
 
         return v
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_Band(**new_dict)
-
 
 class EX_BoundingPolygon(BaseCamelModel):
     """
@@ -300,21 +210,6 @@ class EX_BoundingPolygon(BaseCamelModel):
 
     polygon: List[Polygon] = Field(min_length=1)
     extent_type_code: Optional[bool] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return EX_BoundingPolygon(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_BoundingPolygon.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class EX_GeographicBoundingBox(BaseCamelModel):
@@ -329,21 +224,6 @@ class EX_GeographicBoundingBox(BaseCamelModel):
 
     extent_type_code: Optional[bool] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return EX_GeographicBoundingBox(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_GeographicBoundingBox.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class EX_GeographicDescription(BaseCamelModel):
     """
@@ -353,21 +233,6 @@ class EX_GeographicDescription(BaseCamelModel):
     geographic_identifier: MD_Identifier
 
     extent_type_code: Optional[bool] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return EX_GeographicDescription(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_GeographicDescription.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class TimeInstant(BaseCamelModel):
@@ -382,21 +247,6 @@ class TimeInstant(BaseCamelModel):
     identifier: Optional[str] = None
     name: Optional[List[str]] = None
     related_time: Optional[List[KeyValuePair]] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return TimeInstant(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            TimeInstant.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class TimePeriod(BaseCamelModel):
@@ -423,21 +273,6 @@ class TimePeriod(BaseCamelModel):
     def validate_end_position(cls, v):
         return _validate_date(v)
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return TimePeriod(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            TimePeriod.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class EX_TemporalExtent(BaseCamelModel):
     """
@@ -445,28 +280,6 @@ class EX_TemporalExtent(BaseCamelModel):
     """
 
     extent: Union[TimeInstant, TimePeriod]
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            if TimeInstant.can_build_from_data(extent):
-                extent = TimeInstant.from_dict(extent)
-            else:
-                extent = TimePeriod.from_dict(extent)
-            new_dict['extent'] = extent
-        return EX_TemporalExtent(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_TemporalExtent.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class EX_ReferenceSystem(BaseCamelModel):
@@ -476,14 +289,6 @@ class EX_ReferenceSystem(BaseCamelModel):
 
     reference_system_identifier: Optional[MD_Identifier] = None
     reference_system_type: Optional[str] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return EX_ReferenceSystem(**new_dict)
 
 
 class VerticalCRS(BaseCamelModel):
@@ -502,14 +307,6 @@ class VerticalCRS(BaseCamelModel):
     remarks: Optional[List[str]] = None
     domain_of_validity: Optional[List[str]] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return VerticalCRS(**new_dict)
-
 
 class EX_VerticalExtent(BaseCamelModel):
     """
@@ -522,14 +319,6 @@ class EX_VerticalExtent(BaseCamelModel):
     vertical_CRS_id: Optional[EX_ReferenceSystem] = None
     vertical_CRS: Optional[VerticalCRS] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return EX_VerticalExtent(**new_dict)
-
 
 class EX_SpatialTemporalExtent(BaseCamelModel):
     """
@@ -541,37 +330,6 @@ class EX_SpatialTemporalExtent(BaseCamelModel):
 
     vertical_extent: Optional[EX_VerticalExtent] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            if TimeInstant.can_build_from_data(extent):
-                extent = TimeInstant.from_dict(extent)
-            else:
-                extent = TimePeriod.from_dict(extent)
-            new_dict['extent'] = extent
-        if new_dict.__contains__('spatialExtent'):
-            spatial_extent = new_dict['spatialExtent']
-            if EX_BoundingPolygon.can_build_from_data(spatial_extent):
-                spatial_extent = EX_BoundingPolygon.from_dict(spatial_extent)
-            elif EX_GeographicBoundingBox.can_build_from_data(spatial_extent):
-                spatial_extent = EX_GeographicBoundingBox.from_dict(spatial_extent)
-            else:
-                spatial_extent = EX_GeographicDescription.from_dict(spatial_extent)
-            new_dict['spatialExtent'] = spatial_extent
-        return EX_SpatialTemporalExtent(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_SpatialTemporalExtent.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class EX_Extent(BaseCamelModel):
     """
@@ -582,40 +340,6 @@ class EX_Extent(BaseCamelModel):
     geographic_element: Optional[List[Union[EX_BoundingPolygon, EX_GeographicBoundingBox, EX_GeographicDescription]]] = None
     temporal_element: Optional[List[Union[EX_TemporalExtent, EX_SpatialTemporalExtent]]] = None
     vertical_element: Optional[List[EX_VerticalExtent]] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('geographicElement'):
-            geographic_element = new_dict['geographicElement']
-            for i in range(len(geographic_element)):
-                if EX_BoundingPolygon.can_build_from_data(geographic_element[i]):
-                    geographic_element[i] = EX_BoundingPolygon.from_dict(geographic_element[i])
-                elif EX_GeographicBoundingBox.can_build_from_data(geographic_element[i]):
-                    geographic_element[i] = EX_GeographicBoundingBox.from_dict(geographic_element[i])
-                else:
-                    geographic_element[i] = EX_GeographicDescription.from_dict(geographic_element[i])
-            new_dict['geographicElement'] = geographic_element
-
-        if new_dict.__contains__('temporalElement'):
-            temporal_element = new_dict['temporalElement']
-            for i in range(len(temporal_element)):
-                if EX_TemporalExtent.can_build_from_data(temporal_element[i]):
-                    temporal_element[i] = EX_TemporalExtent.from_dict(temporal_element[i])
-                else:
-                    temporal_element[i] = EX_SpatialTemporalExtent.from_dict(temporal_element[i])
-            new_dict['temporalElement'] = temporal_element
-        return EX_Extent(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_Extent.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 # class BoundingBox(BaseCamelModel):
@@ -645,14 +369,6 @@ class MD_ScopeDescription(BaseCamelModel):
     dataset: Optional[str] = None
     other: Optional[str] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_ScopeDescription(**new_dict)
-
 
 class MD_Scope(BaseCamelModel):
     """
@@ -663,34 +379,11 @@ class MD_Scope(BaseCamelModel):
     extent: Optional[List[Union[EX_Extent, List[float]]]] = None
     level_description: Optional[List[MD_ScopeDescription]] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            for i in range(len(extent)):
-                if EX_Extent.can_build_from_data(extent[i]):
-                    extent[i] = EX_Extent.from_dict(extent[i])
-                else:
-                    pass
-        return MD_Scope(**new_dict)
-
 
 class CI_Telephone(BaseCamelModel):
 
     number: str
     number_type: Optional[str] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return CI_Telephone(**new_dict)
 
 
 class CI_Address(BaseCamelModel):
@@ -701,14 +394,6 @@ class CI_Address(BaseCamelModel):
     postal_code: Optional[str] = None
     country: Optional[str] = None
     electronic_mail_address: Optional[List[str]] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return CI_Address(**new_dict)
 
 
 class CI_OnlineResource(BaseCamelModel):
@@ -721,14 +406,6 @@ class CI_OnlineResource(BaseCamelModel):
     function: Optional[str] = None
     protocol_request: Optional[str] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return CI_OnlineResource(**new_dict)
-
 
 class CI_Contact(BaseCamelModel):
 
@@ -739,14 +416,6 @@ class CI_Contact(BaseCamelModel):
     contact_instructions: Optional[str] = None
     contact_type: Optional[str] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return CI_Contact(**new_dict)
-
 
 class CI_Individual(BaseCamelModel):
 
@@ -754,21 +423,6 @@ class CI_Individual(BaseCamelModel):
     contact_info: Optional[List[CI_Contact]] = None
     party_identifier: Optional[List[MD_Identifier]] = None
     position_name: Optional[str] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return CI_Individual(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            CI_Individual.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class CI_Organisation(BaseCamelModel):
@@ -779,21 +433,6 @@ class CI_Organisation(BaseCamelModel):
     logo: Optional[List[KeyValuePair]] = None
     individual: Optional[List[CI_Individual]] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return CI_Organisation(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            CI_Individual.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class CI_Responsibility(BaseCamelModel):
 
@@ -802,48 +441,12 @@ class CI_Responsibility(BaseCamelModel):
 
     extent: Optional[List[Union[EX_Extent, List[float]]]] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('party'):
-            party = new_dict['party']
-            for i in range(len(party)):
-                if CI_Individual.can_build_from_data(party[i]):
-                    party[i] = CI_Individual.from_dict(party[i])
-                else:
-                    party[i] = CI_Organisation.from_dict(party[i])
-                new_dict['party'] = party
-        else:
-            print("Some necessary parameters of party are not provided.")
-            exit()
-
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            for i in range(len(extent)):
-                if EX_Extent.can_build_from_data(extent[i]):
-                    extent[i] = EX_Extent.from_dict(extent[i])
-                else:
-                    pass
-                new_dict['extent'] = extent
-        return CI_Responsibility(**new_dict)
-
 
 class MD_Releasability(BaseCamelModel):
 
     addressee: Optional[List[CI_Responsibility]] = None
     statement: Optional[str] = None
     dissemination_constraints: Optional[List[str]] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_Releasability(**new_dict)
 
 
 class MD_Constraints(BaseCamelModel):
@@ -854,14 +457,6 @@ class MD_Constraints(BaseCamelModel):
     reference: Optional[List[CI_Citation]] = None
     releasability: Optional[MD_Releasability] = None
     responsible_party: Optional[List[CI_Responsibility]] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_Constraints(**new_dict)
 
 
 class MD_BrowseGraphic(BaseCamelModel):
@@ -874,14 +469,6 @@ class MD_BrowseGraphic(BaseCamelModel):
     file_type: Optional[str] = None
     image_constraints: Optional[List[MD_Constraints]] = None
     linkage: Optional[List[CI_OnlineResource]] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_BrowseGraphic(**new_dict)
 
 
 # class MetricsPair(BaseCamelModel):
@@ -911,14 +498,6 @@ class AI_MetricsInLiterature(BaseCamelModel):
 
     algorithm: Optional[str] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_MetricsInLiterature(**new_dict)
-
 
 class AI_Task(BaseCamelModel):
     """
@@ -931,14 +510,6 @@ class AI_Task(BaseCamelModel):
     dataset_id: Optional[str] = None
     description: Optional[str] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_Task(**new_dict)
-
 
 class AI_Labeler(BaseCamelModel):
     """
@@ -948,14 +519,6 @@ class AI_Labeler(BaseCamelModel):
     id: str
     name: str
     type: Literal["AI_Labeler"]
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_Labeler(**new_dict)
 
 
 class AI_LabelingProcedure(BaseCamelModel):
@@ -973,14 +536,6 @@ class AI_LabelingProcedure(BaseCamelModel):
     def valid_methods(cls, v):
         return _valid_methods(v)
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_LabelingProcedure(**new_dict)
-
 
 class AI_Labeling(BaseCamelModel):
     """
@@ -994,28 +549,12 @@ class AI_Labeling(BaseCamelModel):
     labelers: Optional[List[AI_Labeler]] = None
     procedure: Optional[AI_LabelingProcedure] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_Labeling(**new_dict)
-
 
 class MeasureReference(BaseCamelModel):
 
     measure_identification: Optional[MD_Identifier] = None
     name_of_measure: Optional[List[str]] = None
     measure_description: Optional[str] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MeasureReference(**new_dict)
 
 
 class EvaluationMethod(BaseCamelModel):
@@ -1043,14 +582,6 @@ class EvaluationMethod(BaseCamelModel):
                 evaluation_method.append(item)
         return evaluation_method
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return EvaluationMethod(**new_dict)
-
 
 class QuantitativeResult(BaseCamelModel):
 
@@ -1058,14 +589,6 @@ class QuantitativeResult(BaseCamelModel):
 
     value_unit: Optional[str] = None
     value_record_type: Optional[str] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return QuantitativeResult(**new_dict)
 
 
 class ConformanceResult(BaseCamelModel):
@@ -1075,26 +598,10 @@ class ConformanceResult(BaseCamelModel):
 
     explanation: Optional[List[str]] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return ConformanceResult(**new_dict)
-
 
 class DescriptiveResult(BaseCamelModel):
 
     statement: str
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return DescriptiveResult(**new_dict)
 
 
 class MD_Dimension(BaseCamelModel):
@@ -1106,14 +613,6 @@ class MD_Dimension(BaseCamelModel):
     dimension_title: Optional[str] = None
     dimension_description: Optional[str] = None
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_Dimension(**new_dict)
-
 
 class MD_GridSpatialRepresentation(BaseCamelModel):
 
@@ -1124,34 +623,11 @@ class MD_GridSpatialRepresentation(BaseCamelModel):
     scope: Optional[MD_Scope] = None
     axis_dimension_properties: Optional[List[MD_Dimension]]
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_GridSpatialRepresentation(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            MD_GridSpatialRepresentation.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class MD_GeometricObjects(BaseCamelModel):
 
     geometric_object_type: str
     geometric_object_count: Optional[int]
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_GeometricObjects(**new_dict)
 
 
 class MD_VectorSpatialRepresentation(BaseCamelModel):
@@ -1160,35 +636,12 @@ class MD_VectorSpatialRepresentation(BaseCamelModel):
     topology_level: Optional[str]
     geometric_objects: Optional[MD_GeometricObjects]
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_VectorSpatialRepresentation(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            MD_VectorSpatialRepresentation.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class MD_RangeDimension(BaseCamelModel):
 
     sequence_identifier: Optional[MemberName] = None
     description: Optional[str] = None
     name: Optional[List[MD_Identifier]] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return MD_RangeDimension(**new_dict)
 
 
 class CoverageResult(BaseCamelModel):
@@ -1198,24 +651,6 @@ class CoverageResult(BaseCamelModel):
 
     result_content: Optional[List[MD_RangeDimension]] = None
     result_format: Optional[str] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('resultSpatialRepresentation'):
-            representation = new_dict['resultSpatialRepresentation']
-            if MD_GridSpatialRepresentation.can_build_from_data(representation):
-                representation = MD_GridSpatialRepresentation.from_dict(representation)
-            else:
-                representation = MD_VectorSpatialRepresentation.from_dict(representation)
-            new_dict['resultSpatialRepresentation'] = representation
-        else:
-            print("Some necessary parameters of resultSpatialRepresentation are not provided.")
-            exit(0)
-        return CoverageResult(**new_dict)
 
 
 class QualityElement(BaseCamelModel):
@@ -1228,29 +663,6 @@ class QualityElement(BaseCamelModel):
     evaluation_method: EvaluationMethod
     result: List[Union[QuantitativeResult, ConformanceResult, DescriptiveResult, CoverageResult]]
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('result'):
-            result = new_dict['result']
-            for i in range(len(result)):
-                if QuantitativeResult.can_build_from_data(result[i]):
-                    result[i] = QuantitativeResult.from_dict(result[i])
-                elif ConformanceResult.can_build_from_data(result[i]):
-                    result[i] = ConformanceResult.from_dict(result[i])
-                elif DescriptiveResult.can_build_from_data(result[i]):
-                    result[i] = DescriptiveResult.from_dict(result[i])
-                else:
-                    result[i] = CoverageResult.from_dict(result[i])
-            new_dict['resultSpatialRepresentation'] = result
-        else:
-            print("Parameter \"result\" must be provided.")
-            exit(0)
-        return QualityElement(**new_dict)
-
 
 class DataQuality(BaseCamelModel):
     """
@@ -1260,14 +672,6 @@ class DataQuality(BaseCamelModel):
     type: Literal["DataQuality"]
     scope: MD_Scope
     report: Optional[List[QualityElement]] = None
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return DataQuality(**new_dict)
 
 
 # class GeoJSON Point
@@ -1293,14 +697,6 @@ class AI_Label(BaseCamelModel):
     is_negative: Optional[bool] = Field(False)
     confidence: Optional[float] = Field(1.0, ge=0.0, le=1.0)
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_Label(**new_dict)
-
 
 class AI_TrainingData(BaseCamelModel):
     """
@@ -1311,7 +707,7 @@ class AI_TrainingData(BaseCamelModel):
     id: str
     labels: List[Union[AI_Label, "AI_PixelLabel", "AI_ObjectLabel", "AI_SceneLabel"]]
 
-    dataset_id: Optional[str] = None
+    dataSet_id: Optional[str] = None
     data_sources: Optional[List[CI_Citation]] = None
     number_of_labels: Optional[int] = None
     labeling: Optional[List[AI_Labeling]] = None
@@ -1328,23 +724,7 @@ class AI_TrainingData(BaseCamelModel):
 
     @staticmethod
     def from_dict(json_dict):
-        from pytdml.type.extended_types import AI_PixelLabel, AI_ObjectLabel, AI_SceneLabel
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('labels'):
-            labels = new_dict['labels']
-            for i in range(len(labels)):
-                if labels[i]["type"] == "AI_AbstractLabel":
-                    labels[i] = AI_Label.from_dict(labels[i])
-                elif labels[i]["type"] == "AI_PixelLabel":
-                    labels[i] = AI_PixelLabel.from_dict(labels[i])
-                elif labels[i]["type"] == "AI_ObjectLabel":
-                    labels[i] = AI_ObjectLabel.from_dict(labels[i])
-                else:
-                    labels[i] = AI_SceneLabel.from_dict(labels[i])
-            new_dict['resultSpatialRepresentation'] = labels
-        else:
-            print("Parameter \"labels\" must be provided.")
-            exit(0)
         return AI_TrainingData(**new_dict)
 
 
@@ -1369,34 +749,7 @@ class AI_TDChangeset(BaseCamelModel):
 
     @staticmethod
     def from_dict(json_dict):
-        from pytdml.type.extended_types import AI_EOTrainingData
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('add'):
-            add = new_dict['add']
-            for i in range(len(add)):
-                if add[i]["type"] == "AI_EOTrainingData":
-                    add[i] = AI_EOTrainingData.from_dict(add[i])
-                else:
-                    add[i] = AI_TrainingData.from_dict(add[i])
-            new_dict['add'] = add
-
-        if new_dict.__contains__('modify'):
-            modify = new_dict['modify']
-            for i in range(len(modify)):
-                if modify[i]["type"] == "AI_EOTrainingData":
-                    modify[i] = AI_EOTrainingData.from_dict(modify[i])
-                else:
-                    modify[i] = AI_TrainingData.from_dict(modify[i])
-            new_dict['modify'] = modify
-
-        if new_dict.__contains__('delete'):
-            delete = new_dict['delete']
-            for i in range(len(delete)):
-                if AI_EOTrainingData.can_build_from_data(delete[i]):
-                    delete[i] = AI_EOTrainingData.from_dict(delete[i])
-                else:
-                    delete[i] = AI_TrainingData.from_dict(delete[i])
-            new_dict['delete'] = delete
         return AI_TDChangeset(**new_dict)
 
 
@@ -1414,7 +767,7 @@ class TrainingDataset(BaseCamelModel):
 
     amount_of_training_data: Optional[int] = None
     classes: Optional[List[NamedValue]] = None
-    classification_scheme: Optional[str] = None  # That one should be uri-format
+    classification_schema: Optional[str] = None  # That one should be uri-format
     created_time: Optional[str] = None
     data_sources: Optional[List[CI_Citation]] = None  # That string one should be uri-format
     doi: Optional[str] = None
@@ -1446,25 +799,5 @@ class TrainingDataset(BaseCamelModel):
 
     @staticmethod
     def from_dict(json_dict):
-        from pytdml.type.extended_types import AI_EOTask, AI_EOTrainingData
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('tasks') and new_dict.__contains__('data'):
-            tasks = new_dict['tasks']
-            for i in range(len(tasks)):
-                if tasks[i]["type"] == "AI_EOTask":
-                    tasks[i] = AI_EOTask.from_dict(tasks[i])
-                else:
-                    tasks[i] = AI_Task.from_dict(tasks[i])
-            new_dict['tasks'] = tasks
-
-            data = new_dict['data']
-            for i in range(len(data)):
-                if data[i]["type"] == "AI_EOTrainingData":
-                    data[i] = AI_EOTrainingData.from_dict(data[i])
-                else:
-                    data[i] = AI_TrainingData.from_dict(data[i])
-            new_dict['data'] = data
-        else:
-            print("Parameter \"tasks\" and \"data\" must be provided.")
-            exit()
         return TrainingDataset(**new_dict)

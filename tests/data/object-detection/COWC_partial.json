@@ -52,7 +52,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -102,7 +102,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -140,7 +140,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -190,7 +190,7 @@
                     "class": "Sedan",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -228,7 +228,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -266,7 +266,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -316,7 +316,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -354,7 +354,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -404,7 +404,7 @@
                     "class": "Sedan",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -442,7 +442,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [
@@ -480,7 +480,7 @@
                     "class": "Vehicle",
                     "object": {
                         "type": "Feature",
-                        "properties": null,
+                        "properties": {},
                         "geometry": {
                             "type": "Polygon",
                             "coordinates": [

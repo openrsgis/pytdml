@@ -37,8 +37,8 @@ from geojson import Feature
 from typing import List, Union, Optional, Literal
 from pydantic import Field, field_validator
 
-from pytdml.type._utils import _validate_date, _validate_image_format, to_interior_class, list_to_interior_class
-from pytdml.type.basic_types import AI_Label, TrainingDataset, AI_TrainingData, MD_Band, EX_Extent, CI_Citation, AI_Labeling, DataQuality, AI_Task, NamedValue, MD_Scope, AI_MetricsInLiterature, AI_TDChangeset
+from pytdml.type._utils import _validate_date, _validate_image_format
+from pytdml.type.basic_types import AI_Label, TrainingDataset, AI_TrainingData, MD_Band, EX_Extent, AI_Task
 
 
 class AI_PixelLabel(AI_Label):
@@ -47,7 +47,7 @@ class AI_PixelLabel(AI_Label):
     """
 
     type: Literal["AI_PixelLabel"]
-    image_URL: List[str] = Field(min_length=1)
+    image_url: List[str] = Field(min_length=1, alias='imageURL')
     image_format: List[str] = Field(min_length=1)
 
     @field_validator("image_format")
@@ -57,14 +57,6 @@ class AI_PixelLabel(AI_Label):
             if _validate_image_format(item):
                 valid_format.append(item)
         return valid_format
-
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_PixelLabel(**new_dict)
 
 
 class AI_ObjectLabel(AI_Label):
@@ -90,19 +82,6 @@ class AI_ObjectLabel(AI_Label):
     def validate_date_time(cls, v):
         return _validate_date(v)
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('object'):
-            new_dict["object"] = geojson.loads(json.dumps(json_dict["object"]))
-        else:
-            print("Parameter \"object\" must be provided.")
-            exit()
-        return AI_ObjectLabel(**new_dict)
-
 
 class AI_SceneLabel(AI_Label):
     """
@@ -112,14 +91,6 @@ class AI_SceneLabel(AI_Label):
     type: Literal["AI_SceneLabel"]
     label_class: str = Field(alias="class")
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_SceneLabel(**new_dict)
-
 
 class AI_EOTask(AI_Task):
     """
@@ -128,14 +99,6 @@ class AI_EOTask(AI_Task):
     type: Literal["AI_EOTask"]
     task_type: str
 
-    def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
-
-    @staticmethod
-    def from_dict(json_dict):
-        new_dict = copy.deepcopy(json_dict)
-        return AI_EOTask(**new_dict)
-
 
 class AI_EOTrainingData(AI_TrainingData):
     """
@@ -143,7 +106,7 @@ class AI_EOTrainingData(AI_TrainingData):
     """
 
     type: Literal["AI_EOTrainingData"]
-    data_URL: List[str] = Field(min_length=1)  # That one should be uri-format
+    data_url: List[str] = Field(min_length=1, alias='dataURL')
     labels: List[Union[AI_Label, AI_PixelLabel, AI_ObjectLabel, AI_SceneLabel]]
 
     extent: Optional[Union[EX_Extent, List[Union[int, float]]]] = None
@@ -162,32 +125,6 @@ class AI_EOTrainingData(AI_TrainingData):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        labels = new_dict['labels']
-        for i in range(len(labels)):
-            if labels[i]["type"] == "AI_AbstractLabel":
-                labels[i] = AI_Label.from_dict(labels[i])
-            elif labels[i]["type"] == "AI_PixelLabel":
-                labels[i] = AI_PixelLabel.from_dict(labels[i])
-            elif labels[i]["type"] == "AI_ObjectLabel":
-                labels[i] = AI_ObjectLabel.from_dict(labels[i])
-            else:
-                labels[i] = AI_SceneLabel.from_dict(labels[i])
-        new_dict['labels'] = labels
-        if new_dict.__contains__('dataSources'):
-            list_to_interior_class(new_dict, "dataSources", CI_Citation)
-        if new_dict.__contains__('labeling'):
-            list_to_interior_class(new_dict, "labeling", AI_Labeling)
-        if new_dict.__contains__('quality'):
-            list_to_interior_class(new_dict, "quality", DataQuality)
-
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            for i in range(len(extent)):
-                if EX_Extent.can_build_from_data(extent[i]):
-                    extent[i] = EX_Extent.from_dict(extent[i])
-                else:
-                    pass
-            new_dict['extent'] = extent
         return AI_EOTrainingData(**new_dict)
 
 
@@ -211,12 +148,4 @@ class EOTrainingDataset(TrainingDataset):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            for i in range(len(extent)):
-                if EX_Extent.can_build_from_data(extent[i]):
-                    extent[i] = EX_Extent.from_dict(extent[i])
-                else:
-                    continue
-            new_dict['extent'] = extent
         return EOTrainingDataset(**new_dict)
