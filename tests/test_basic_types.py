@@ -120,7 +120,7 @@ def test_required_elements_with_Labeler():
         "name": "zhaoyan"
     }
     with pytest.raises( ValidationError):
-        AI_Labeler.from_dict(data)
+        AI_Labeler(**data)
 
 # Test valid Labeler and with remote schema
 def test_valid_Labeler_schema():
@@ -129,13 +129,13 @@ def test_valid_Labeler_schema():
         "id": "1",
         "name": "zhaoyan"
     }
-    labeler = AI_Labeler.from_dict(data)
+    labeler = AI_Labeler(**data)
 
     remote_schema_url = base_url.format("ai_labeler")
     response = requests.get(remote_schema_url)
     remote_schema = response.json()
 
-    jsonschema.validate(instance=labeler.to_dict(), schema=remote_schema)
+    jsonschema.validate(instance=labeler.model_dump(by_alias=True, exclude_none=True), schema=remote_schema)
 
 def test_valid_datatime():
     remote_schema_url = base_url.format("dateTime")
