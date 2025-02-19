@@ -59,6 +59,14 @@ class KeyValuePair(BaseCamelModel):
     key: list
     value: list
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return KeyValuePair(**new_dict)
+
 
 class NamedValue(BaseCamelModel):
     """
@@ -67,6 +75,14 @@ class NamedValue(BaseCamelModel):
 
     key: str
     value: Union[str, object, int, float, list, bool, None]
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return NamedValue(**new_dict)
 
 
 class CI_Date(BaseCamelModel):
@@ -80,6 +96,14 @@ class CI_Date(BaseCamelModel):
     @field_validator("date")
     def validate_date(cls, v):
         return _validate_date(v)
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_Date(**new_dict)
 
 
 class CI_Citation(BaseCamelModel):
@@ -101,6 +125,14 @@ class CI_Citation(BaseCamelModel):
     def validate_edition_date(cls, v):
         return _validate_date(v)
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_Citation(**new_dict)
+
 
 class LinearRing(BaseCamelModel):
     """
@@ -109,6 +141,14 @@ class LinearRing(BaseCamelModel):
 
     pos_list: List[float] = Field(min_length=4)
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return LinearRing(**new_dict)
+
 
 class LinearRing_Object(BaseCamelModel):
     """
@@ -116,6 +156,14 @@ class LinearRing_Object(BaseCamelModel):
     """
 
     linear_ring: LinearRing
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return LinearRing_Object(**new_dict)
 
 
 class Polygon(BaseCamelModel):
@@ -130,6 +178,14 @@ class Polygon(BaseCamelModel):
     exterior: Optional[LinearRing_Object] = None
     interior: Optional[List[LinearRing_Object]] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return Polygon(**new_dict)
+
 
 class MD_Identifier(BaseCamelModel):
     """
@@ -142,6 +198,14 @@ class MD_Identifier(BaseCamelModel):
     version: Optional[str] = None
     description: Optional[str] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_Identifier(**new_dict)
+
 
 class MemberName(BaseCamelModel):
     """
@@ -150,6 +214,14 @@ class MemberName(BaseCamelModel):
 
     a_name: str
     attribute_type: str
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MemberName(**new_dict)
 
 
 class MI_RangeElementDescription(BaseCamelModel):
@@ -160,6 +232,14 @@ class MI_RangeElementDescription(BaseCamelModel):
     name: str
     definition: str
     range_element: List[str] = Field(min_length=1)
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MI_RangeElementDescription(**new_dict)
 
 
 class MD_Band(BaseCamelModel):
@@ -202,6 +282,14 @@ class MD_Band(BaseCamelModel):
 
         return v
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_Band(**new_dict)
+
 
 class EX_BoundingPolygon(BaseCamelModel):
     """
@@ -210,6 +298,14 @@ class EX_BoundingPolygon(BaseCamelModel):
 
     polygon: List[Polygon] = Field(min_length=1)
     extent_type_code: Optional[bool] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EX_BoundingPolygon(**new_dict)
 
 
 class EX_GeographicBoundingBox(BaseCamelModel):
@@ -224,6 +320,14 @@ class EX_GeographicBoundingBox(BaseCamelModel):
 
     extent_type_code: Optional[bool] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EX_GeographicBoundingBox(**new_dict)
+
 
 class EX_GeographicDescription(BaseCamelModel):
     """
@@ -233,6 +337,14 @@ class EX_GeographicDescription(BaseCamelModel):
     geographic_identifier: MD_Identifier
 
     extent_type_code: Optional[bool] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EX_GeographicDescription(**new_dict)
 
 
 class TimeInstant(BaseCamelModel):
@@ -247,6 +359,14 @@ class TimeInstant(BaseCamelModel):
     identifier: Optional[str] = None
     name: Optional[List[str]] = None
     related_time: Optional[List[KeyValuePair]] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return TimeInstant(**new_dict)
 
 
 class TimePeriod(BaseCamelModel):
@@ -273,6 +393,14 @@ class TimePeriod(BaseCamelModel):
     def validate_end_position(cls, v):
         return _validate_date(v)
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return TimePeriod(**new_dict)
+
 
 class EX_TemporalExtent(BaseCamelModel):
     """
@@ -280,6 +408,14 @@ class EX_TemporalExtent(BaseCamelModel):
     """
 
     extent: Union[TimeInstant, TimePeriod]
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EX_TemporalExtent(**new_dict)
 
 
 class EX_ReferenceSystem(BaseCamelModel):
@@ -289,6 +425,14 @@ class EX_ReferenceSystem(BaseCamelModel):
 
     reference_system_identifier: Optional[MD_Identifier] = None
     reference_system_type: Optional[str] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EX_ReferenceSystem(**new_dict)
 
 
 class VerticalCRS(BaseCamelModel):
@@ -307,6 +451,14 @@ class VerticalCRS(BaseCamelModel):
     remarks: Optional[List[str]] = None
     domain_of_validity: Optional[List[str]] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return VerticalCRS(**new_dict)
+
 
 class EX_VerticalExtent(BaseCamelModel):
     """
@@ -319,6 +471,14 @@ class EX_VerticalExtent(BaseCamelModel):
     vertical_CRS_id: Optional[EX_ReferenceSystem] = None
     vertical_CRS: Optional[VerticalCRS] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EX_VerticalExtent(**new_dict)
+
 
 class EX_SpatialTemporalExtent(BaseCamelModel):
     """
@@ -330,6 +490,14 @@ class EX_SpatialTemporalExtent(BaseCamelModel):
 
     vertical_extent: Optional[EX_VerticalExtent] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EX_SpatialTemporalExtent(**new_dict)
+
 
 class EX_Extent(BaseCamelModel):
     """
@@ -340,6 +508,14 @@ class EX_Extent(BaseCamelModel):
     geographic_element: Optional[List[Union[EX_BoundingPolygon, EX_GeographicBoundingBox, EX_GeographicDescription]]] = None
     temporal_element: Optional[List[Union[EX_TemporalExtent, EX_SpatialTemporalExtent]]] = None
     vertical_element: Optional[List[EX_VerticalExtent]] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EX_Extent(**new_dict)
 
 
 # class BoundingBox(BaseCamelModel):
@@ -369,6 +545,14 @@ class MD_ScopeDescription(BaseCamelModel):
     dataset: Optional[str] = None
     other: Optional[str] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_ScopeDescription(**new_dict)
+
 
 class MD_Scope(BaseCamelModel):
     """
@@ -379,11 +563,27 @@ class MD_Scope(BaseCamelModel):
     extent: Optional[List[Union[EX_Extent, List[float]]]] = None
     level_description: Optional[List[MD_ScopeDescription]] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_Scope(**new_dict)
+
 
 class CI_Telephone(BaseCamelModel):
 
     number: str
     number_type: Optional[str] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_Telephone(**new_dict)
 
 
 class CI_Address(BaseCamelModel):
@@ -394,6 +594,14 @@ class CI_Address(BaseCamelModel):
     postal_code: Optional[str] = None
     country: Optional[str] = None
     electronic_mail_address: Optional[List[str]] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_Address(**new_dict)
 
 
 class CI_OnlineResource(BaseCamelModel):
@@ -406,6 +614,14 @@ class CI_OnlineResource(BaseCamelModel):
     function: Optional[str] = None
     protocol_request: Optional[str] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_OnlineResource(**new_dict)
+
 
 class CI_Contact(BaseCamelModel):
 
@@ -416,6 +632,14 @@ class CI_Contact(BaseCamelModel):
     contact_instructions: Optional[str] = None
     contact_type: Optional[str] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_Contact(**new_dict)
+
 
 class CI_Individual(BaseCamelModel):
 
@@ -423,6 +647,14 @@ class CI_Individual(BaseCamelModel):
     contact_info: Optional[List[CI_Contact]] = None
     party_identifier: Optional[List[MD_Identifier]] = None
     position_name: Optional[str] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_Individual(**new_dict)
 
 
 class CI_Organisation(BaseCamelModel):
@@ -433,6 +665,14 @@ class CI_Organisation(BaseCamelModel):
     logo: Optional[List[KeyValuePair]] = None
     individual: Optional[List[CI_Individual]] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_Organisation(**new_dict)
+
 
 class CI_Responsibility(BaseCamelModel):
 
@@ -441,12 +681,28 @@ class CI_Responsibility(BaseCamelModel):
 
     extent: Optional[List[Union[EX_Extent, List[float]]]] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CI_Responsibility(**new_dict)
+
 
 class MD_Releasability(BaseCamelModel):
 
     addressee: Optional[List[CI_Responsibility]] = None
     statement: Optional[str] = None
     dissemination_constraints: Optional[List[str]] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_Releasability(**new_dict)
 
 
 class MD_Constraints(BaseCamelModel):
@@ -457,6 +713,14 @@ class MD_Constraints(BaseCamelModel):
     reference: Optional[List[CI_Citation]] = None
     releasability: Optional[MD_Releasability] = None
     responsible_party: Optional[List[CI_Responsibility]] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_Constraints(**new_dict)
 
 
 class MD_BrowseGraphic(BaseCamelModel):
@@ -469,6 +733,14 @@ class MD_BrowseGraphic(BaseCamelModel):
     file_type: Optional[str] = None
     image_constraints: Optional[List[MD_Constraints]] = None
     linkage: Optional[List[CI_OnlineResource]] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_BrowseGraphic(**new_dict)
 
 
 # class MetricsPair(BaseCamelModel):
@@ -498,6 +770,14 @@ class AI_MetricsInLiterature(BaseCamelModel):
 
     algorithm: Optional[str] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_MetricsInLiterature(**new_dict)
+
 
 class AI_Task(BaseCamelModel):
     """
@@ -510,6 +790,14 @@ class AI_Task(BaseCamelModel):
     dataset_id: Optional[str] = None
     description: Optional[str] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_Task(**new_dict)
+
 
 class AI_Labeler(BaseCamelModel):
     """
@@ -519,6 +807,14 @@ class AI_Labeler(BaseCamelModel):
     id: str
     name: str
     type: Literal["AI_Labeler"]
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_Labeler(**new_dict)
 
 
 class AI_LabelingProcedure(BaseCamelModel):
@@ -536,6 +832,14 @@ class AI_LabelingProcedure(BaseCamelModel):
     def valid_methods(cls, v):
         return _valid_methods(v)
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_LabelingProcedure(**new_dict)
+
 
 class AI_Labeling(BaseCamelModel):
     """
@@ -549,12 +853,28 @@ class AI_Labeling(BaseCamelModel):
     labelers: Optional[List[AI_Labeler]] = None
     procedure: Optional[AI_LabelingProcedure] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_Labeling(**new_dict)
+
 
 class MeasureReference(BaseCamelModel):
 
     measure_identification: Optional[MD_Identifier] = None
     name_of_measure: Optional[List[str]] = None
     measure_description: Optional[str] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MeasureReference(**new_dict)
 
 
 class EvaluationMethod(BaseCamelModel):
@@ -582,6 +902,14 @@ class EvaluationMethod(BaseCamelModel):
                 evaluation_method.append(item)
         return evaluation_method
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return EvaluationMethod(**new_dict)
+
 
 class QuantitativeResult(BaseCamelModel):
 
@@ -589,6 +917,14 @@ class QuantitativeResult(BaseCamelModel):
 
     value_unit: Optional[str] = None
     value_record_type: Optional[str] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return QuantitativeResult(**new_dict)
 
 
 class ConformanceResult(BaseCamelModel):
@@ -598,10 +934,26 @@ class ConformanceResult(BaseCamelModel):
 
     explanation: Optional[List[str]] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return ConformanceResult(**new_dict)
+
 
 class DescriptiveResult(BaseCamelModel):
 
     statement: str
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return DescriptiveResult(**new_dict)
 
 
 class MD_Dimension(BaseCamelModel):
@@ -613,6 +965,14 @@ class MD_Dimension(BaseCamelModel):
     dimension_title: Optional[str] = None
     dimension_description: Optional[str] = None
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_Dimension(**new_dict)
+
 
 class MD_GridSpatialRepresentation(BaseCamelModel):
 
@@ -623,11 +983,27 @@ class MD_GridSpatialRepresentation(BaseCamelModel):
     scope: Optional[MD_Scope] = None
     axis_dimension_properties: Optional[List[MD_Dimension]]
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_GridSpatialRepresentation(**new_dict)
+
 
 class MD_GeometricObjects(BaseCamelModel):
 
     geometric_object_type: str
     geometric_object_count: Optional[int]
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_GeometricObjects(**new_dict)
 
 
 class MD_VectorSpatialRepresentation(BaseCamelModel):
@@ -636,12 +1012,28 @@ class MD_VectorSpatialRepresentation(BaseCamelModel):
     topology_level: Optional[str]
     geometric_objects: Optional[MD_GeometricObjects]
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_VectorSpatialRepresentation(**new_dict)
+
 
 class MD_RangeDimension(BaseCamelModel):
 
     sequence_identifier: Optional[MemberName] = None
     description: Optional[str] = None
     name: Optional[List[MD_Identifier]] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return MD_RangeDimension(**new_dict)
 
 
 class CoverageResult(BaseCamelModel):
@@ -651,6 +1043,14 @@ class CoverageResult(BaseCamelModel):
 
     result_content: Optional[List[MD_RangeDimension]] = None
     result_format: Optional[str] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return CoverageResult(**new_dict)
 
 
 class QualityElement(BaseCamelModel):
@@ -663,6 +1063,14 @@ class QualityElement(BaseCamelModel):
     evaluation_method: EvaluationMethod
     result: List[Union[QuantitativeResult, ConformanceResult, DescriptiveResult, CoverageResult]]
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return QualityElement(**new_dict)
+
 
 class DataQuality(BaseCamelModel):
     """
@@ -672,6 +1080,14 @@ class DataQuality(BaseCamelModel):
     type: Literal["DataQuality"]
     scope: MD_Scope
     report: Optional[List[QualityElement]] = None
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return DataQuality(**new_dict)
 
 
 # class GeoJSON Point
@@ -696,6 +1112,14 @@ class AI_Label(BaseCamelModel):
 
     is_negative: Optional[bool] = Field(False)
     confidence: Optional[float] = Field(1.0, ge=0.0, le=1.0)
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_Label(**new_dict)
 
 
 class AI_TrainingData(BaseCamelModel):

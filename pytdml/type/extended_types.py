@@ -58,6 +58,14 @@ class AI_PixelLabel(AI_Label):
                 valid_format.append(item)
         return valid_format
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_PixelLabel(**new_dict)
+
 
 class AI_ObjectLabel(AI_Label):
     """
@@ -82,6 +90,14 @@ class AI_ObjectLabel(AI_Label):
     def validate_date_time(cls, v):
         return _validate_date(v)
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_ObjectLabel(**new_dict)
+
 
 class AI_SceneLabel(AI_Label):
     """
@@ -91,6 +107,14 @@ class AI_SceneLabel(AI_Label):
     type: Literal["AI_SceneLabel"]
     label_class: str = Field(alias="class")
 
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_SceneLabel(**new_dict)
+
 
 class AI_EOTask(AI_Task):
     """
@@ -98,6 +122,14 @@ class AI_EOTask(AI_Task):
     """
     type: Literal["AI_EOTask"]
     task_type: str
+
+    def to_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @staticmethod
+    def from_dict(json_dict):
+        new_dict = copy.deepcopy(json_dict)
+        return AI_EOTask(**new_dict)
 
 
 class AI_EOTrainingData(AI_TrainingData):
