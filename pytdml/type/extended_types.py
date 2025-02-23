@@ -52,11 +52,14 @@ class AI_PixelLabel(AI_Label):
 
     @field_validator("image_format")
     def validate_image_format(cls, v):
-        valid_format = []
-        for item in v:
-            if _validate_image_format(item):
-                valid_format.append(item)
-        return valid_format
+        if v:
+            valid_format = []
+            for item in v:
+                if _validate_image_format(item):
+                    valid_format.append(item)
+            return valid_format
+        else:
+            return v
 
     def to_dict(self):
         return self.model_dump(by_alias=True, exclude_none=True)
@@ -82,13 +85,15 @@ class AI_ObjectLabel(AI_Label):
     @field_validator("object", mode="before")
     def parse_feature(cls, v):
         if isinstance(v, dict):
-            # 使用 geojson 库解析字典为 Feature 对象
             return Feature(**v)
         return v
 
     @field_validator("date_time")
     def validate_date_time(cls, v):
-        return _validate_date(v)
+        if v:
+            return _validate_date(v)
+        else:
+            return None
 
     def to_dict(self):
         return self.model_dump(by_alias=True, exclude_none=True)
@@ -146,10 +151,13 @@ class AI_EOTrainingData(AI_TrainingData):
 
     @field_validator("data_time")
     def validate_data_time(cls, v):
-        validated_date = []
-        for item in v:
-            validated_date.append(_validate_date(item))
-        return validated_date
+        if v:
+            validated_date = []
+            for item in v:
+                validated_date.append(_validate_date(item))
+            return validated_date
+        else:
+            return None
 
     def to_dict(self):
         return self.model_dump(by_alias=True, exclude_none=True)

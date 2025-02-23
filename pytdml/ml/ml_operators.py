@@ -29,10 +29,10 @@
 #
 # ------------------------------------------------------------------------------
 import random
-
 import torch
-
-from pytdml.type import TrainingDataset
+import pytdml
+from pytdml.type import TrainingDataset, EOTrainingDataset, MD_Band
+from pytdml.type.basic_types import NamedValue
 
 
 def split_train_valid_test(td: TrainingDataset, train_ratio=0.7, valid_ratio=0.0, test_ratio=0.3):
@@ -54,18 +54,18 @@ def split_train_valid_test(td: TrainingDataset, train_ratio=0.7, valid_ratio=0.0
     return train_td, valid_td, test_td
 
 
-def create_class_map(td: TrainingDataset):
+def create_class_map(td: TrainingDataset or EOTrainingDataset):
     """
     Creates a map from class labels to indices.
     """
     assert td.classes is not None, "Training dataset has no classes"
     class_map = {}
     for i, _class in enumerate(td.classes):
-        if isinstance(_class, dict):
-            for item in _class.items():
+        if isinstance(_class, pytdml.type.basic_types.NamedValue):
+            for item in _class.to_dict().items():
                 class_map[item[0]] = item[1]
         else:
-            class_map[_class.key] = _class.value
+            class_map[_class] = i
     return class_map
 
 
@@ -79,6 +79,8 @@ def create_classes_map_(classes):
         if isinstance(_class, dict):
             for item in _class.items():
                 class_map[item[0]] = item[1]
+        elif isinstance(_class, NamedValue):
+            class_map[_class.key] = _class.value
         else:
             class_map[_class] = i
     return class_map

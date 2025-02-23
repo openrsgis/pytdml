@@ -39,10 +39,12 @@ from typing import Iterable
 import numpy as np
 import torch
 import urllib3
+
 from PIL import Image
 from minio import S3Error
-
 from datalibrary.s3Client import minio_client as client
+from pytdml.type import MD_Band, MD_Identifier
+from pytdml.type.basic_types import NamedValue
 
 Image.MAX_IMAGE_PIXELS = 10_000_000_000  # 10 billion
 
@@ -296,9 +298,20 @@ def generate_new_tdml(dataset, classes):
     new_id = '_'.join([ds.id for ds in dataset])
     new_name = '&'.join([ds.name for ds in dataset])
     new_description = "samples of " + str(classes) + " from datasets: " + new_name
-    new_image_size = list(set([ds.image_size for ds in dataset]))
-    new_bands = list(set([elem for ds in dataset for elem in ds.bands]))
-    return new_id, new_name, new_description, new_image_size, new_bands
+    new_classes = [NamedValue(
+        key=classes[i],
+        value=i + 1
+    ) for i in range(len(classes))]
+    old_bands = []
+    for ds in dataset:
+        for band in ds.bands:
+            old_bands.append(band.name[0].code)
+    bands = set(old_bands)
+    new_bands = [MD_Band(
+        name=[MD_Identifier(
+            code=band
+        )]) for band in bands]
+    return new_id, new_name, new_description, new_classes, new_bands
 
 
 def datasets_list(dataset_descriptions, task_type, cls_list):

@@ -256,7 +256,7 @@ class Scope:
     def to_dict(self):
         return {
             "level": self.level,
-            "levelDescription": [ld.to_dict for ld in self.levelDescription]
+            "levelDescription": [ld.to_dict() for ld in self.levelDescription]
         }
 
     @staticmethod
@@ -380,6 +380,7 @@ class TrainingData:
             "type": "TrainingData",
             "id": self.id,
             "trainingType": self.training_type,
+            "datasetId": self.dataset_id,
             "numberOfLabels": self.number_of_labels,
             "dataSources": self.data_sources,
             "quality": self.quality.to_dict() if self.quality is not None else None,
@@ -541,6 +542,7 @@ class TrainingDataset:
             "keywords": self.keywords,
             "metricsInLIT": [m.to_dict() for m in self.metrics_in_literature],
             "statisticsInfo": [s.to_dict() for s in self.statistics_info],
+            "dataSources": self.dataSources,
             "numberOfClasses": self.number_of_classes,
             "classificationSchema": self.classification_schema,
             "classes": self.classes,
@@ -578,6 +580,8 @@ class TrainingDataset:
                                             json_dict["metricsInLIT"]]
             if json_dict.__contains__("statisticsInfo"):
                 td.statistics_info = [KeyValuePair.from_dict(s) for s in json_dict["statisticsInfo"]]
+            if json_dict.__contains__("dataSources"):
+                td.dataSources = json_dict["dataSources"]
             if json_dict.__contains__("numberOfClasses"):
                 td.number_of_classes = json_dict["numberOfClasses"]
             if json_dict.__contains__("classificationSchema"):

@@ -1209,7 +1209,10 @@ class TrainingDataset(BaseCamelModel):
 
     @field_validator("created_time")
     def validate_created_time(cls, v):
-        return _validate_date(v)
+        if v:
+            return _validate_date(v)
+        else:
+            return v
 
     @field_validator("updated_time")
     def validate_updated_time(cls, v):
