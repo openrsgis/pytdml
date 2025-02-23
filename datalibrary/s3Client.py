@@ -1,11 +1,8 @@
 from io import BytesIO
-
+import os
 from minio import Minio
 from minio.error import S3Error
-
-_SERVER = '125.220.153.22:9006'
-_ACCESS_KEY = 'pytdmlopenuseraccount'
-_SECRET_KEY = 'HTJIEGCLPKUZBQYAVWMFXNRDOVS'
+from dotenv import load_dotenv
 
 
 class MinioClient:
@@ -29,8 +26,11 @@ class MinioClient:
     def get_client(self):
         return self.client
 
-
-minio_client = MinioClient(_SERVER, _ACCESS_KEY, _SECRET_KEY).get_client()
+load_dotenv()
+server = os.getenv("MINIO_SERVER")
+access_key = os.getenv("MINIO_ACCESS_KEY")
+secret_key = os.getenv("MINIO_SECRET_KEY")
+minio_client = MinioClient(server, access_key, secret_key).get_client()
 
 
 class S3Client:
