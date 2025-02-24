@@ -46,7 +46,7 @@ class MinioClient:
         return self.client
 
 
-test_config = MinioConfig(test_mode=False)
+test_config = MinioConfig(test_mode=True)
 minio_client = MinioClient(test_config).client
 
 
