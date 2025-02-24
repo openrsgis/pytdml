@@ -2,7 +2,6 @@ from io import BytesIO
 import os
 from minio import Minio
 from minio.error import S3Error
-from dotenv import load_dotenv
 
 
 class MinioConfig:
@@ -18,7 +17,6 @@ class MinioConfig:
         self.secret_key = "test_secret_key"
 
     def _load_env_config(self, server, access_key, secret_key):
-        load_dotenv()
         self.server = server or os.getenv("MINIO_SERVER")
         self.access_key = access_key or os.getenv("MINIO_ACCESS_KEY")
         self.secret_key = secret_key or os.getenv("MINIO_SECRET_KEY")
