@@ -1,22 +1,36 @@
 from io import BytesIO
-
+import os
 from minio import Minio
 from minio.error import S3Error
 
-_SERVER = '125.220.153.22:9006'
-_ACCESS_KEY = 'pytdmlopenuseraccount'
-_SECRET_KEY = 'HTJIEGCLPKUZBQYAVWMFXNRDOVS'
+
+class MinioConfig:
+    def __init__(self, test_mode=False, server=None, access_key=None, secret_key=None):
+        if test_mode:
+            self._load_test_config()
+        else:
+            self._load_env_config(server, access_key, secret_key)
+
+    def _load_test_config(self):
+        self.server = "test_minio_server"
+        self.access_key = "test_access_key"
+        self.secret_key = "test_secret_key"
+
+    def _load_env_config(self, server, access_key, secret_key):
+        self.server = server or os.getenv("MINIO_SERVER")
+        self.access_key = access_key or os.getenv("MINIO_ACCESS_KEY")
+        self.secret_key = secret_key or os.getenv("MINIO_SECRET_KEY")
 
 
 class MinioClient:
     _instance = None
 
-    def __new__(cls, server, access_key, secret_key):
+    def __new__(cls, config: MinioConfig):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance.server = server
-            cls._instance.access_key = access_key
-            cls._instance.secret_key = secret_key
+            cls._instance.server = config.server
+            cls._instance.access_key = config.access_key
+            cls._instance.secret_key = config.secret_key
             cls._instance._create_client()
         return cls._instance
 
@@ -30,7 +44,8 @@ class MinioClient:
         return self.client
 
 
-minio_client = MinioClient(_SERVER, _ACCESS_KEY, _SECRET_KEY).get_client()
+test_config = MinioConfig(test_mode=True)
+minio_client = MinioClient(test_config).client
 
 
 class S3Client:

@@ -28,14 +28,16 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-from torch.utils.data import DataLoader2, DataLoader
-from torchvision.transforms import transforms
+import warnings
+from rasterio.errors import NotGeoreferencedWarning
+warnings.filterwarnings("ignore", category=NotGeoreferencedWarning)
 
+from pytdml.ml.ml_operators import collate_fn
+from torchvision.transforms import transforms
+import torch.utils.data as data
 from datalibrary.pipeline import PipeLine
 from datalibrary.datasetcollection import EOTrainingDatasetCollection, Task
 import pytdml.ml.object_transforms as transform_target
-from pytdml.ml.ml_operators import collate_fn
-
 
 transform = transforms.Compose(  # transform for the dataset
     [
@@ -55,34 +57,36 @@ target_transform = transform_target.Compose([
 
 path = "."
 
-def datasetsForSceneTask():
+def datasets_for_scene_task():
     ds_lib = EOTrainingDatasetCollection()
     ds_lib.dataset_list(Task.scene_classification, ["Airport"])
     whurs19_ml = ds_lib["WHU-RS19"]
-    # 获取 DOTA-v2.0 数据集的元数据信息
+
     print("Load training dataset: " + str(whurs19_ml.name))
     print("Number of training samples: " + str(whurs19_ml.amount_of_training_data))
     print("Number of classes: " + str(whurs19_ml.number_of_classes))
 
     # across dataset
     rsd46_ml = ds_lib["RSD46-WHU"]
-    my_dataset_TD = ds_lib.training_data_collection(Task.scene_classification, [rsd46_ml, whurs19_ml], ["Airport"])
+    my_dataset_td = ds_lib.training_data_collection(Task.scene_classification, [rsd46_ml, whurs19_ml], ["Airport"])
 
-    my_pipeline = PipeLine(my_dataset_TD, path)
+    my_pipeline = PipeLine(my_dataset_td, path)
     # my_dataset = my_pipeline.torch_dataset(download=False, transform=transform)
     my_data_pipe = my_pipeline.torch_data_pipe(transform=transform)
 
-    dataloader = DataLoader2(my_data_pipe, batch_size=4, num_workers=4)
+    dataloader = data.DataLoader(my_data_pipe, batch_size=4, num_workers=4)
 
-    for batch in dataloader:
+    for i, batch in enumerate(dataloader):
         print(batch)
+        if i == 3:
+            break
 
 
-def datasetsForObjectTask():
+def datasets_for_object_task():
     ds_lib = EOTrainingDatasetCollection()
     ds_lib.dataset_list(Task.object_detection)
     dota_ml = ds_lib["AIR-SARShip"]
-    # 获取 DOTA-v2.0 数据集的元数据信息
+
     print("Load training dataset: " + str(dota_ml.tasks))
     print("Number of training samples: " + str(dota_ml.amount_of_training_data))
     print("Number of classes: " + str(dota_ml.number_of_classes))
@@ -94,15 +98,17 @@ def datasetsForObjectTask():
     my_pipeline = PipeLine(dota_ml, path, crop=(500,0,0))
     # NWPU_VHR10_torchPipe = my_pipeline.torch_dataset(download=True, transform=target_transform)
     my_torchPipe = my_pipeline.torch_data_pipe(transform=target_transform)
-    dataloader = DataLoader2(my_torchPipe, batch_size=4, num_workers=4, collate_fn=collate_fn)
+    dataloader = data.DataLoader(my_torchPipe, batch_size=4, num_workers=1, collate_fn=collate_fn)
 
-    for batch in dataloader:
+    for i, batch in enumerate(dataloader):
         print(batch)
+        if i == 3:
+            break
     # print("start..")
     # ds_lib = EOTrainingDatasetCollection()
     # ds_lib.dataset_list(Task.object_detection)
     # dota_ml = ds_lib["DOTA-v2.0"]
-    # # 获取 DOTA-v2.0 数据集的元数据信息
+
     # print("Load training dataset: " + str(dota_ml.tasks))
     # print("Number of training samples: " + str(dota_ml.amount_of_training_data))
     # print("Number of classes: " + str(dota_ml.number_of_classes))
@@ -122,7 +128,7 @@ def datasetsForObjectTask():
     #  #   print(batch)
 
 
-def datasetsForSegmentationTask():
+def datasets_for_segmentation_task():
     ds_lib = EOTrainingDatasetCollection()
     ds_lib.dataset_list(Task.semantic_segmentation, ["Building Area"])
     AISD_ml = ds_lib["waterExtraction"]
@@ -137,12 +143,14 @@ def datasetsForSegmentationTask():
     building_extraction_ml = PipeLine(AISD_ml, path)
     # NWPU_VHR10_torchPipe = building_extraction_ml.torch_dataset(download=True, transform=transform)
     building_extraction_torchPipe = building_extraction_ml.torch_data_pipe(transform=transform)
-    dataloader = DataLoader2(building_extraction_torchPipe, batch_size=4, num_workers=4)
-    for batch in dataloader:
+    dataloader = data.DataLoader(building_extraction_torchPipe, batch_size=4, num_workers=4)
+    for i, batch in enumerate(dataloader):
         print(batch)
+        if i == 3:
+            break
 
 
-def datasetsForChangeTask():
+def datasets_for_change_task():
     ds_lib = EOTrainingDatasetCollection()
     ds_lib.dataset_list(Task.change_detection)
     sysu_ml = ds_lib["SOUTHGIS Remote Sensing Building Change Detection DataSet"]
@@ -158,26 +166,15 @@ def datasetsForChangeTask():
     my_pipeline = PipeLine(sysu_ml, path)
     # my_torchPipe = my_pipeline.torch_dataset(download=True, transform=transform)
     my_torchPipe = my_pipeline.torch_data_pipe(transform=transform)
-    dataloader = DataLoader2(my_torchPipe, batch_size=4, num_workers=4)
-    for batch in dataloader:
+    dataloader = data.DataLoader(my_torchPipe, batch_size=4, num_workers=4)
+    for i, batch in enumerate(dataloader):
         print(batch)
-        # pass
-
-
-import pytdml
-from pytdml.convert_utils import convert_coco_to_tdml,convert_stac_to_tdml
-
-def format_test():
-
-    training_dataset = pytdml.io.read_from_json(r"C:\Users\corona\Desktop\tdmldataset-语义分割.json")  # read from TDML json file
-    print("Load training dataset: " + training_dataset.name)
-    print("Number of training samples: " + str(training_dataset.amount_of_training_data))
-    print("Number of classes: " + str(training_dataset.number_of_classes))
+        if i == 3:
+            break
 
 
 if __name__ == "__main__":
-    datasetsForChangeTask()
-
+    datasets_for_change_task()
 
 
 

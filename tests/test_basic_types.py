@@ -119,7 +119,7 @@ def test_required_elements_with_Labeler():
         "type": "AI_Labeler",
         "name": "zhaoyan"
     }
-    with pytest.raises( ValidationError):
+    with pytest.raises(ValidationError):
         AI_Labeler.from_dict(data)
 
 # Test valid Labeler and with remote schema

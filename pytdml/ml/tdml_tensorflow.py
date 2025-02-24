@@ -31,9 +31,7 @@
 import cv2
 import tensorflow as tf
 import tensorflow_io as tfio
-from datalibrary.s3Client import minio_client as client
-import os
-
+import numpy as np
 import pytdml.utils as utils
 from datalibrary.downloader import *
 
@@ -305,7 +303,7 @@ class TensorObjectDetectionDataPipe:
                     num_targets = []
                     for target in targets[index]:
                         json_object = {"bbox": target["bbox"], "type": "Feature"}
-                        labels = [ObjectLabel(object=json_object,
+                        labels = [AI_ObjectLabel(object=json_object,
                                               label_class=target["class"],
                                               bbox_type=target["bboxType"],
                                               is_negative=target["isNegative"],

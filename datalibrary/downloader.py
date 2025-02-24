@@ -37,14 +37,21 @@ import geojson
 from minio.error import MinioException
 from tqdm import tqdm
 
-from datalibrary.datasetcollection import Task
 from datalibrary.s3Client import minio_client as client
 from pytdml.tdml_image_crop import CropWithImage, CropWithTargetImage
-from pytdml.type.extended_types_old import EOTrainingData, ObjectLabel, PixelLabel
+from pytdml.type.extended_types import AI_EOTrainingData, AI_ObjectLabel, AI_PixelLabel
 from pytdml.utils import split_data_url, generate_local_file_path, image_open
 
 # Creating a Mutual Exclusion Lock
 lock = multiprocessing.Lock()
+
+
+class Task:
+    scene_classification = "Scene Classification"
+    object_detection = "Object Detection"
+    semantic_segmentation = "Semantic Segmentation"
+    change_detection = "Change Detection"
+    model_3d_reconstruction = "3D Model Reconstruction"
 
 
 def download_file(bucket_name, object_name, file_name):
@@ -154,13 +161,13 @@ def download_object_data(args):
 
             for target in targets[i]:
                 # json_object = {"bbox": target["object"], "type": "Feature"}
-                labels.append(ObjectLabel(object=geojson.loads(json.dumps(target["object"])),
+                labels.append(AI_ObjectLabel(object=geojson.loads(json.dumps(target["object"])),
                               label_class=target["class"],
                               bbox_type=target["bboxType"],
                               is_negative=target["isNegative"]
                               ))
 
-            new_d = EOTrainingData(
+            new_d = AI_EOTrainingData(
                 id=str(data_item.id + "_crop_" + str(index)),
                 # extent=data_item.extent,
                 number_of_labels=len(targets[i]),
@@ -218,9 +225,9 @@ def download_segmentation_data(args):
 
         index = 0
         for crop_image_url, crop_label_url in zip(crop_imgs, crop_labels):
-            new_d = EOTrainingData(
+            new_d = AI_EOTrainingData(
                 id=str(data_item.id + "_crop_" + str(index)),
-                labels=[PixelLabel(image_url=crop_label_url)],
+                labels=[AI_PixelLabel(image_url=crop_label_url)],
                 data_url=[crop_image_url],
             )
             index = index + 1
@@ -285,9 +292,9 @@ def download_changeDetection_data(args):
 
         index = 0
         for crop_bef_image_url, crop_af_image_url, crop_label_url in zip(crop_bef_imgs, crop_af_imgs, crop_labels):
-            new_d = EOTrainingData(
+            new_d = AI_EOTrainingData(
                 id=str(data_item.id + "_crop_" + str(index)),
-                labels=[PixelLabel(image_url=crop_label_url)],
+                labels=[AI_PixelLabel(image_url=crop_label_url)],
                 data_url=[crop_bef_image_url, crop_af_image_url]
             )
             index = index + 1

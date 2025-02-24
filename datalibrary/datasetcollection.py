@@ -35,7 +35,7 @@ from urllib.parse import urlparse
 
 import pytdml.utils as utils
 from pytdml.io import internal, read_from_json, parse_json
-from pytdml.type.extended_types_old import EOTrainingDataset, EOTask
+from pytdml.type.extended_types import EOTrainingDataset, AI_EOTask
 
 
 @dataclass
@@ -172,21 +172,21 @@ class EOTrainingDatasetCollection:
                 if task == Task.semantic_segmentation:
                     merged_td_list.extend([item for item in dataset_item.data])
             # generate an new EOTrainingDataset
-            new_id, new_name, new_description, new_image_size, new_bands = utils.generate_new_tdml(dataset_list,
+            new_id, new_name, new_description, new_classes, new_bands = utils.generate_new_tdml(dataset_list,
                                                                                                    classes)
             return EOTrainingDataset(
-                    id=new_id,
-                    name=new_name,
-                    description=new_description,
-                    tasks=[EOTask(id=new_id + " Task", task_type=task)],
-                    data=merged_td_list,
-                    amount_of_training_data=len(merged_td_list),
-                    classes=classes,
-                    number_of_classes=len(classes),
-                    bands=new_bands,
-                    license="",
-                    image_size=new_image_size
-                )
+                id=new_id,
+                name=new_name,
+                description=new_description,
+                tasks=[AI_EOTask(id=new_id + " Task", type="AI_EOTask", task_type=task)],
+                license="",
+                data=merged_td_list,
+                type="AI_EOTrainingDataset",
+                amount_of_training_data=len(merged_td_list),
+                classes=new_classes,
+                number_of_classes=len(classes),
+                bands=new_bands
+            )
 
 
 class Task:

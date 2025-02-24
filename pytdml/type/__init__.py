@@ -37,6 +37,8 @@ from .basic_types import MD_Scope
 from .basic_types import CI_Date
 from .basic_types import MD_BrowseGraphic
 from .basic_types import CI_Citation
+from .basic_types import AI_Labeling
+from .basic_types import MD_ScopeDescription
 from .basic_types import MD_Identifier
 from .basic_types import QualityElement
 from .basic_types import DataQuality

@@ -19,6 +19,25 @@ def test_read_and_write():
         data = json.load(f)
     assert td.to_dict() == data
 
+
+def test_ai_scene_label_data():
+    tdml_path = r"tests/data/json/AiRound-aerial.json"
+    td = read_from_json(tdml_path)
+    with open(tdml_path, 'r') as f:
+        data = json.load(f)
+    assert td.to_dict() == data
+
+
+def test_ai_object_label_data():
+    tdml_path = r"tests/data/object-detection/COWC_partial.json"
+    td = read_from_json(tdml_path)
+    with open(tdml_path, 'r') as f:
+        data = json.load(f)
+    print("td.to_dict():", td.to_dict())
+    print("data:", data)
+    assert td.to_dict() == data
+
+
 def test_yaml_to_eo_tdml():
     yaml_path = r"tests/data/yaml/UiT_HCD_California_2017.yml"
     tdml_path = r"tests/data/json/UiT_HCD_California_2017.json"

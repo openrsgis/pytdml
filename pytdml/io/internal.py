@@ -2,7 +2,7 @@ import json
 from io import BytesIO
 
 from datalibrary.s3Client import minio_client as client
-from pytdml.type.extended_types_old import EOTrainingDataset
+from pytdml.type.extended_types import EOTrainingDataset
 
 
 def read_from_server(name):
@@ -10,7 +10,7 @@ def read_from_server(name):
     encode_data = client.get_object("pytdml", "datasetTDEncodes/" + name + ".json")
     json_dict = json.load(BytesIO(encode_data.read()))
     print("parsing dataset " + name + "...")
-    if json_dict["type"] == "EOTrainingDataset":
+    if json_dict["type"] == "AI_EOTrainingDataset":
         return EOTrainingDataset.from_dict(json_dict)
     else:
         raise ValueError("Unknown TDML type: {}".format(json_dict["type"]))

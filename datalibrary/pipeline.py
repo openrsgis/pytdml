@@ -348,7 +348,7 @@ class Model3DReconstructionTDPipeLine:
             utils.cache_dump(cache_file_path, self.root, td_list)
         return tdml_torch.TorchStereoTD(td_list, self.root, transform)
 
-    def torch_data_Pipe(self, transform=None):
+    def torch_data_pipe(self, transform=None):
         return tdml_torch_data_pipe.TorchStereoDataPipe(self.dataset.data, self.root, transform)
 
     def tensorflow_data_pipe(self):

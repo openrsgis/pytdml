@@ -35,7 +35,7 @@ import copy
 from typing_extensions import TypedDict
 from typing import List, Union, Optional, Literal
 from pydantic import BaseModel, Field, field_validator, model_validator
-from pytdml.type._utils import _validate_date, to_camel, _valid_methods, _validate_training_type, _validate_evaluation_method_type, to_interior_class, list_to_interior_class
+from pytdml.type._utils import _validate_date, to_camel, _valid_methods, _validate_training_type, _validate_evaluation_method_type
 
 
 class BaseCamelModel(BaseModel):
@@ -64,10 +64,8 @@ class KeyValuePair(BaseCamelModel):
 
     @staticmethod
     def from_dict(json_dict):
-        key = json_dict.keys()
-        value = json_dict.values()
-        key_value_pair = {"key": key, "value": value}
-        return KeyValuePair(**key_value_pair)
+        new_dict = copy.deepcopy(json_dict)
+        return KeyValuePair(**new_dict)
 
 
 class NamedValue(BaseCamelModel):
@@ -309,13 +307,6 @@ class EX_BoundingPolygon(BaseCamelModel):
         new_dict = copy.deepcopy(json_dict)
         return EX_BoundingPolygon(**new_dict)
 
-    def can_build_from_data(data):
-        try:
-            EX_BoundingPolygon.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class EX_GeographicBoundingBox(BaseCamelModel):
     """
@@ -337,13 +328,6 @@ class EX_GeographicBoundingBox(BaseCamelModel):
         new_dict = copy.deepcopy(json_dict)
         return EX_GeographicBoundingBox(**new_dict)
 
-    def can_build_from_data(data):
-        try:
-            EX_GeographicBoundingBox.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class EX_GeographicDescription(BaseCamelModel):
     """
@@ -361,13 +345,6 @@ class EX_GeographicDescription(BaseCamelModel):
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
         return EX_GeographicDescription(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_GeographicDescription.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class TimeInstant(BaseCamelModel):
@@ -390,13 +367,6 @@ class TimeInstant(BaseCamelModel):
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
         return TimeInstant(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            TimeInstant.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class TimePeriod(BaseCamelModel):
@@ -431,13 +401,6 @@ class TimePeriod(BaseCamelModel):
         new_dict = copy.deepcopy(json_dict)
         return TimePeriod(**new_dict)
 
-    def can_build_from_data(data):
-        try:
-            TimePeriod.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class EX_TemporalExtent(BaseCamelModel):
     """
@@ -452,21 +415,7 @@ class EX_TemporalExtent(BaseCamelModel):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            if TimeInstant.can_build_from_data(extent):
-                extent = TimeInstant.from_dict(extent)
-            else:
-                extent = TimePeriod.from_dict(extent)
-            new_dict['extent'] = extent
         return EX_TemporalExtent(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_TemporalExtent.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class EX_ReferenceSystem(BaseCamelModel):
@@ -547,30 +496,7 @@ class EX_SpatialTemporalExtent(BaseCamelModel):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            if TimeInstant.can_build_from_data(extent):
-                extent = TimeInstant.from_dict(extent)
-            else:
-                extent = TimePeriod.from_dict(extent)
-            new_dict['extent'] = extent
-        if new_dict.__contains__('spatialExtent'):
-            spatial_extent = new_dict['spatialExtent']
-            if EX_BoundingPolygon.can_build_from_data(spatial_extent):
-                spatial_extent = EX_BoundingPolygon.from_dict(spatial_extent)
-            elif EX_GeographicBoundingBox.can_build_from_data(spatial_extent):
-                spatial_extent = EX_GeographicBoundingBox.from_dict(spatial_extent)
-            else:
-                spatial_extent = EX_GeographicDescription.from_dict(spatial_extent)
-            new_dict['spatialExtent'] = spatial_extent
         return EX_SpatialTemporalExtent(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_SpatialTemporalExtent.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class EX_Extent(BaseCamelModel):
@@ -589,33 +515,7 @@ class EX_Extent(BaseCamelModel):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('geographicElement'):
-            geographic_element = new_dict['geographicElement']
-            for i in range(len(geographic_element)):
-                if EX_BoundingPolygon.can_build_from_data(geographic_element[i]):
-                    geographic_element[i] = EX_BoundingPolygon.from_dict(geographic_element[i])
-                elif EX_GeographicBoundingBox.can_build_from_data(geographic_element[i]):
-                    geographic_element[i] = EX_GeographicBoundingBox.from_dict(geographic_element[i])
-                else:
-                    geographic_element[i] = EX_GeographicDescription.from_dict(geographic_element[i])
-            new_dict['geographicElement'] = geographic_element
-
-        if new_dict.__contains__('temporalElement'):
-            temporal_element = new_dict['temporalElement']
-            for i in range(len(temporal_element)):
-                if EX_TemporalExtent.can_build_from_data(temporal_element[i]):
-                    temporal_element[i] = EX_TemporalExtent.from_dict(temporal_element[i])
-                else:
-                    temporal_element[i] = EX_SpatialTemporalExtent.from_dict(temporal_element[i])
-            new_dict['temporalElement'] = temporal_element
         return EX_Extent(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            EX_Extent.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 # class BoundingBox(BaseCamelModel):
@@ -661,7 +561,7 @@ class MD_Scope(BaseCamelModel):
 
     level: str
     extent: Optional[List[Union[EX_Extent, List[float]]]] = None
-    level_description: Optional[MD_ScopeDescription] = Field(None, min_length=4)
+    level_description: Optional[List[MD_ScopeDescription]] = None
 
     def to_dict(self):
         return self.model_dump(by_alias=True, exclude_none=True)
@@ -669,13 +569,6 @@ class MD_Scope(BaseCamelModel):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            for i in range(len(extent)):
-                if EX_Extent.can_build_from_data(extent[i]):
-                    extent[i] = EX_Extent.from_dict(extent[i])
-                else:
-                    pass
         return MD_Scope(**new_dict)
 
 
@@ -763,13 +656,6 @@ class CI_Individual(BaseCamelModel):
         new_dict = copy.deepcopy(json_dict)
         return CI_Individual(**new_dict)
 
-    def can_build_from_data(data):
-        try:
-            CI_Individual.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class CI_Organisation(BaseCamelModel):
 
@@ -787,13 +673,6 @@ class CI_Organisation(BaseCamelModel):
         new_dict = copy.deepcopy(json_dict)
         return CI_Organisation(**new_dict)
 
-    def can_build_from_data(data):
-        try:
-            CI_Individual.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class CI_Responsibility(BaseCamelModel):
 
@@ -808,26 +687,6 @@ class CI_Responsibility(BaseCamelModel):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('party'):
-            party = new_dict['party']
-            for i in range(len(party)):
-                if CI_Individual.can_build_from_data(party[i]):
-                    party[i] = CI_Individual.from_dict(party[i])
-                else:
-                    party[i] = CI_Organisation.from_dict(party[i])
-                new_dict['party'] = party
-        else:
-            print("Some necessary parameters of party are not provided.")
-            exit()
-
-        if new_dict.__contains__('extent'):
-            extent = new_dict['extent']
-            for i in range(len(extent)):
-                if EX_Extent.can_build_from_data(extent[i]):
-                    extent[i] = EX_Extent.from_dict(extent[i])
-                else:
-                    pass
-                new_dict['extent'] = extent
         return CI_Responsibility(**new_dict)
 
 
@@ -1132,13 +991,6 @@ class MD_GridSpatialRepresentation(BaseCamelModel):
         new_dict = copy.deepcopy(json_dict)
         return MD_GridSpatialRepresentation(**new_dict)
 
-    def can_build_from_data(data):
-        try:
-            MD_GridSpatialRepresentation.from_dict(data)
-            return True
-        except Exception:
-            return False
-
 
 class MD_GeometricObjects(BaseCamelModel):
 
@@ -1167,13 +1019,6 @@ class MD_VectorSpatialRepresentation(BaseCamelModel):
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
         return MD_VectorSpatialRepresentation(**new_dict)
-
-    def can_build_from_data(data):
-        try:
-            MD_VectorSpatialRepresentation.from_dict(data)
-            return True
-        except Exception:
-            return False
 
 
 class MD_RangeDimension(BaseCamelModel):
@@ -1205,16 +1050,6 @@ class CoverageResult(BaseCamelModel):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('resultSpatialRepresentation'):
-            representation = new_dict['resultSpatialRepresentation']
-            if MD_GridSpatialRepresentation.can_build_from_data(representation):
-                representation = MD_GridSpatialRepresentation.from_dict(representation)
-            else:
-                representation = MD_VectorSpatialRepresentation.from_dict(representation)
-            new_dict['resultSpatialRepresentation'] = representation
-        else:
-            print("Some necessary parameters of resultSpatialRepresentation are not provided.")
-            exit(0)
         return CoverageResult(**new_dict)
 
 
@@ -1234,21 +1069,6 @@ class QualityElement(BaseCamelModel):
     @staticmethod
     def from_dict(json_dict):
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('result'):
-            result = new_dict['result']
-            for i in range(len(result)):
-                if QuantitativeResult.can_build_from_data(result[i]):
-                    result[i] = QuantitativeResult.from_dict(result[i])
-                elif ConformanceResult.can_build_from_data(result[i]):
-                    result[i] = ConformanceResult.from_dict(result[i])
-                elif DescriptiveResult.can_build_from_data(result[i]):
-                    result[i] = DescriptiveResult.from_dict(result[i])
-                else:
-                    result[i] = CoverageResult.from_dict(result[i])
-            new_dict['resultSpatialRepresentation'] = result
-        else:
-            print("Parameter \"result\" must be provided.")
-            exit(0)
         return QualityElement(**new_dict)
 
 
@@ -1311,7 +1131,7 @@ class AI_TrainingData(BaseCamelModel):
     id: str
     labels: List[Union[AI_Label, "AI_PixelLabel", "AI_ObjectLabel", "AI_SceneLabel"]]
 
-    dataset_id: Optional[str] = None
+    dataSet_id: Optional[str] = None
     data_sources: Optional[List[CI_Citation]] = None
     number_of_labels: Optional[int] = None
     labeling: Optional[List[AI_Labeling]] = None
@@ -1328,23 +1148,7 @@ class AI_TrainingData(BaseCamelModel):
 
     @staticmethod
     def from_dict(json_dict):
-        from pytdml.type.extended_types import AI_PixelLabel, AI_ObjectLabel, AI_SceneLabel
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('labels'):
-            labels = new_dict['labels']
-            for i in range(len(labels)):
-                if labels[i]["type"] == "AI_AbstractLabel":
-                    labels[i] = AI_Label.from_dict(labels[i])
-                elif labels[i]["type"] == "AI_PixelLabel":
-                    labels[i] = AI_PixelLabel.from_dict(labels[i])
-                elif labels[i]["type"] == "AI_ObjectLabel":
-                    labels[i] = AI_ObjectLabel.from_dict(labels[i])
-                else:
-                    labels[i] = AI_SceneLabel.from_dict(labels[i])
-            new_dict['resultSpatialRepresentation'] = labels
-        else:
-            print("Parameter \"labels\" must be provided.")
-            exit(0)
         return AI_TrainingData(**new_dict)
 
 
@@ -1369,34 +1173,7 @@ class AI_TDChangeset(BaseCamelModel):
 
     @staticmethod
     def from_dict(json_dict):
-        from pytdml.type.extended_types import AI_EOTrainingData
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('add'):
-            add = new_dict['add']
-            for i in range(len(add)):
-                if add[i]["type"] == "AI_EOTrainingData":
-                    add[i] = AI_EOTrainingData.from_dict(add[i])
-                else:
-                    add[i] = AI_TrainingData.from_dict(add[i])
-            new_dict['add'] = add
-
-        if new_dict.__contains__('modify'):
-            modify = new_dict['modify']
-            for i in range(len(modify)):
-                if modify[i]["type"] == "AI_EOTrainingData":
-                    modify[i] = AI_EOTrainingData.from_dict(modify[i])
-                else:
-                    modify[i] = AI_TrainingData.from_dict(modify[i])
-            new_dict['modify'] = modify
-
-        if new_dict.__contains__('delete'):
-            delete = new_dict['delete']
-            for i in range(len(delete)):
-                if AI_EOTrainingData.can_build_from_data(delete[i]):
-                    delete[i] = AI_EOTrainingData.from_dict(delete[i])
-                else:
-                    delete[i] = AI_TrainingData.from_dict(delete[i])
-            new_dict['delete'] = delete
         return AI_TDChangeset(**new_dict)
 
 
@@ -1412,9 +1189,9 @@ class TrainingDataset(BaseCamelModel):
     data: List[Union[AI_TrainingData, "AI_EOTrainingData"]] = Field(min_length=1)  # That one should be uri-format
     type: Literal["AI_AbstractTrainingDataset"]
 
-    amount_of_trainingData: Optional[int] = None
+    amount_of_training_data: Optional[int] = None
     classes: Optional[List[NamedValue]] = None
-    classification_scheme: Optional[str] = None  # That one should be uri-format
+    classification_schema: Optional[str] = None  # That one should be uri-format
     created_time: Optional[str] = None
     data_sources: Optional[List[CI_Citation]] = None  # That string one should be uri-format
     doi: Optional[str] = None
@@ -1432,7 +1209,10 @@ class TrainingDataset(BaseCamelModel):
 
     @field_validator("created_time")
     def validate_created_time(cls, v):
-        return _validate_date(v)
+        if v:
+            return _validate_date(v)
+        else:
+            return v
 
     @field_validator("updated_time")
     def validate_updated_time(cls, v):
@@ -1446,25 +1226,5 @@ class TrainingDataset(BaseCamelModel):
 
     @staticmethod
     def from_dict(json_dict):
-        from pytdml.type.extended_types import AI_EOTask, AI_EOTrainingData
         new_dict = copy.deepcopy(json_dict)
-        if new_dict.__contains__('tasks') and new_dict.__contains__('data'):
-            tasks = new_dict['tasks']
-            for i in range(len(tasks)):
-                if tasks[i]["type"] == "AI_EOTask":
-                    tasks[i] = AI_EOTask.from_dict(tasks[i])
-                else:
-                    tasks[i] = AI_Task.from_dict(tasks[i])
-            new_dict['tasks'] = tasks
-
-            data = new_dict['data']
-            for i in range(len(data)):
-                if data[i]["type"] == "AI_EOTrainingData":
-                    data[i] = AI_EOTrainingData.from_dict(data[i])
-                else:
-                    data[i] = AI_TrainingData.from_dict(data[i])
-            new_dict['data'] = data
-        else:
-            print("Parameter \"tasks\" and \"data\" must be provided.")
-            exit()
         return TrainingDataset(**new_dict)

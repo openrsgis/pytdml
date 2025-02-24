@@ -41,7 +41,7 @@ from PIL import Image
 from torchdata.datapipes.iter import IterDataPipe
 
 import pytdml.utils as utils
-from pytdml.type import ObjectLabel
+from pytdml.type import AI_ObjectLabel
 from pytdml.utils import image_open, save_cache
 from pytdml.tdml_image_crop import CropWithImage, CropWithTargetImage
 from datalibrary import downloader
@@ -101,7 +101,6 @@ class TorchObjectDetectionDataPipe(IterDataPipe):
 
     def __iter__(self):
         if os.path.exists(self.cache_path):
-
             with open(self.cache_path, "rb") as cache_file:
                 td_list = pickle.load(cache_file)
             iterator = worker_load_process(td_list)
@@ -145,14 +144,13 @@ class TorchObjectDetectionDataPipe(IterDataPipe):
                         img = utils.channel_processing(img)
                         labels = []
                         for target in target_:
-
-                            json_object = {"bbox": target["bbox"], "type": "Feature"}
-
-                            labels.append(ObjectLabel(object=geojson.loads(json.dumps(json_object)),
-                                                      label_class=target["class"],
-                                                      bbox_type=target["bboxType"],
-                                                      is_negative=target["isNegative"],
-                                                      ))
+                            labels.append(AI_ObjectLabel(
+                                type="AI_ObjectLabel",
+                                object=target["object"],
+                                label_class=target["class"],
+                                bbox_type=target["bboxType"] if target["bboxType"] else None,
+                                is_negative=target["isNegative"] if target["isNegative"] else None,
+                            ))
                         target_dict = utils.target_to_dict(labels, self.class_map, img_width, img_height)
                         if self.transform is not None:
                             img, targets = self.transform(img, target_dict)
@@ -198,7 +196,7 @@ class TorchSemanticSegmentationDataPipe(IterDataPipe, ABC):
 
                 sample_url = item.data_url[0]
 
-                label_url = item.labels[0].image_url
+                label_url = item.labels[0].image_url[0]
                 img, image_path = downloader.download_remote_object(self._basedir, sample_url)
                 img = utils.channel_processing(img)
                 label, label_path = downloader.download_remote_object(self._basedir, label_url)
@@ -270,7 +268,7 @@ class TorchChangeDetectionDataPipe(IterDataPipe, ABC):
 
             for item in iterator:
                 data_url = item.data_url
-                label_url = item.labels[0].image_url
+                label_url = item.labels[0].image_url[0]
                 before_img, before_img_path = downloader.download_remote_object(self._basedir, data_url[0])
                 after_img, after_img_path = downloader.download_remote_object(self._basedir, data_url[1])
                 label, label_path = downloader.download_remote_object(self._basedir, label_url)

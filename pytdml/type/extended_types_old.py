@@ -237,6 +237,7 @@ class EOTrainingData(TrainingData):
             "trainingType": self.training_type,
             "numberOfLabels": self.number_of_labels,
             "dataSources": self.data_sources,
+            "datasetId": self.dataset_id,
             'extent': self.extent,
             'dateTime': self.date_time,
             'dataURL': self.data_url,
@@ -309,6 +310,7 @@ class EOTrainingDataset(TrainingDataset):
             "keywords": self.keywords,
             "metricsInLIT": [m.to_dict() for m in self.metrics_in_literature],
             "statisticsInfo": [s.to_dict() for s in self.statistics_info],
+            "dataSources": self.dataSources,
             "numberOfClasses": self.number_of_classes,
             "classificationSchema": self.classification_schema,
             "classes": self.classes,
@@ -351,6 +353,8 @@ class EOTrainingDataset(TrainingDataset):
                                             json_dict["metricsInLIT"]]
             if json_dict.__contains__("statisticsInfo"):
                 td.statistics_info = [KeyValuePair.from_dict(s) for s in json_dict["statisticsInfo"]]
+            if json_dict.__contains__("dataSources"):
+                td.dataSources = json_dict["dataSources"]
             if json_dict.__contains__("numberOfClasses"):
                 td.number_of_classes = json_dict["numberOfClasses"]
             if json_dict.__contains__("classificationSchema"):
