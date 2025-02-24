@@ -61,11 +61,11 @@ def create_class_map(td: TrainingDataset or EOTrainingDataset):
     assert td.classes is not None, "Training dataset has no classes"
     class_map = {}
     for i, _class in enumerate(td.classes):
-        if isinstance(_class, pytdml.type.basic_types.NamedValue):
-            for item in _class.to_dict().items():
+        if isinstance(_class, dict):
+            for item in _class.items():
                 class_map[item[0]] = item[1]
         else:
-            class_map[_class] = i
+            class_map[_class.key] = _class.value
     return class_map
 
 
