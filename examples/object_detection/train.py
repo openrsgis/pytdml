@@ -21,9 +21,7 @@ lr_epoch = (60, 90, 160)
 # Prepare the training dataset
 class_map = pytdml.ml.creat_class_map(training_dataset)  # create class map
 train_dataset = pytdml.ml.TorchEOImageObjectTD(  # create Torch train dataset
-    training_dataset.data,
-    class_map,
-    transform=pytdml.ml.BaseTransform(train_size)
+    training_dataset.data, class_map, transform=pytdml.ml.BaseTransform(train_size)
 )
 dataloader = DataLoader(
     train_dataset,
@@ -31,7 +29,7 @@ dataloader = DataLoader(
     shuffle=True,
     collate_fn=tools.detection_collate,
     num_workers=0,
-    pin_memory=True
+    pin_memory=True,
 )
 
 # Create model
@@ -39,39 +37,32 @@ yolo_net = myYOLO(
     device,
     input_size=train_size,
     num_classes=training_dataset.number_of_classes,
-    trainable=True
+    trainable=True,
 )
 model = yolo_net
 model.to(device).train()
-print('Let us train yolo net!')
+print("Let us train yolo net!")
 
 # Create Optimizer
 base_lr = 1e-5
 tmp_lr = base_lr
-optimizer = optim.SGD(
-    model.parameters(),
-    lr=1e-5,
-    momentum=0.9,
-    weight_decay=5e-4
-)
+optimizer = optim.SGD(model.parameters(), lr=1e-5, momentum=0.9, weight_decay=5e-4)
 epoch_size = len(train_dataset) // batch_size
 
 # Start training
 for epoch_ in range(0, max_epoch):
-    print('Epoch: %d' % epoch_)
+    print("Epoch: %d" % epoch_)
     if epoch_ in lr_epoch:
         tmp_lr = tmp_lr * 0.1
         tools.set_lr(optimizer, tmp_lr)
     # get a batch of data
     batch_num = 1
     for iter_i, (images_, targets_) in enumerate(dataloader):
-        print('Batch: %d' % batch_num)
+        print("Batch: %d" % batch_num)
         # new target
         targets_ = [label_.tolist() for label_ in targets_]
         targets_ = tools.gt_creator(
-            input_size=train_size,
-            stride=yolo_net.stride,
-            label_lists=targets_
+            input_size=train_size, stride=yolo_net.stride, label_lists=targets_
         )
         # to device
         images_ = images_.to(device)

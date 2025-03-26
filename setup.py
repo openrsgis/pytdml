@@ -36,7 +36,7 @@ import io
 import os.path
 
 
-def read(filename, encoding='utf-8'):
+def read(filename, encoding="utf-8"):
     """read file contents"""
     full_path = os.path.join(os.path.dirname(__file__), filename)
     with io.open(full_path, encoding=encoding) as fh:
@@ -45,7 +45,7 @@ def read(filename, encoding='utf-8'):
 
 
 # get version number
-with open(os.path.join(os.path.dirname(__file__), 'pytdml/__init__.py')) as f:
+with open(os.path.join(os.path.dirname(__file__), "pytdml/__init__.py")) as f:
     for line in f:
         if line.find("__version__") >= 0:
             version = line.split("=")[1].strip()
@@ -63,21 +63,21 @@ setup(
     description="Parsing and encoding training datasets based on OGC Training Data Markup Language for AI (TrainingDML-AI) standard",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author='Boyi Shangguan',
-    author_email='sgby@whu.edu.cn',
-    url='https://github.com/TrainingDML/pytdml',
-    license='MIT',
+    author="Boyi Shangguan",
+    author_email="sgby@whu.edu.cn",
+    url="https://github.com/TrainingDML/pytdml",
+    license="MIT",
     packages=find_packages(),
     include_package_data=True,
     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Scientific/Engineering :: GIS',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Topic :: Scientific/Engineering :: GIS",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
     ],
-    tests_require=['pytest'],
+    tests_require=["pytest"],
     extras_require={
-        'dev': ['pytest'],
+        "dev": ["pytest"],
     },
 )

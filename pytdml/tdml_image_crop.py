@@ -42,16 +42,18 @@ from pytdml.type import AI_EOTrainingData, AI_PixelLabel, EOTrainingDataset
 from pytdml.utils import remove_empty
 
 
-def td_image_crop(td: EOTrainingDataset, save_tdml_path: str, save_crop_dir: str, sub_size: int):
+def td_image_crop(
+    td: EOTrainingDataset, save_tdml_path: str, save_crop_dir: str, sub_size: int
+):
     td_dict = td.to_dict()
-    td_list = td_dict['data']
+    td_list = td_dict["data"]
     new_td_list = []
     index = 0
     for d in td_list:
-        label_type = d['labels'][0]['type']
-        if label_type == 'PixelLabel':
-            image_url = d['dataURL']
-            label_url = d['labels'][0]['imageURL']
+        label_type = d["labels"][0]["type"]
+        if label_type == "PixelLabel":
+            image_url = d["dataURL"]
+            label_url = d["labels"][0]["imageURL"]
             image_dir = os.path.join(save_crop_dir, "images")
             label_dir = os.path.join(save_crop_dir, "labels")
             if not os.path.isdir(image_dir):
@@ -69,7 +71,7 @@ def td_image_crop(td: EOTrainingDataset, save_tdml_path: str, save_crop_dir: str
                 index = index + 1
                 new_td_list.append(new_d.to_dict())
     td_dict["amountOfTrainingData"] = len(new_td_list)
-    td_dict['data'] = new_td_list
+    td_dict["data"] = new_td_list
     with open(save_tdml_path, "w") as f:
         json.dump(remove_empty(td_dict), f, indent=4)
 
@@ -89,7 +91,9 @@ def image_crop(data_url, save_dir, sub_size):
         for i in range(int(w / sub_size)):
             for j in range(int(h / sub_size)):
                 crop_image_path = os.path.join(save_dir, str(i) + str(j) + image_name)
-                crop_image = image[j * sub_size: sub_size * (j + 1), i * sub_size: sub_size * (i + 1)]
+                crop_image = image[
+                    j * sub_size : sub_size * (j + 1), i * sub_size : sub_size * (i + 1)
+                ]
                 cv2.imwrite(crop_image_path, crop_image)
                 crop_image_path_list.append(crop_image_path)
     return crop_image_path_list
@@ -123,9 +127,16 @@ class CropWithImage:
                 x2, y2 = x + self.crop_size, y + self.crop_size
                 # Crop the image
                 dot_index = file_name.find(".")
-                file_name_crop = file_name[:dot_index] + "_cropped_by_" + str(
-                    self.crop_size) + "_" + str(int(y / stride)) + "_" + str(int(x / stride)) + \
-                                 file_name[dot_index:]
+                file_name_crop = (
+                    file_name[:dot_index]
+                    + "_cropped_by_"
+                    + str(self.crop_size)
+                    + "_"
+                    + str(int(y / stride))
+                    + "_"
+                    + str(int(x / stride))
+                    + file_name[dot_index:]
+                )
                 crop_image_path = os.path.join(dir, file_name_crop)
 
                 if not os.path.exists(crop_image_path):
@@ -171,8 +182,16 @@ class CropWithTargetImage(object):
 
                 # Crop the image
                 dot_index = file_name.find(".")
-                file_name_crop = file_name[:dot_index] + "_cropped_by_" + str(self.crop_size) + "_" + str(int(y / stride)) + "_" + str(int(x / stride)) \
-                                 + file_name[dot_index:]
+                file_name_crop = (
+                    file_name[:dot_index]
+                    + "_cropped_by_"
+                    + str(self.crop_size)
+                    + "_"
+                    + str(int(y / stride))
+                    + "_"
+                    + str(int(x / stride))
+                    + file_name[dot_index:]
+                )
                 crop_image_path = os.path.join(dir, file_name_crop)
                 if not os.path.isdir(dir):
                     os.makedirs(dir)
@@ -227,20 +246,28 @@ class CropWithTargetImage(object):
                         "type": "Feature",
                         "geometry": {
                             "type": "Polygon",
-                            "coordinates": [[[xmin, ymin], [xmin,ymax], [xmax,ymax], [xmax, ymin], [xmin, ymin]]]
+                            "coordinates": [
+                                [
+                                    [xmin, ymin],
+                                    [xmin, ymax],
+                                    [xmax, ymax],
+                                    [xmax, ymin],
+                                    [xmin, ymin],
+                                ]
+                            ],
                         },
-                        "properties": {
-                            "name": ""
-                        }
+                        "properties": {"name": ""},
                     }
 
-                    targets.append({
-                        "object": feature,
-                        "class": t.label_class,
-                        "area": area_intersection / area_bbox,
-                        "isNegative": t.is_negative,
-                        "bboxType": t.bbox_type
-                    })
+                    targets.append(
+                        {
+                            "object": feature,
+                            "class": t.label_class,
+                            "area": area_intersection / area_bbox,
+                            "isNegative": t.is_negative,
+                            "bboxType": t.bbox_type,
+                        }
+                    )
 
                 if targets:
                     targets_crops.append(targets)
@@ -249,20 +276,22 @@ class CropWithTargetImage(object):
                         "type": "Feature",
                         "geometry": {
                             "type": "Polygon",
-                            "coordinates": [[[0, 0], [0, 0], [0, 0], [0, 0]]]
+                            "coordinates": [[[0, 0], [0, 0], [0, 0], [0, 0]]],
                         },
-                        "properties": {
-                            "name": ""
-                        }
+                        "properties": {"name": ""},
                     }
-                    targets_crops.append([{
-                        "object": feature_zero,
-                        "class": "",
-                        "area": "",
-                        "isNegative": "",
-                        "isDiffDetectable": "",
-                        "bboxType": ""
-                    }])
+                    targets_crops.append(
+                        [
+                            {
+                                "object": feature_zero,
+                                "class": "",
+                                "area": "",
+                                "isNegative": "",
+                                "isDiffDetectable": "",
+                                "bboxType": "",
+                            }
+                        ]
+                    )
                 write_object_label(dir, targets_crops)
         return crop_coords_paths, targets_crops
 
@@ -272,12 +301,29 @@ def write_object_label(dir, target):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Encode a training dataset to TrainingDML-AI JSON format based on '
-                                                 'YAML configuration file')
-    parser.add_argument('--input', type=str, required=True, help='Input original TrainingDML-AU file path')
-    parser.add_argument('--output_json', type=str, required=True, help='Output result TrainingDML-AI JSON file path')
-    parser.add_argument('--output_images', type=str, required=True, help='Output dir of result cropped images')
-    parser.add_argument('--size', type=int, required=True, help='Crop size of images')
+    parser = argparse.ArgumentParser(
+        description="Encode a training dataset to TrainingDML-AI JSON format based on "
+        "YAML configuration file"
+    )
+    parser.add_argument(
+        "--input",
+        type=str,
+        required=True,
+        help="Input original TrainingDML-AU file path",
+    )
+    parser.add_argument(
+        "--output_json",
+        type=str,
+        required=True,
+        help="Output result TrainingDML-AI JSON file path",
+    )
+    parser.add_argument(
+        "--output_images",
+        type=str,
+        required=True,
+        help="Output dir of result cropped images",
+    )
+    parser.add_argument("--size", type=int, required=True, help="Crop size of images")
 
     args = parser.parse_args()
     tdml_path = args.input
@@ -289,5 +335,5 @@ def main():
         td_image_crop(training_datasets, save_tdml_path, save_crop_dir, sub_size)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

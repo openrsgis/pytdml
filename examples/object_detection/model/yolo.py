@@ -8,8 +8,16 @@ from .backbone.resnet import resnet18
 
 
 class myYOLO(nn.Module):
-    def __init__(self, device, input_size=None, num_classes=16, trainable=False, conf_thresh=0.01, nms_thresh=0.5,
-                 hr=False):
+    def __init__(
+        self,
+        device,
+        input_size=None,
+        num_classes=16,
+        trainable=False,
+        conf_thresh=0.01,
+        nms_thresh=0.5,
+        hr=False,
+    ):
         super(myYOLO, self).__init__()
         self.device = device
         self.num_classes = num_classes
@@ -19,7 +27,9 @@ class myYOLO(nn.Module):
         self.stride = 32
         self.grid_cell = self.create_grid(input_size)
         self.input_size = input_size
-        self.scale = np.array([[[input_size[1], input_size[0], input_size[1], input_size[0]]]])
+        self.scale = np.array(
+            [[[input_size[1], input_size[0], input_size[1], input_size[0]]]]
+        )
         self.scale_torch = torch.tensor(self.scale.copy(), device=device).float()
 
         # we use resnet18 as backbone
@@ -27,9 +37,7 @@ class myYOLO(nn.Module):
 
         # neck
         self.SPP = nn.Sequential(
-            Conv(512, 256, k=1),
-            SPP(),
-            BottleneckCSP(256 * 4, 512, n=1, shortcut=False)
+            Conv(512, 256, k=1), SPP(), BottleneckCSP(256 * 4, 512, n=1, shortcut=False)
         )
         self.SAM = SAM(512)
         self.conv_set = BottleneckCSP(512, 512, n=3, shortcut=False)
@@ -49,7 +57,9 @@ class myYOLO(nn.Module):
     def set_grid(self, input_size):
         self.input_size = input_size
         self.grid_cell = self.create_grid(input_size)
-        self.scale = np.array([[[input_size[1], input_size[0], input_size[1], input_size[0]]]])
+        self.scale = np.array(
+            [[[input_size[1], input_size[0], input_size[1], input_size[0]]]]
+        )
         self.scale_torch = torch.tensor(self.scale.copy(), device=self.device).float()
 
     def decode_boxes(self, pred):
@@ -70,7 +80,7 @@ class myYOLO(nn.Module):
         return output
 
     def nms(self, dets, scores):
-        """"Pure Python NMS baseline."""
+        """ "Pure Python NMS baseline."""
         x1 = dets[:, 0]  # xmin
         y1 = dets[:, 1]  # ymin
         x2 = dets[:, 2]  # xmax
@@ -151,36 +161,45 @@ class myYOLO(nn.Module):
 
         # pred
         prediction = self.pred(C_5)
-        prediction = prediction.view(C_5.trans_size(0), 1 + self.num_classes + 4, -1).permute(0, 2, 1)
+        prediction = prediction.view(
+            C_5.trans_size(0), 1 + self.num_classes + 4, -1
+        ).permute(0, 2, 1)
         B, HW, C = prediction.trans_size()
 
-        # Divide prediction to obj_pred, txtytwth_pred and cls_pred   
+        # Divide prediction to obj_pred, txtytwth_pred and cls_pred
         # [B, H*W, 1]
         conf_pred = prediction[:, :, :1]
         # [B, H*W, num_cls]
-        cls_pred = prediction[:, :, 1: 1 + self.num_classes]
+        cls_pred = prediction[:, :, 1 : 1 + self.num_classes]
         # [B, H*W, 4]
-        txtytwth_pred = prediction[:, :, 1 + self.num_classes:]
+        txtytwth_pred = prediction[:, :, 1 + self.num_classes :]
 
         # test
         if not self.trainable:
             with torch.no_grad():
                 # batch size = 1
-                all_conf = torch.sigmoid(conf_pred)[0]  # 0 is because that these is only 1 batch.
-                all_bbox = torch.clamp((self.decode_boxes(txtytwth_pred) / self.scale_torch)[0], 0., 1.)
-                all_class = (torch.softmax(cls_pred[0, :, :], 1) * all_conf)
+                all_conf = torch.sigmoid(conf_pred)[
+                    0
+                ]  # 0 is because that these is only 1 batch.
+                all_bbox = torch.clamp(
+                    (self.decode_boxes(txtytwth_pred) / self.scale_torch)[0], 0.0, 1.0
+                )
+                all_class = torch.softmax(cls_pred[0, :, :], 1) * all_conf
 
                 # separate box pred and class conf
-                all_conf = all_conf.to('cpu').numpy()
-                all_class = all_class.to('cpu').numpy()
-                all_bbox = all_bbox.to('cpu').numpy()
+                all_conf = all_conf.to("cpu").numpy()
+                all_class = all_class.to("cpu").numpy()
+                all_bbox = all_bbox.to("cpu").numpy()
 
                 bboxes, scores, cls_inds = self.postprocess(all_bbox, all_class)
 
                 return bboxes, scores, cls_inds
         else:
-            conf_loss, cls_loss, txtytwth_loss, total_loss = tools.loss(pred_conf=conf_pred, pred_cls=cls_pred,
-                                                                        pred_txtytwth=txtytwth_pred,
-                                                                        label=target)
+            conf_loss, cls_loss, txtytwth_loss, total_loss = tools.loss(
+                pred_conf=conf_pred,
+                pred_cls=cls_pred,
+                pred_txtytwth=txtytwth_pred,
+                label=target,
+            )
 
             return conf_loss, cls_loss, txtytwth_loss, total_loss

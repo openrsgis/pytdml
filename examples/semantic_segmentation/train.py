@@ -20,22 +20,28 @@ print("Number of classes: " + str(training_dataset.number_of_classes))
 # Prepare the training dataset
 class_map = pytdml.ml.creat_class_map(training_dataset)  # create class map
 test = class_to_index(class_map)
-train_set, val_set, test_set = pytdml.ml.split_train_valid_test(training_dataset, 0.7, 0.2, 0.1)  # split dataset
+train_set, val_set, test_set = pytdml.ml.split_train_valid_test(
+    training_dataset, 0.7, 0.2, 0.1
+)  # split dataset
 train_dataset = pytdml.ml.TorchEOImageSegmentationTD(  # create Torch train dataset
     train_set,
     class_map,
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    transform=transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    ),
 )
 val_dataset = pytdml.ml.TorchEOImageSegmentationTD(
     val_set,
     class_map,
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    transform=transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    ),
 )
 batch_size = 16
 train_data = data.DataLoader(train_dataset, batch_size, shuffle=True, num_workers=0)
@@ -104,10 +110,17 @@ for e in range(100):
         cur_time = datetime.datetime.now()
         h, remainder = divmod((cur_time - prev_time).seconds, 3600)
         m, s = divmod(remainder, 60)
-        epoch_str = (
-            'Epoch: {}, Train Loss: {:.5f}, Train Acc: {:.5f}, Train Mean IU: {:.5f},   Val Loss: {:.5f}, Val Acc: {:.5f}, Val Mean IU: {:.5f} '.format(
-                e + 1, train_loss / len(train_data), train_acc / len(train_dataset), train_mean_iu / len(train_dataset),
-                eval_loss / len(val_data), eval_acc / len(val_dataset), eval_mean_iu / len(val_dataset)))
-        time_str = 'Time: {:.0f}:{:.0f}:{:.0f}'.format(h, m, s)
+        epoch_str = "Epoch: {}, Train Loss: {:.5f}, Train Acc: {:.5f}, Train Mean IU: {:.5f},   Val Loss: {:.5f}, Val Acc: {:.5f}, Val Mean IU: {:.5f} ".format(
+            e + 1,
+            train_loss / len(train_data),
+            train_acc / len(train_dataset),
+            train_mean_iu / len(train_dataset),
+            eval_loss / len(val_data),
+            eval_acc / len(val_dataset),
+            eval_mean_iu / len(val_dataset),
+        )
+        time_str = "Time: {:.0f}:{:.0f}:{:.0f}".format(h, m, s)
         print(epoch_str + time_str)  # + ' lr: {}'.format(optimizer.learning_rate)
-        print('------------------------------------------------------------------------------------------------------')
+        print(
+            "------------------------------------------------------------------------------------------------------"
+        )

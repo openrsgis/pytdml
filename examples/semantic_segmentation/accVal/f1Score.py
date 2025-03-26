@@ -1,6 +1,7 @@
 """
-    f1 to F1 score is used for evaluation the performance of the model
+f1 to F1 score is used for evaluation the performance of the model
 """
+
 import os
 import cv2 as cv
 
@@ -33,13 +34,13 @@ def cal_p_r_each(pre_img, gt_img, class_type):
             if gt_img[i][j] == 0:
                 break
             else:
-                if (pre_img[i][j] == class_type and gt_img[i][j] == class_type):
+                if pre_img[i][j] == class_type and gt_img[i][j] == class_type:
                     TP += 1
-                elif (not pre_img[i][j] == class_type and not gt_img[i][j] == class_type):
+                elif not pre_img[i][j] == class_type and not gt_img[i][j] == class_type:
                     TN += 1
-                elif (not pre_img[i][j] == class_type and gt_img[i][j] == class_type):
+                elif not pre_img[i][j] == class_type and gt_img[i][j] == class_type:
                     FN += 1
-                elif (pre_img[i][j] == class_type and not gt_img[i][j] == class_type):
+                elif pre_img[i][j] == class_type and not gt_img[i][j] == class_type:
                     FP += 1
     return TP, TN, FN, FP
 
@@ -89,7 +90,7 @@ def import_img(img_path):
     return img_list
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pre_path = "/home/pySampleCube/RSTask/DeepLabV32/result"
     gt_path = "/home/RSdata/LandUse/GID5class/test/label"
     pre_img_list = import_img(pre_path)

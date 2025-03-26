@@ -36,7 +36,12 @@ class MinioClient:
 
     def _create_client(self):
         try:
-            self.client = Minio(self.server, access_key=self.access_key, secret_key=self.secret_key, secure=False)
+            self.client = Minio(
+                self.server,
+                access_key=self.access_key,
+                secret_key=self.secret_key,
+                secure=False,
+            )
         except S3Error as e:
             print("error:", e)
 
@@ -53,10 +58,16 @@ class S3Client:
         try:
             import boto3
         except ModuleNotFoundError:
-            raise LibraryNotInstalledError("Failed to import boto3, please install the library first")
+            raise LibraryNotInstalledError(
+                "Failed to import boto3, please install the library first"
+            )
         try:
-            self.s3_client = boto3.client(resource, endpoint_url=server, aws_access_key_id=access_key,
-                                          aws_secret_access_key=secret_key)
+            self.s3_client = boto3.client(
+                resource,
+                endpoint_url=server,
+                aws_access_key_id=access_key,
+                aws_secret_access_key=secret_key,
+            )
         except Exception as e:
             print("Exception when connecting to S3: ", str(e))
 
@@ -64,7 +75,7 @@ class S3Client:
         response = self.s3_client.list_buckets()
         # Print storage bucket name
         bucket_list = []
-        for bucket in response['Buckets']:
+        for bucket in response["Buckets"]:
             bucket_list.append(bucket)
         return bucket_list
 
@@ -75,9 +86,9 @@ class S3Client:
             response = self.s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
             # 打印对象列表
 
-            if 'Contents' in response:
-                for obj in response['Contents']:
-                    obj_list.append(obj['Key'])
+            if "Contents" in response:
+                for obj in response["Contents"]:
+                    obj_list.append(obj["Key"])
             else:
                 print("There are no objects in the storage bucket: " + bucket_name)
 
@@ -90,7 +101,7 @@ class S3Client:
         response = self.s3_client.get_object(Bucket=bucket, Key=key)
 
         # Get object content
-        object_data = response['Body'].read()
+        object_data = response["Body"].read()
         return BytesIO(object_data)
 
     def download_file(self, bucket_name, object_key, file_path):

@@ -220,8 +220,7 @@ class TorchSemanticSegmentationTD(VisionDataset):
         return len(self.td_data_list)
 
     def _load_data(self, td_list):
-        """
-        """
+        """ """
         return td_list
 
     def _load_img_label(self, td_list):
@@ -234,7 +233,9 @@ class TorchSemanticSegmentationTD(VisionDataset):
 
     def __getitem__(self, item):
         if self._imgs[item].startswith(BUCKET.LC):
-            self._imgs[item] = utils.generate_local_file_path(self.root, self._imgs[item])
+            self._imgs[item] = utils.generate_local_file_path(
+                self.root, self._imgs[item]
+            )
         image = utils.image_open(self._imgs[item])
 
         label = utils.image_open(self._labels[item])
@@ -325,7 +326,9 @@ class Torch3DModelReconstructionTD(VisionDataset):
     def __init__(self, tdml, root, transform=None):
         super().__init__(root)
         self.root = root
-        self.cams, self.depths, self.images = self._load_data()  # Load camera parameters
+        self.cams, self.depths, self.images = (
+            self._load_data()
+        )  # Load camera parameters
         self.tdml = tdml
         self.transform = transform
 
@@ -349,7 +352,9 @@ class Torch3DModelReconstructionTD(VisionDataset):
     def __getitem__(self, item):
         cam = self.cams[item]
         depth = self.depths[item]
-        image_list = self.images[item]  # For each sample, use different perspective images, i.e., modulo operation
+        image_list = self.images[
+            item
+        ]  # For each sample, use different perspective images, i.e., modulo operation
         images = [utils.image_open(i) for i in image_list]
         depth_imgs = [utils.image_open(i) for i in depth]
         cam_txt = []
@@ -363,15 +368,19 @@ class Torch3DModelReconstructionTD(VisionDataset):
 
 
 def base_transform(image, size, mean, std):
-    x = cv2.resize(image, (size[0], size[1]), interpolation=cv2.INTER_AREA).astype(np.float32)
-    x /= 255.
+    x = cv2.resize(image, (size[0], size[1]), interpolation=cv2.INTER_AREA).astype(
+        np.float32
+    )
+    x /= 255.0
     x -= mean
     x /= std
     return x
 
 
 class BaseTransform:
-    def __init__(self, size=None, mean=(0.406, 0.456, 0.485), std=(0.225, 0.224, 0.229)):
+    def __init__(
+        self, size=None, mean=(0.406, 0.456, 0.485), std=(0.225, 0.224, 0.229)
+    ):
         if size is None:
             size = [256, 256]
         self.size = size

@@ -4,8 +4,18 @@ import torch
 from torch.utils.data import DataLoader
 
 
-def train_and_valid(model, train_dataset, valid_dataset, train_dataset_size, valid_dataset_size,
-                    writer, loss_function, optimizer, epochs=1000, batch_size=128):
+def train_and_valid(
+    model,
+    train_dataset,
+    valid_dataset,
+    train_dataset_size,
+    valid_dataset_size,
+    writer,
+    loss_function,
+    optimizer,
+    epochs=1000,
+    batch_size=128,
+):
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     valid_data = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True)
 
@@ -72,10 +82,20 @@ def train_and_valid(model, train_dataset, valid_dataset, train_dataset_size, val
 
         print(
             "Epoch: {:03d}, Training: Loss: {:.4f}, Accuracy: {:.4f}%, \n\t\tValidation: Loss: {:.4f}, Accuracy: {:.4f}%, Time: {:.4f}s".format(
-                epoch + 1, avg_valid_loss, avg_train_acc * 100, avg_valid_loss, avg_valid_acc * 100,
-                epoch_end - epoch_start))
-        print("Best Accuracy for validation : {:.4f} at epoch {:03d}".format(best_acc, best_epoch))
+                epoch + 1,
+                avg_valid_loss,
+                avg_train_acc * 100,
+                avg_valid_loss,
+                avg_valid_acc * 100,
+                epoch_end - epoch_start,
+            )
+        )
+        print(
+            "Best Accuracy for validation : {:.4f} at epoch {:03d}".format(
+                best_acc, best_epoch
+            )
+        )
 
-        torch.save(model, 'model/resnet50_model_' + str(epoch + 1) + '.pth')
+        torch.save(model, "model/resnet50_model_" + str(epoch + 1) + ".pth")
     writer.close()
     return model, record

@@ -35,11 +35,15 @@ from pytdml.type import TrainingDataset, EOTrainingDataset, MD_Band
 from pytdml.type.basic_types import NamedValue
 
 
-def split_train_valid_test(td: TrainingDataset, train_ratio=0.7, valid_ratio=0.0, test_ratio=0.3):
+def split_train_valid_test(
+    td: TrainingDataset, train_ratio=0.7, valid_ratio=0.0, test_ratio=0.3
+):
     """
     Splits a TrainingDataset into train, valid and test sets.
     """
-    assert abs(train_ratio + valid_ratio + test_ratio - 1.0) <= 0.000001, "Ratios must sum to 1.0"
+    assert (
+        abs(train_ratio + valid_ratio + test_ratio - 1.0) <= 0.000001
+    ), "Ratios must sum to 1.0"
 
     n_samples = len(td.data)
     n_train = int(n_samples * train_ratio)
@@ -48,8 +52,8 @@ def split_train_valid_test(td: TrainingDataset, train_ratio=0.7, valid_ratio=0.0
     random.shuffle(td.data)
 
     train_td = td.data[:n_train]
-    valid_td = td.data[n_train:n_train + n_valid]
-    test_td = td.data[n_train + n_valid:]
+    valid_td = td.data[n_train : n_train + n_valid]
+    test_td = td.data[n_train + n_valid :]
 
     return train_td, valid_td, test_td
 
@@ -89,4 +93,3 @@ def create_classes_map_(classes):
 def collate_fn(batch):
     img, targets = list(zip(*batch))
     return torch.stack(img, 0), list(targets)
-

@@ -80,11 +80,11 @@ def download_file(bucket_name, object_name, file_name):
 
 def download_scene_data(args):
     """
-        Downloads training data and saves it to a local directory,
-        Args:
-            args (tuple): A tuple containing a training data object and the directory where the data should be downloaded to.
-        Returns:
-            A data item object with the updated data_url field.
+    Downloads training data and saves it to a local directory,
+    Args:
+        args (tuple): A tuple containing a training data object and the directory where the data should be downloaded to.
+    Returns:
+        A data item object with the updated data_url field.
     """
 
     data_item, download_dir, _ = args
@@ -161,11 +161,14 @@ def download_object_data(args):
 
             for target in targets[i]:
                 # json_object = {"bbox": target["object"], "type": "Feature"}
-                labels.append(AI_ObjectLabel(object=geojson.loads(json.dumps(target["object"])),
-                              label_class=target["class"],
-                              bbox_type=target["bboxType"],
-                              is_negative=target["isNegative"]
-                              ))
+                labels.append(
+                    AI_ObjectLabel(
+                        object=geojson.loads(json.dumps(target["object"])),
+                        label_class=target["class"],
+                        bbox_type=target["bboxType"],
+                        is_negative=target["isNegative"],
+                    )
+                )
 
             new_d = AI_EOTrainingData(
                 id=str(data_item.id + "_crop_" + str(index)),
@@ -173,7 +176,7 @@ def download_object_data(args):
                 number_of_labels=len(targets[i]),
                 training_type=data_item.training_type,
                 data_url=[crop_image_url],
-                labels=labels
+                labels=labels,
             )
             index = index + 1
             new_td_list.append(new_d)
@@ -291,11 +294,13 @@ def download_changeDetection_data(args):
         crop_labels = crop_image(label, label_dir, label_url.split("/")[-1])
 
         index = 0
-        for crop_bef_image_url, crop_af_image_url, crop_label_url in zip(crop_bef_imgs, crop_af_imgs, crop_labels):
+        for crop_bef_image_url, crop_af_image_url, crop_label_url in zip(
+            crop_bef_imgs, crop_af_imgs, crop_labels
+        ):
             new_d = AI_EOTrainingData(
                 id=str(data_item.id + "_crop_" + str(index)),
                 labels=[AI_PixelLabel(image_url=crop_label_url)],
-                data_url=[crop_bef_image_url, crop_af_image_url]
+                data_url=[crop_bef_image_url, crop_af_image_url],
             )
             index = index + 1
             new_td_list.append(new_d)
@@ -358,10 +363,14 @@ def DatasetDownload(taskType, data_list, download_dir, num_processes=8):
 
             args = [(data_item, download_dir, lock) for data_item in data_list.data]
             if taskType == Task.scene_classification:
-                for result in tqdm(pool.imap_unordered(download_scene_data, args), total=len(args)):
+                for result in tqdm(
+                    pool.imap_unordered(download_scene_data, args), total=len(args)
+                ):
                     result_list.append(result)
             if taskType == Task.model_3d_reconstruction:
-                for result in tqdm(pool.imap_unordered(download_3MR_data, args), total=len(args)):
+                for result in tqdm(
+                    pool.imap_unordered(download_3MR_data, args), total=len(args)
+                ):
                     result_list.append(result)
         return list(result_list)
 

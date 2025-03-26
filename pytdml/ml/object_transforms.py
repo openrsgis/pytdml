@@ -34,7 +34,7 @@ def crop(image, target, region):
 
     if "masks" in target:
         # FIXME should we update the area here if there are no boxes?
-        target['masks'] = target['masks'][:, i:i + h, j:j + w]
+        target["masks"] = target["masks"][:, i : i + h, j : j + w]
         fields.append("masks")
 
     # remove elements for which the boxes or masks that have zero area
@@ -42,10 +42,10 @@ def crop(image, target, region):
         # favor boxes selection when defining which elements to keep
         # this is compatible with previous implementation
         if "boxes" in target:
-            cropped_boxes = target['boxes'].reshape(-1, 2, 2)
+            cropped_boxes = target["boxes"].reshape(-1, 2, 2)
             keep = torch.all(cropped_boxes[:, 1, :] > cropped_boxes[:, 0, :], dim=1)
         else:
-            keep = target['masks'].flatten(1).any(1)
+            keep = target["masks"].flatten(1).any(1)
 
         for field in fields:
             target[field] = target[field][keep]
@@ -63,7 +63,9 @@ def hflip(image, target):
     if "bbox" in target:
         boxes = target["bbox"]
         if boxes.shape[0] > 0:
-            boxes = boxes[:, [2, 1, 0, 3]] * torch.as_tensor([-1, 1, -1, 1]) + torch.as_tensor([w, 0, w, 0])
+            boxes = boxes[:, [2, 1, 0, 3]] * torch.as_tensor(
+                [-1, 1, -1, 1]
+            ) + torch.as_tensor([w, 0, w, 0])
             target["bbox"] = boxes
 
     return flipped_image, target
@@ -103,13 +105,18 @@ def resize(image, target, size, max_size=None):
     if target is None:
         return rescaled_image, None
 
-    ratios = tuple(float(s) / float(s_orig) for s, s_orig in zip(rescaled_image.size()[1:], image.size()[1:]))
+    ratios = tuple(
+        float(s) / float(s_orig)
+        for s, s_orig in zip(rescaled_image.size()[1:], image.size()[1:])
+    )
     ratio_width, ratio_height = ratios
 
     target = target.copy()
     if "bbox" in target:
         boxes = target["bbox"]
-        scaled_boxes = boxes * torch.Tensor([ratio_width, ratio_height, ratio_width, ratio_height])
+        scaled_boxes = boxes * torch.Tensor(
+            [ratio_width, ratio_height, ratio_width, ratio_height]
+        )
         target["bbox"] = scaled_boxes
 
     if "area" in target:
@@ -131,7 +138,9 @@ def pad(image, target, padding):
     # should we do something wrt the original size?
     target["size"] = torch.tensor(padded_image.size[::-1])
     if "masks" in target:
-        target['masks'] = torch.nn.functional.pad(target['masks'], (0, padding[0], 0, padding[1]))
+        target["masks"] = torch.nn.functional.pad(
+            target["masks"], (0, padding[0], 0, padding[1])
+        )
     return padded_image, target
 
 
@@ -165,8 +174,8 @@ class CenterCrop(object):
         # image_width, image_height = img.size
         _, image_height, image_width = F.get_dimensions(img)
         crop_height, crop_width = self.size
-        crop_top = int(round((image_height - crop_height) / 2.))
-        crop_left = int(round((image_width - crop_width) / 2.))
+        crop_top = int(round((image_height - crop_height) / 2.0))
+        crop_left = int(round((image_width - crop_width) / 2.0))
         return crop(img, target, (crop_top, crop_left, crop_height, crop_width))
 
 
@@ -265,6 +274,5 @@ class Compose(object):
 
 def box_xyxy_to_cxcywh(x):
     x0, y0, x1, y1 = x.unbind(-1)
-    b = [(x0 + x1) / 2, (y0 + y1) / 2,
-         (x1 - x0), (y1 - y0)]
+    b = [(x0 + x1) / 2, (y0 + y1) / 2, (x1 - x0), (y1 - y0)]
     return torch.stack(b, dim=-1)

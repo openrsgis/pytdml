@@ -9,9 +9,9 @@ response = requests.get(remote_schema_url)
 remote_schema = response.json()
 
 json_data = {
-    "type":"AI_PixelLabel",
+    "type": "AI_PixelLabel",
     "imageFormat": ["png"],
-    "imageURL":["this_is_not_a_url.tif"]
+    "imageURL": ["this_is_not_a_url.tif"],
 }
 
 # Validate the JSON data against the remote schema

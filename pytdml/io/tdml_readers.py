@@ -36,7 +36,7 @@ def read_from_json(file_path: str):
     """
     Reads a TDML JSON file and returns a TrainingDataset object.
     """
-    with open(file_path, "r", encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         json_dict = json.load(f)
 
     return parse_json(json_dict)

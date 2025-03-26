@@ -41,10 +41,12 @@ from pytdml.type import EOTrainingDataset, AI_EOTrainingData, AI_ObjectLabel, AI
 
 def convert_stac_to_tdml(stac_dataset_path):
     # Reads JSON data in stac format from a given path.
-    with open(stac_dataset_path, 'r') as file:
+    with open(stac_dataset_path, "r") as file:
         collection_data = json.load(file)
     collection_object = Collection.from_dict(collection_data)
-    stac_collection_dataset = collection_object.to_dict(include_self_link=False, transform_hrefs=True)
+    stac_collection_dataset = collection_object.to_dict(
+        include_self_link=False, transform_hrefs=True
+    )
 
     # Reads the necessary attributes from the Collection object and maps them to the EOTrainingDataset object
     collection_version = stac_collection_dataset.get("stac_version")
@@ -52,12 +54,16 @@ def convert_stac_to_tdml(stac_dataset_path):
     collection_description = stac_collection_dataset.get("description")
     collection_license = stac_collection_dataset.get("license")
     collection_bbox = stac_collection_dataset.get("extent").get("spatial").get("bbox")
-    collection_interval = stac_collection_dataset.get("extent").get("temporal").get("interval")
+    collection_interval = (
+        stac_collection_dataset.get("extent").get("temporal").get("interval")
+    )
     data_time = []
     for item in collection_interval:
         for time in item:
             cleaned_date_time_str = re.sub(r"(\\+00:00|Z)$", "", time)
-            date_time_obj = datetime.strptime(cleaned_date_time_str, "%Y-%m-%dT%H:%M:%S.%f")
+            date_time_obj = datetime.strptime(
+                cleaned_date_time_str, "%Y-%m-%dT%H:%M:%S.%f"
+            )
             formatted_date_time_str = date_time_obj.strftime("%Y-%m-%dT%H:%M:%S")
             data_time.append(formatted_date_time_str)
 
@@ -68,53 +74,57 @@ def convert_stac_to_tdml(stac_dataset_path):
 
     # Reads the necessary attributes from the item object and maps them to the data object
     collection_links = stac_collection_dataset.get("links")
-    collection_filtered_links = [link for link in collection_links if link.get("rel") == "item"]
+    collection_filtered_links = [
+        link for link in collection_links if link.get("rel") == "item"
+    ]
 
     datalist = []
     for link in collection_filtered_links:
         item_path = link.get("href")
-        with open(item_path, 'r') as item_file:
+        with open(item_path, "r") as item_file:
             stac_item = json.load(item_file)
         link_id = stac_item.get("id")
         link_rel = link.get("rel")
         feature = Feature(**stac_item)
-        link_href = [asset['href'] for asset in stac_item.get("assets").values()]
+        link_href = [asset["href"] for asset in stac_item.get("assets").values()]
 
         label = AI_ObjectLabel(
-            type = "AI_ObjectLabel",
-            object = feature,
-            label_class = link_rel
+            type="AI_ObjectLabel", object=feature, label_class=link_rel
         )
 
         data = AI_EOTrainingData(
-            type = "AI_EOTrainingData",
-            id = link_id,
-            labels = [label],
-            data_url = link_href,
-            data_time = data_time
+            type="AI_EOTrainingData",
+            id=link_id,
+            labels=[label],
+            data_url=link_href,
+            data_time=data_time,
         )
         datalist.append(data)
 
     # Reads the unnecessary attributes from the Collection object and maps them to the EOTrainingDataset object
     collection_name = stac_collection_dataset.get("title")
 
-    tasks = [AI_EOTask(task_type="STAC",
-                       id=str(collection_id) + "_task",
-                       dataset_id= str(collection_id),
-                       type='AI_EOTask')]
+    tasks = [
+        AI_EOTask(
+            task_type="STAC",
+            id=str(collection_id) + "_task",
+            dataset_id=str(collection_id),
+            type="AI_EOTask",
+        )
+    ]
 
     dataset = EOTrainingDataset(
         # necessary attributes
-        id = str(collection_id),
-        name = collection_name,
-        description = collection_description,
-        license = collection_license,
-        tasks = tasks,
-        data = datalist,
+        id=str(collection_id),
+        name=collection_name,
+        description=collection_description,
+        license=collection_license,
+        tasks=tasks,
+        data=datalist,
         type="AI_EOTrainingDataset",
         # unnecessary attributes
-        version = collection_version,
-        extent = collection_extent
+        version=collection_version,
+        extent=collection_extent,
     )
 
     return dataset

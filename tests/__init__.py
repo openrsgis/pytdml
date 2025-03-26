@@ -10,4 +10,3 @@
 #
 # for ext, mime in mimetypes.types_map.items():
 #     print(f"{ext}: {mime}")
-

@@ -30,6 +30,7 @@
 # ------------------------------------------------------------------------------
 import warnings
 from rasterio.errors import NotGeoreferencedWarning
+
 warnings.filterwarnings("ignore", category=NotGeoreferencedWarning)
 
 from pytdml.ml.ml_operators import collate_fn
@@ -49,13 +50,16 @@ transform = transforms.Compose(  # transform for the dataset
     ]
 )
 
-target_transform = transform_target.Compose([
-    transform_target.ToTensor(),
-    transform_target.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
-    transform_target.RandomResize((512, 512))
-])
+target_transform = transform_target.Compose(
+    [
+        transform_target.ToTensor(),
+        transform_target.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        transform_target.RandomResize((512, 512)),
+    ]
+)
 
 path = "."
+
 
 def datasets_for_scene_task():
     ds_lib = EOTrainingDatasetCollection()
@@ -68,7 +72,9 @@ def datasets_for_scene_task():
 
     # across dataset
     rsd46_ml = ds_lib["RSD46-WHU"]
-    my_dataset_td = ds_lib.training_data_collection(Task.scene_classification, [rsd46_ml, whurs19_ml], ["Airport"])
+    my_dataset_td = ds_lib.training_data_collection(
+        Task.scene_classification, [rsd46_ml, whurs19_ml], ["Airport"]
+    )
 
     my_pipeline = PipeLine(my_dataset_td, path)
     # my_dataset = my_pipeline.torch_dataset(download=False, transform=transform)
@@ -95,10 +101,12 @@ def datasets_for_object_task():
     # rsod_ml = ds_lib["RSOD"]
     # my_dataset_TD = ds_lib.training_data_collection(Task.object_detection, [dota_ml, rsod_ml], ["Plane"])
     # print(len(my_dataset_TD.data))
-    my_pipeline = PipeLine(dota_ml, path, crop=(500,0,0))
+    my_pipeline = PipeLine(dota_ml, path, crop=(500, 0, 0))
     # NWPU_VHR10_torchPipe = my_pipeline.torch_dataset(download=True, transform=target_transform)
     my_torchPipe = my_pipeline.torch_data_pipe(transform=target_transform)
-    dataloader = data.DataLoader(my_torchPipe, batch_size=4, num_workers=1, collate_fn=collate_fn)
+    dataloader = data.DataLoader(
+        my_torchPipe, batch_size=4, num_workers=1, collate_fn=collate_fn
+    )
 
     for i, batch in enumerate(dataloader):
         print(batch)
@@ -142,8 +150,12 @@ def datasets_for_segmentation_task():
     # my_dataset_TD = ds_lib.training_data_collection(Task.semantic_segmentation, [AISD_ml, building_extraction_ml], ["Building Area"])
     building_extraction_ml = PipeLine(AISD_ml, path)
     # NWPU_VHR10_torchPipe = building_extraction_ml.torch_dataset(download=True, transform=transform)
-    building_extraction_torchPipe = building_extraction_ml.torch_data_pipe(transform=transform)
-    dataloader = data.DataLoader(building_extraction_torchPipe, batch_size=4, num_workers=4)
+    building_extraction_torchPipe = building_extraction_ml.torch_data_pipe(
+        transform=transform
+    )
+    dataloader = data.DataLoader(
+        building_extraction_torchPipe, batch_size=4, num_workers=4
+    )
     for i, batch in enumerate(dataloader):
         print(batch)
         if i == 3:
@@ -175,8 +187,3 @@ def datasets_for_change_task():
 
 if __name__ == "__main__":
     datasets_for_change_task()
-
-
-
-
-
