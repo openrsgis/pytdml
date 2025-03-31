@@ -5,7 +5,13 @@ from datetime import datetime
 
 from geojson import Feature
 
-from pytdml.type import AI_EOTrainingData, EOTrainingDataset, AI_EOTask, AI_ObjectLabel, AI_SceneLabel
+from pytdml.type import (
+    AI_EOTrainingData,
+    EOTrainingDataset,
+    AI_EOTask,
+    AI_ObjectLabel,
+    AI_SceneLabel,
+)
 from pytdml.type.basic_types import NamedValue
 
 
@@ -20,21 +26,21 @@ def categorize_string(s):
     Returns:
         str: The matching category.
     """
-    if re.search(r'train', s, re.IGNORECASE):
-        return 'train'
-    elif re.search(r'test', s, re.IGNORECASE):
-        return 'test'
-    elif re.search(r'valid', s, re.IGNORECASE):
-        return 'validation'
+    if re.search(r"train", s, re.IGNORECASE):
+        return "train"
+    elif re.search(r"test", s, re.IGNORECASE):
+        return "test"
+    elif re.search(r"valid", s, re.IGNORECASE):
+        return "validation"
     else:
-        return 'unknown'  # If none of the above matches, then 'unknown' or some other default value is returned.
+        return "unknown"  # If none of the above matches, then 'unknown' or some other default value is returned.
 
 
 def distinguish_dataset_type(coco_dataset):
-    if not(coco_dataset.keys().__contains__("annotations")):
+    if not (coco_dataset.keys().__contains__("annotations")):
         return "Unknown"
 
-    anns = coco_dataset['annotations']
+    anns = coco_dataset["annotations"]
     if anns[0].keys().__contains__("keypoints"):
         return "Keypoint Detection"
     elif anns[0].keys().__contains__("segments_info"):
@@ -69,7 +75,7 @@ def parse_date(input_date):
         "%H:%M:%S",  # time
         "%Y/%m/%d",
         "%Y-%m-%d %H:%M:%S.%f",  # date-time with milliseconds
-        "%Y-%m-%d %H:%M:%S"
+        "%Y-%m-%d %H:%M:%S",
     ]
 
     for date_format in formats:
@@ -92,7 +98,7 @@ def convert_coco_to_tdml(cocofile):
     return:
         EOTrainingDataset
     """
-    with open(cocofile, 'r') as file:
+    with open(cocofile, "r") as file:
         coco_dataset = json.load(file)
 
     try:
@@ -100,7 +106,9 @@ def convert_coco_to_tdml(cocofile):
         images = coco_dataset["images"]
         licenses = coco_dataset["licenses"]
     except KeyError as e:
-        raise ValueError("The format of the data is incorrect, missing the key {}".format(e))
+        raise ValueError(
+            "The format of the data is incorrect, missing the key {}".format(e)
+        )
     except Exception as e:
         raise e
 
@@ -109,7 +117,7 @@ def convert_coco_to_tdml(cocofile):
         annotations = coco_dataset.get("annotations")
         annotations_grouped_by_image = {}
         for annotation in annotations:
-            image_id = annotation['image_id']
+            image_id = annotation["image_id"]
             if image_id not in annotations_grouped_by_image:
                 annotations_grouped_by_image[image_id] = []
             annotations_grouped_by_image[image_id].append(annotation)
@@ -121,14 +129,14 @@ def convert_coco_to_tdml(cocofile):
         dataset_description = dataset_id
         # license
         names = [license_elem.get("name") for license_elem in licenses]
-        dataset_licenses = ', '.join(names)
+        dataset_licenses = ", ".join(names)
         # task
         dataset_task = AI_EOTask(
-                id=str(dataset_id) + "_task",
-                type='AI_EOTask',
-                task_type=dataset_type,
-                dataset_id=str(dataset_id),
-                description="The COCO {} Task.".format(dataset_type)
+            id=str(dataset_id) + "_task",
+            type="AI_EOTask",
+            task_type=dataset_type,
+            dataset_id=str(dataset_id),
+            description="The COCO {} Task.".format(dataset_type),
         )
         # data
         td_list = []
@@ -144,25 +152,27 @@ def convert_coco_to_tdml(cocofile):
                             [points[0], points[1]],
                             [points[0] + points[2], points[1]],
                             [points[0] + points[2], points[1] + points[3]],
-                            [points[0], points[1] + points[2]]
+                            [points[0], points[1] + points[2]],
                         ]
                     ]
                     labels = AI_ObjectLabel(
                         type="AI_ObjectLabel",
                         is_negative=False,
-                        confidence =1.0,
+                        confidence=1.0,
                         object=Feature(
                             id="feature " + str(i),
-                            geometry={
-                                "type": "Polygon",
-                                "coordinates": coord
-                            }
+                            geometry={"type": "Polygon", "coordinates": coord},
                         ),
-                        label_class=categories_by_id[label_element["category_id"]].get("name"),
-                        bbox_type="Horizontal BBox")
+                        label_class=categories_by_id[label_element["category_id"]].get(
+                            "name"
+                        ),
+                        bbox_type="Horizontal BBox",
+                    )
                     object_labels.append(labels)
 
-            training_type = categorize_string(os.path.basename(os.path.dirname(image["coco_url"])))
+            training_type = categorize_string(
+                os.path.basename(os.path.dirname(image["coco_url"]))
+            )
             numbers_of_labels = len(object_labels)
 
             td = AI_EOTrainingData(
@@ -173,8 +183,8 @@ def convert_coco_to_tdml(cocofile):
                 dataset_id=dataset_id,
                 number_of_labels=numbers_of_labels,
                 training_type=training_type,
-                date_time=[formatted_date_time]
-                )
+                date_time=[formatted_date_time],
+            )
             td_list.append(td)
 
         amount_of_trainingdata = len(images)
@@ -191,9 +201,9 @@ def convert_coco_to_tdml(cocofile):
 
         classes = [
             NamedValue(
-                key=category["name"],
-                value=category_counts.get(category["name"])
-            ) for category in categories
+                key=category["name"], value=category_counts.get(category["name"])
+            )
+            for category in categories
         ]
 
         created_time = parse_date(info.get("date_created"))
@@ -216,7 +226,7 @@ def convert_coco_to_tdml(cocofile):
             number_of_classes=number_of_classes,
             providers=providers,
             updated_time=updated_time,
-            version=dataset_version
+            version=dataset_version,
         )
 
         return dataset
@@ -225,7 +235,7 @@ def convert_coco_to_tdml(cocofile):
         annotations = coco_dataset.get("annotations")
         annotations_grouped_by_image = {}
         for annotation in annotations:
-            image_id = annotation['image_id']
+            image_id = annotation["image_id"]
             if image_id not in annotations_grouped_by_image:
                 annotations_grouped_by_image[image_id] = []
             annotations_grouped_by_image[image_id].append(annotation)
@@ -235,14 +245,14 @@ def convert_coco_to_tdml(cocofile):
         dataset_description = dataset_id
         # license
         names = [license_elem.get("name") for license_elem in licenses]
-        dataset_licenses = ', '.join(names)
+        dataset_licenses = ", ".join(names)
         # task
         dataset_task = AI_EOTask(
-                id=str(dataset_id) + "_task",
-                type='AI_EOTask',
-                task_type=dataset_type,
-                dataset_id=str(dataset_id),
-                description="The COCO {} Task.".format(dataset_type)
+            id=str(dataset_id) + "_task",
+            type="AI_EOTask",
+            task_type=dataset_type,
+            dataset_id=str(dataset_id),
+            description="The COCO {} Task.".format(dataset_type),
         )
         # data
         td_list = []
@@ -262,26 +272,28 @@ def convert_coco_to_tdml(cocofile):
                             [points[0], points[1]],
                             [points[0] + points[2], points[1]],
                             [points[0] + points[2], points[1] + points[3]],
-                            [points[0], points[1] + points[2]]
+                            [points[0], points[1] + points[2]],
                         ]
                     ]
-                    keypoint_counts, label_class = update_keypoint_counts(keypoint_counts, label_element["keypoints"])
+                    keypoint_counts, label_class = update_keypoint_counts(
+                        keypoint_counts, label_element["keypoints"]
+                    )
                     labels = AI_ObjectLabel(
                         type="AI_ObjectLabel",
                         is_negative=False,
-                        confidence =1.0,
+                        confidence=1.0,
                         object=Feature(
                             id="feature " + str(i),
-                            geometry={
-                                "type": "Polygon",
-                                "coordinates": coord
-                            }
+                            geometry={"type": "Polygon", "coordinates": coord},
                         ),
                         label_class=", ".join(label_class),
-                        bbox_type="Horizontal BBox")
+                        bbox_type="Horizontal BBox",
+                    )
                     object_labels.append(labels)
 
-            training_type = categorize_string(os.path.basename(os.path.dirname(image["coco_url"])))
+            training_type = categorize_string(
+                os.path.basename(os.path.dirname(image["coco_url"]))
+            )
             numbers_of_labels = len(object_labels)
 
             td = AI_EOTrainingData(
@@ -292,18 +304,16 @@ def convert_coco_to_tdml(cocofile):
                 dataset_id=dataset_id,
                 number_of_labels=numbers_of_labels,
                 training_type=training_type,
-                date_time=[formatted_date_time]
-                )
+                date_time=[formatted_date_time],
+            )
             td_list.append(td)
 
         amount_of_trainingdata = len(images)
         created_time = parse_date(info.get("date_created"))
         updated_time = created_time
         classes = [
-            NamedValue(
-                key=keypoint,
-                value=keypoint_counts.get(keypoint)
-            ) for keypoint in keypoints
+            NamedValue(key=keypoint, value=keypoint_counts.get(keypoint))
+            for keypoint in keypoints
         ]
         number_of_classes = len(classes)
 
@@ -324,14 +334,16 @@ def convert_coco_to_tdml(cocofile):
             number_of_classes=number_of_classes,
             providers=providers,
             updated_time=updated_time,
-            version=dataset_version
+            version=dataset_version,
         )
 
         return dataset
 
     elif dataset_type == "Panoptic Segmentation":
         annotations = coco_dataset.get("annotations")
-        annotations_by_image_id = {annotation["image_id"]: annotation for annotation in annotations}
+        annotations_by_image_id = {
+            annotation["image_id"]: annotation for annotation in annotations
+        }
         categories = coco_dataset.get("categories")
         categories_by_id = {category["id"]: category for category in categories}
         dataset_id = info.get("description")
@@ -339,14 +351,14 @@ def convert_coco_to_tdml(cocofile):
         dataset_description = dataset_id
         # license
         names = [license_elem.get("name") for license_elem in licenses]
-        dataset_licenses = ', '.join(names)
+        dataset_licenses = ", ".join(names)
         # task
         dataset_task = AI_EOTask(
-                id=str(dataset_id) + "_task",
-                type='AI_EOTask',
-                task_type=dataset_type,
-                dataset_id=str(dataset_id),
-                description="The COCO {} Task.".format(dataset_type)
+            id=str(dataset_id) + "_task",
+            type="AI_EOTask",
+            task_type=dataset_type,
+            dataset_id=str(dataset_id),
+            description="The COCO {} Task.".format(dataset_type),
         )
         # data
         td_list = []
@@ -362,25 +374,27 @@ def convert_coco_to_tdml(cocofile):
                             [points[0], points[1]],
                             [points[0] + points[2], points[1]],
                             [points[0] + points[2], points[1] + points[3]],
-                            [points[0], points[1] + points[2]]
+                            [points[0], points[1] + points[2]],
                         ]
                     ]
                     labels = AI_ObjectLabel(
                         type="AI_ObjectLabel",
                         is_negative=False,
-                        confidence =1.0,
+                        confidence=1.0,
                         object=Feature(
                             id="feature " + str(i),
-                            geometry={
-                                "type": "Polygon",
-                                "coordinates": coord
-                            }
+                            geometry={"type": "Polygon", "coordinates": coord},
                         ),
-                        label_class=categories_by_id[label_element["category_id"]].get("name"),
-                        bbox_type="Horizontal BBox")
+                        label_class=categories_by_id[label_element["category_id"]].get(
+                            "name"
+                        ),
+                        bbox_type="Horizontal BBox",
+                    )
                     object_labels.append(labels)
 
-            training_type = categorize_string(os.path.basename(os.path.dirname(image["coco_url"])))
+            training_type = categorize_string(
+                os.path.basename(os.path.dirname(image["coco_url"]))
+            )
             numbers_of_labels = len(object_labels)
 
             td = AI_EOTrainingData(
@@ -391,8 +405,8 @@ def convert_coco_to_tdml(cocofile):
                 dataset_id=dataset_id,
                 number_of_labels=numbers_of_labels,
                 training_type=training_type,
-                date_time=[formatted_date_time]
-                )
+                date_time=[formatted_date_time],
+            )
             td_list.append(td)
 
         amount_of_trainingdata = len(images)
@@ -410,9 +424,9 @@ def convert_coco_to_tdml(cocofile):
 
         classes = [
             NamedValue(
-                key=category["name"],
-                value=category_counts.get(category["name"])
-            ) for category in categories
+                key=category["name"], value=category_counts.get(category["name"])
+            )
+            for category in categories
         ]
 
         created_time = parse_date(info.get("date_created"))
@@ -434,7 +448,7 @@ def convert_coco_to_tdml(cocofile):
             number_of_classes=number_of_classes,
             providers=providers,
             updated_time=created_time,
-            version=dataset_version
+            version=dataset_version,
         )
 
         return dataset
@@ -443,7 +457,7 @@ def convert_coco_to_tdml(cocofile):
         annotations = coco_dataset.get("annotations")
         annotations_grouped_by_image = {}
         for annotation in annotations:
-            image_id = annotation['image_id']
+            image_id = annotation["image_id"]
             if image_id not in annotations_grouped_by_image:
                 annotations_grouped_by_image[image_id] = []
             annotations_grouped_by_image[image_id].append(annotation)
@@ -452,14 +466,14 @@ def convert_coco_to_tdml(cocofile):
         dataset_description = dataset_id
         # license
         names = [license_elem.get("name") for license_elem in licenses]
-        dataset_licenses = ', '.join(names)
+        dataset_licenses = ", ".join(names)
         # task
         dataset_task = AI_EOTask(
-                id=str(dataset_id) + "_task",
-                type='AI_EOTask',
-                task_type=dataset_type,
-                dataset_id=str(dataset_id),
-                description="The COCO {} Task.".format(dataset_type)
+            id=str(dataset_id) + "_task",
+            type="AI_EOTask",
+            task_type=dataset_type,
+            dataset_id=str(dataset_id),
+            description="The COCO {} Task.".format(dataset_type),
         )
         # data
         td_list = []
@@ -473,11 +487,13 @@ def convert_coco_to_tdml(cocofile):
                         type="AI_SceneLabel",
                         label_class=label_element.get("caption"),
                         is_negative=False,
-                        confidence =1.0
+                        confidence=1.0,
                     )
                     object_labels.append(labels)
 
-            training_type = categorize_string(os.path.basename(os.path.dirname(image["coco_url"])))
+            training_type = categorize_string(
+                os.path.basename(os.path.dirname(image["coco_url"]))
+            )
             numbers_of_labels = len(object_labels)
 
             td = AI_EOTrainingData(
@@ -488,8 +504,8 @@ def convert_coco_to_tdml(cocofile):
                 dataset_id=dataset_id,
                 number_of_labels=numbers_of_labels,
                 training_type=training_type,
-                date_time=[formatted_date_time]
-                )
+                date_time=[formatted_date_time],
+            )
             td_list.append(td)
 
         amount_of_trainingdata = len(images)
@@ -509,7 +525,7 @@ def convert_coco_to_tdml(cocofile):
             created_time=created_time,
             providers=providers,
             updated_time=created_time,
-            version=dataset_version
+            version=dataset_version,
         )
 
         return dataset
@@ -518,7 +534,7 @@ def convert_coco_to_tdml(cocofile):
         annotations = coco_dataset.get("annotations")
         annotations_grouped_by_image = {}
         for annotation in annotations:
-            image_id = annotation['image_id']
+            image_id = annotation["image_id"]
             if image_id not in annotations_grouped_by_image:
                 annotations_grouped_by_image[image_id] = []
             annotations_grouped_by_image[image_id].append(annotation)
@@ -530,14 +546,14 @@ def convert_coco_to_tdml(cocofile):
         dataset_description = dataset_id
         # license
         names = [license_elem.get("name") for license_elem in licenses]
-        dataset_licenses = ', '.join(names)
+        dataset_licenses = ", ".join(names)
         # task
         dataset_task = AI_EOTask(
             id=str(dataset_id) + "_task",
-            type='AI_EOTask',
+            type="AI_EOTask",
             task_type=dataset_type,
             dataset_id=str(dataset_id),
-            description="The COCO {} Task.".format(dataset_type)
+            description="The COCO {} Task.".format(dataset_type),
         )
         # data
         td_list = []
@@ -553,7 +569,7 @@ def convert_coco_to_tdml(cocofile):
                             [points[0], points[1]],
                             [points[0] + points[2], points[1]],
                             [points[0] + points[2], points[1] + points[3]],
-                            [points[0], points[1] + points[2]]
+                            [points[0], points[1] + points[2]],
                         ]
                     ]
                     labels = AI_ObjectLabel(
@@ -562,16 +578,18 @@ def convert_coco_to_tdml(cocofile):
                         confidence=1.0,
                         object=Feature(
                             id="feature " + str(i),
-                            geometry={
-                                "type": "Polygon",
-                                "coordinates": coord
-                            }
+                            geometry={"type": "Polygon", "coordinates": coord},
                         ),
-                        label_class=categories_by_id[label_element["category_id"]].get("name"),
-                        bbox_type="Horizontal BBox")
+                        label_class=categories_by_id[label_element["category_id"]].get(
+                            "name"
+                        ),
+                        bbox_type="Horizontal BBox",
+                    )
                     object_labels.append(labels)
 
-            training_type = categorize_string(os.path.basename(os.path.dirname(image["coco_url"])))
+            training_type = categorize_string(
+                os.path.basename(os.path.dirname(image["coco_url"]))
+            )
             numbers_of_labels = len(object_labels)
 
             td = AI_EOTrainingData(
@@ -582,7 +600,7 @@ def convert_coco_to_tdml(cocofile):
                 dataset_id=dataset_id,
                 number_of_labels=numbers_of_labels,
                 training_type=training_type,
-                date_time=[formatted_date_time]
+                date_time=[formatted_date_time],
             )
             td_list.append(td)
 
@@ -600,9 +618,9 @@ def convert_coco_to_tdml(cocofile):
 
         classes = [
             NamedValue(
-                key=category["name"],
-                value=category_counts.get(category["name"])
-            ) for category in categories
+                key=category["name"], value=category_counts.get(category["name"])
+            )
+            for category in categories
         ]
 
         created_time = parse_date(info.get("date_created"))
@@ -625,9 +643,7 @@ def convert_coco_to_tdml(cocofile):
             number_of_classes=number_of_classes,
             providers=providers,
             updated_time=updated_time,
-            version=dataset_version
+            version=dataset_version,
         )
 
         return dataset
-
-

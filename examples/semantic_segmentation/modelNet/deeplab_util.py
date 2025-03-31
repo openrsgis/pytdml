@@ -12,23 +12,26 @@ def add_weight_decay(net, l2_value, skip_list=()):
         else:
             decay.append(param)
 
-    return [{'params': no_decay, 'weight_decay': 0.0}, {'params': decay, 'weight_decay': l2_value}]
+    return [
+        {"params": no_decay, "weight_decay": 0.0},
+        {"params": decay, "weight_decay": l2_value},
+    ]
 
 
 def fastHist(label_true, label_pred, n_class):
     mask = (label_true >= 0) & (label_true < n_class)
     hist = np.bincount(
-        n_class * label_true[mask].astype(int) +
-        label_pred[mask], minlength=n_class ** 2).reshape(n_class, n_class)
+        n_class * label_true[mask].astype(int) + label_pred[mask], minlength=n_class**2
+    ).reshape(n_class, n_class)
     return hist
 
 
 def label_accuracy_score(label_trues, label_preds, n_class):
     """Returns accuracy score evaluation result.
-      - overall accuracy
-      - mean accuracy
-      - mean IU
-      - fwavacc
+    - overall accuracy
+    - mean accuracy
+    - mean IU
+    - fwavacc
     """
     hist = np.zeros((n_class, n_class))
     for lt, lp in zip(label_trues, label_preds):

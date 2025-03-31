@@ -35,7 +35,13 @@ import copy
 from typing_extensions import TypedDict
 from typing import List, Union, Optional, Literal
 from pydantic import BaseModel, Field, field_validator, model_validator
-from pytdml.type._utils import _validate_date, to_camel, _valid_methods, _validate_training_type, _validate_evaluation_method_type
+from pytdml.type._utils import (
+    _validate_date,
+    to_camel,
+    _valid_methods,
+    _validate_training_type,
+    _validate_evaluation_method_type,
+)
 
 
 class BaseCamelModel(BaseModel):
@@ -44,10 +50,11 @@ class BaseCamelModel(BaseModel):
     Since python use snake case as default
     We need to convert it to camel case for JSON
     """
+
     model_config: TypedDict = {
-        'alias_generator': to_camel,
-        'populate_by_name': True,
-        'arbitrary_types_allowed': True
+        "alias_generator": to_camel,
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
     }
 
 
@@ -486,7 +493,9 @@ class EX_SpatialTemporalExtent(BaseCamelModel):
     """
 
     extent: Union[TimeInstant, TimePeriod]
-    spatial_extent: Union[EX_BoundingPolygon, EX_GeographicBoundingBox, EX_GeographicDescription]
+    spatial_extent: Union[
+        EX_BoundingPolygon, EX_GeographicBoundingBox, EX_GeographicDescription
+    ]
 
     vertical_extent: Optional[EX_VerticalExtent] = None
 
@@ -505,8 +514,16 @@ class EX_Extent(BaseCamelModel):
     """
 
     description: Optional[str] = None
-    geographic_element: Optional[List[Union[EX_BoundingPolygon, EX_GeographicBoundingBox, EX_GeographicDescription]]] = None
-    temporal_element: Optional[List[Union[EX_TemporalExtent, EX_SpatialTemporalExtent]]] = None
+    geographic_element: Optional[
+        List[
+            Union[
+                EX_BoundingPolygon, EX_GeographicBoundingBox, EX_GeographicDescription
+            ]
+        ]
+    ] = None
+    temporal_element: Optional[
+        List[Union[EX_TemporalExtent, EX_SpatialTemporalExtent]]
+    ] = None
     vertical_element: Optional[List[EX_VerticalExtent]] = None
 
     def to_dict(self):
@@ -1039,7 +1056,9 @@ class MD_RangeDimension(BaseCamelModel):
 class CoverageResult(BaseCamelModel):
 
     spatial_representation_type: str
-    result_spatial_representation: Union[MD_GridSpatialRepresentation, MD_VectorSpatialRepresentation]
+    result_spatial_representation: Union[
+        MD_GridSpatialRepresentation, MD_VectorSpatialRepresentation
+    ]
 
     result_content: Optional[List[MD_RangeDimension]] = None
     result_format: Optional[str] = None
@@ -1061,7 +1080,9 @@ class QualityElement(BaseCamelModel):
     type: str
     measure: MeasureReference
     evaluation_method: EvaluationMethod
-    result: List[Union[QuantitativeResult, ConformanceResult, DescriptiveResult, CoverageResult]]
+    result: List[
+        Union[QuantitativeResult, ConformanceResult, DescriptiveResult, CoverageResult]
+    ]
 
     def to_dict(self):
         return self.model_dump(by_alias=True, exclude_none=True)
@@ -1181,19 +1202,24 @@ class TrainingDataset(BaseCamelModel):
     """
     Basic training dataset type
     """
+
     id: str
     name: str
     description: str
     license: str
     tasks: List[Union[AI_Task, "AI_EOTask"]] = Field(min_length=1)
-    data: List[Union[AI_TrainingData, "AI_EOTrainingData"]] = Field(min_length=1)  # That one should be uri-format
+    data: List[Union[AI_TrainingData, "AI_EOTrainingData"]] = Field(
+        min_length=1
+    )  # That one should be uri-format
     type: Literal["AI_AbstractTrainingDataset"]
 
     amount_of_training_data: Optional[int] = None
     classes: Optional[List[NamedValue]] = None
     classification_schema: Optional[str] = None  # That one should be uri-format
     created_time: Optional[str] = None
-    data_sources: Optional[List[CI_Citation]] = None  # That string one should be uri-format
+    data_sources: Optional[List[CI_Citation]] = (
+        None  # That string one should be uri-format
+    )
     doi: Optional[str] = None
     keywords: Optional[List[str]] = None
     number_of_classes: Optional[int] = None

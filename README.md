@@ -24,6 +24,13 @@ pytdml's installation.
 pip install pytdml
 ```
 
+### (For developers) Installing the git hooks
+
+```bash
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
 ---
 
 ## Usage
@@ -72,7 +79,7 @@ dataset = EOTrainingDataset(
             ]),
         ...
     ],
-    
+
     amount_of_training_data=...,
     classes=["...", "...", "..."],
     classification_scheme='...',
@@ -139,7 +146,7 @@ print("Number of classes: " + str(training_dataset.number_of_classes))
 ```python
 import pytdml
 
-# Initialize S3client 
+# Initialize S3client
 s3_client = pytdml.io.S3_reader.S3Client("s3", "your_server", "your_akey", "your_skey")
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
@@ -291,7 +298,7 @@ pytdml/tdml_image_crop.py  --input=<Input original TrainingDML-AU file path> --o
 ds_lib = EOTrainingDatasetCollection()
 
 # Find the EO dataset that contains the category 'Building Area' in the Semantic Segmentation task in the Server.
-ds_lib.dataset_list(Task.semantic_segmentation, ["Building Area"]) 
+ds_lib.dataset_list(Task.semantic_segmentation, ["Building Area"])
 
 ```
 
@@ -334,10 +341,10 @@ target_transform = transform_target.Compose([
 ])
 # Split the dataset by a customized ratio
 train_data, val_data, test_data = pytdml.ml.split_data(my_dataset_td.data, 0.7, 0.2, 0.1)
-# OR split the dataset by training type of training data 
+# OR split the dataset by training type of training data
 # train_data = pytdml.ml.split_data(my_dataset_td.data, "train")
 # valid_data = pytdml.ml.split_data(my_dataset_td.data, "valid")
-path = "." 
+path = "."
 # Wrapping dataset classes with pytorch framework
 train_set = PipeLine(train_data, path).torch_dataset(download=True, transform=transform)
 valid_set = PipeLine(valid_data, path).torch_dataset(download=True, transform=transform)
@@ -383,4 +390,3 @@ output_path = "convert_result.json"
 
 dataset = convert_stac_to_tdml(stac_path)
 ```
-

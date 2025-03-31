@@ -29,5 +29,10 @@ def schema_load():
 
 
 def task_load():
-    return ['Scene Classification', 'Object Detection', 'Semantic Segmentation',
-            'Change Detection', '3D Model Reconstruction']
+    return [
+        "Scene Classification",
+        "Object Detection",
+        "Semantic Segmentation",
+        "Change Detection",
+        "3D Model Reconstruction",
+    ]

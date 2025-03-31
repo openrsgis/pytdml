@@ -40,7 +40,7 @@ def yaml_to_eo_tdml(yaml_path):
     """
     Transform yaml to tdml
     """
-    yaml_file = open(yaml_path, "r", encoding='utf-8')
+    yaml_file = open(yaml_path, "r", encoding="utf-8")
     yaml_dict = yaml.load(yaml_file, Loader=yaml.FullLoader)
     eo_training_dataset = EOTrainingDataset.from_dict(yaml_dict)
     return eo_training_dataset
@@ -50,7 +50,7 @@ def yaml_to_tdml(yaml_path):
     """
     Transform yaml to tdml
     """
-    yaml_file = open(yaml_path, "r", encoding='utf-8')
+    yaml_file = open(yaml_path, "r", encoding="utf-8")
     yaml_dict = yaml.load(yaml_file, Loader=yaml.FullLoader)
     eo_training_dataset = TrainingDataset.from_dict(yaml_dict)
     return eo_training_dataset
@@ -269,8 +269,13 @@ def traverse_s3(object_path, file_format):
         bucket = split[2]
         for root, dirs, files in s3.walk(bucket):
             for f in files:
-                if (split[3] in root) and (split[4] in root) and (split[5] in root) and (file_format == os.path.splitext(f)[-1]):
-                    s3_object.append(os.path.join("s3://"+root, f))
+                if (
+                    (split[3] in root)
+                    and (split[4] in root)
+                    and (split[5] in root)
+                    and (file_format == os.path.splitext(f)[-1])
+                ):
+                    s3_object.append(os.path.join("s3://" + root, f))
         return s3_object
     except IOError:
         return IOError("Failed to load dataset")
@@ -280,22 +285,34 @@ def get_image_label_url(image_set, label_set):
     """
     Get image url and label url from image set and label set
     """
-    image_root_path = image_set['root_path']
-    label_root_path = label_set['root_path']
-    image_format = image_set['format']
-    label_format = label_set['format']
+    image_root_path = image_set["root_path"]
+    label_root_path = label_set["root_path"]
+    image_format = image_set["format"]
+    label_format = label_set["format"]
     image_dir = []
     label_dir = []
     # if set sub path
-    if image_set.__contains__('sub_path') and image_set['sub_path'] is not None \
-            and label_set.__contains__('sub_path') and label_set['sub_path'] is not None:
-        image_sub_paths = image_set['sub_path']
-        label_sub_paths = label_set['sub_path']
+    if (
+        image_set.__contains__("sub_path")
+        and image_set["sub_path"] is not None
+        and label_set.__contains__("sub_path")
+        and label_set["sub_path"] is not None
+    ):
+        image_sub_paths = image_set["sub_path"]
+        label_sub_paths = label_set["sub_path"]
         for image_sub_path in image_sub_paths:
-            image_dir.extend(traverse_folder(os.path.join(image_root_path, image_sub_path), image_format))
+            image_dir.extend(
+                traverse_folder(
+                    os.path.join(image_root_path, image_sub_path), image_format
+                )
+            )
         for label_sub_path in label_sub_paths:
-            label_dir.extend(traverse_folder(os.path.join(label_root_path, label_sub_path), label_format))
-    elif "s3" in image_root_path: # s3 buckets being used
+            label_dir.extend(
+                traverse_folder(
+                    os.path.join(label_root_path, label_sub_path), label_format
+                )
+            )
+    elif "s3" in image_root_path:  # s3 buckets being used
         image_dir = traverse_s3(image_root_path, image_format)
         label_dir = traverse_s3(label_root_path, label_format)
     else:
@@ -305,22 +322,34 @@ def get_image_label_url(image_set, label_set):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Encode a training dataset to TrainingDML-AI JSON format based on '
-                                                 'YAML configuration file')
-    parser.add_argument('--config', type=str, required=True, help='YAML configuration file path')
-    parser.add_argument('--output', type=str, required=True, help='Output TrainingDML-AI JSON file path')
-    parser.add_argument('--format', type=str, required=True, choices=['EO-TDML', 'TDML'],
-                        help='Specify the output format')
+    parser = argparse.ArgumentParser(
+        description="Encode a training dataset to TrainingDML-AI JSON format based on "
+        "YAML configuration file"
+    )
+    parser.add_argument(
+        "--config", type=str, required=True, help="YAML configuration file path"
+    )
+    parser.add_argument(
+        "--output", type=str, required=True, help="Output TrainingDML-AI JSON file path"
+    )
+    parser.add_argument(
+        "--format",
+        type=str,
+        required=True,
+        choices=["EO-TDML", "TDML"],
+        help="Specify the output format",
+    )
 
     args = parser.parse_args()
     yaml_path = args.config
     json_path = args.output
-    if args.format == 'EO-TDML':
+    if args.format == "EO-TDML":
         training_datasets = yaml_to_eo_tdml(yaml_path)
     else:
         training_datasets = yaml_to_tdml(yaml_path)
     if training_datasets:
         write_to_json(training_datasets, json_path)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

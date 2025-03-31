@@ -32,5 +32,3 @@ from pytdml.io.tdml_readers import read_from_json, parse_json
 from pytdml.io.tdml_writers import write_to_json
 
 from pytdml.io.internal import read_from_server, datasets_load, task_load
-
-

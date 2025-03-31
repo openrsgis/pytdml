@@ -15,7 +15,7 @@ class Conv(nn.Module):
         self.convs = nn.Sequential(
             nn.Conv2d(c1, c2, k, stride=s, padding=p, dilation=d, groups=g),
             nn.BatchNorm2d(c2),
-            nn.LeakyReLU(0.1, inplace=True) if leaky else nn.Identity()
+            nn.LeakyReLU(0.1, inplace=True) if leaky else nn.Identity(),
         )
 
     def forward(self, x):
@@ -23,17 +23,14 @@ class Conv(nn.Module):
 
 
 class SAM(nn.Module):
-    """ Parallel CBAM """
+    """Parallel CBAM"""
 
     def __init__(self, in_ch):
         super(SAM, self).__init__()
-        self.conv = nn.Sequential(
-            nn.Conv2d(in_ch, in_ch, 1),
-            nn.Sigmoid()
-        )
+        self.conv = nn.Sequential(nn.Conv2d(in_ch, in_ch, 1), nn.Sigmoid())
 
     def forward(self, x):
-        """ Spatial Attention Module """
+        """Spatial Attention Module"""
         x_attention = self.conv(x)
 
         return x * x_attention
@@ -41,7 +38,7 @@ class SAM(nn.Module):
 
 class SPP(nn.Module):
     """
-        Spatial Pyramid Pooling
+    Spatial Pyramid Pooling
     """
 
     def __init__(self):
@@ -59,7 +56,9 @@ class SPP(nn.Module):
 # Copy from yolov5
 class Bottleneck(nn.Module):
     # Standard bottleneck
-    def __init__(self, c1, c2, shortcut=True, g=1, e=0.5):  # ch_in, ch_out, shortcut, groups, expansion
+    def __init__(
+        self, c1, c2, shortcut=True, g=1, e=0.5
+    ):  # ch_in, ch_out, shortcut, groups, expansion
         super(Bottleneck, self).__init__()
         c_ = int(c2 * e)  # hidden channels
         self.cv1 = Conv(c1, c_, k=1)
@@ -73,7 +72,9 @@ class Bottleneck(nn.Module):
 # Copy from yolov5
 class BottleneckCSP(nn.Module):
     # CSP Bottleneck https://github.com/WongKinYiu/CrossStagePartialNetworks
-    def __init__(self, c1, c2, n=1, shortcut=True, g=1, e=0.5):  # ch_in, ch_out, number, shortcut, groups, expansion
+    def __init__(
+        self, c1, c2, n=1, shortcut=True, g=1, e=0.5
+    ):  # ch_in, ch_out, number, shortcut, groups, expansion
         super(BottleneckCSP, self).__init__()
         c_ = int(c2 * e)  # hidden channels
         self.cv1 = Conv(c1, c_, k=1)
@@ -82,7 +83,9 @@ class BottleneckCSP(nn.Module):
         self.cv4 = Conv(2 * c_, c2, k=1)
         self.bn = nn.BatchNorm2d(2 * c_)  # applied to cat(cv2, cv3)
         self.act = nn.LeakyReLU(0.1, inplace=True)
-        self.m = nn.Sequential(*[Bottleneck(c_, c_, shortcut, g, e=1.0) for _ in range(n)])
+        self.m = nn.Sequential(
+            *[Bottleneck(c_, c_, shortcut, g, e=1.0) for _ in range(n)]
+        )
 
     def forward(self, x):
         y1 = self.cv3(self.m(self.cv1(x)))

@@ -4,7 +4,7 @@ import torch.nn as nn
 
 
 class MSELoss(nn.Module):
-    def __init__(self, reduction='mean'):
+    def __init__(self, reduction="mean"):
         super(MSELoss, self).__init__()
         self.reduction = reduction
 
@@ -13,7 +13,7 @@ class MSELoss(nn.Module):
         neg_id = (targets == 0.0).float()
         pos_loss = pos_id * (inputs - targets) ** 2
         neg_loss = neg_id * (inputs) ** 2
-        if self.reduction == 'mean':
+        if self.reduction == "mean":
             pos_loss = torch.mean(torch.sum(pos_loss, 1))
             neg_loss = torch.mean(torch.sum(neg_loss, 1))
             return pos_loss, neg_loss
@@ -29,7 +29,7 @@ def generate_dxdywh(gt_label, w, h, s):
     box_w = (xmax - xmin) * w
     box_h = (ymax - ymin) * h
 
-    if box_w < 1. or box_h < 1.:
+    if box_w < 1.0 or box_h < 1.0:
         # print('A dirty data !!!')
         return False
 
@@ -48,7 +48,7 @@ def generate_dxdywh(gt_label, w, h, s):
     return grid_x, grid_y, tx, ty, tw, th, weight
 
 
-def gt_creator(input_size, stride, label_lists=[], name='VOC'):
+def gt_creator(input_size, stride, label_lists=[], name="VOC"):
     assert len(input_size) > 0 and len(label_lists) > 0
     # prepare the all empty gt datas
     batch_size = len(label_lists)
@@ -72,7 +72,9 @@ def gt_creator(input_size, stride, label_lists=[], name='VOC'):
                 if grid_x < gt_tensor.shape[2] and grid_y < gt_tensor.shape[1]:
                     gt_tensor[batch_index, grid_y, grid_x, 0] = 1.0
                     gt_tensor[batch_index, grid_y, grid_x, 1] = gt_class
-                    gt_tensor[batch_index, grid_y, grid_x, 2:6] = np.array([tx, ty, tw, th])
+                    gt_tensor[batch_index, grid_y, grid_x, 2:6] = np.array(
+                        [tx, ty, tw, th]
+                    )
                     gt_tensor[batch_index, grid_y, grid_x, 6] = weight
 
     gt_tensor = gt_tensor.reshape(batch_size, -1, 1 + 1 + 4 + 1)
@@ -85,10 +87,10 @@ def loss(pred_conf, pred_cls, pred_txtytwth, label):
     noobj = 1.0
 
     # create loss_f
-    conf_loss_function = MSELoss(reduction='mean')
-    cls_loss_function = nn.CrossEntropyLoss(reduction='none')
-    txty_loss_function = nn.BCEWithLogitsLoss(reduction='none')
-    twth_loss_function = nn.MSELoss(reduction='none')
+    conf_loss_function = MSELoss(reduction="mean")
+    cls_loss_function = nn.CrossEntropyLoss(reduction="none")
+    txty_loss_function = nn.BCEWithLogitsLoss(reduction="none")
+    twth_loss_function = nn.MSELoss(reduction="none")
 
     pred_conf = torch.sigmoid(pred_conf[:, :, 0])
     pred_cls = pred_cls.permute(0, 2, 1)
@@ -109,9 +111,21 @@ def loss(pred_conf, pred_cls, pred_txtytwth, label):
 
     # box loss
     txty_loss = torch.mean(
-        torch.sum(torch.sum(txty_loss_function(pred_txty, gt_txtytwth[:, :, :2]), 2) * gt_box_scale_weight * gt_obj, 1))
+        torch.sum(
+            torch.sum(txty_loss_function(pred_txty, gt_txtytwth[:, :, :2]), 2)
+            * gt_box_scale_weight
+            * gt_obj,
+            1,
+        )
+    )
     twth_loss = torch.mean(
-        torch.sum(torch.sum(twth_loss_function(pred_twth, gt_txtytwth[:, :, 2:]), 2) * gt_box_scale_weight * gt_obj, 1))
+        torch.sum(
+            torch.sum(twth_loss_function(pred_twth, gt_txtytwth[:, :, 2:]), 2)
+            * gt_box_scale_weight
+            * gt_obj,
+            1,
+        )
+    )
 
     txtytwth_loss = txty_loss + twth_loss
 
@@ -122,7 +136,7 @@ def loss(pred_conf, pred_cls, pred_txtytwth, label):
 
 def set_lr(optimizer, lr):
     for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
+        param_group["lr"] = lr
 
 
 def detection_collate(batch):

@@ -1,4 +1,3 @@
-
 # ------------------------------------------------------------------------------
 #
 # Project: pytdml
@@ -38,6 +37,7 @@ class KeyValuePair:
     """
     Key/Value pair type
     """
+
     key: str
     value: Union[str, int, float, bool, None]
 
@@ -63,6 +63,7 @@ class MetricsInLiterature:
     """
     Metrics in literature type
     """
+
     doi: str
     algorithm: str = field(default=None)
     metrics: List[KeyValuePair] = field(default_factory=list)
@@ -71,7 +72,7 @@ class MetricsInLiterature:
         return {
             "doi": self.doi,
             "algorithm": self.algorithm,
-            "metrics": [m.to_dict() for m in self.metrics]
+            "metrics": [m.to_dict() for m in self.metrics],
         }
 
     @staticmethod
@@ -81,7 +82,9 @@ class MetricsInLiterature:
             if json_dict.__contains__("algorithm"):
                 metrics_in_literature.algorithm = json_dict["algorithm"]
             if json_dict.__contains__("metrics"):
-                metrics_in_literature.metrics = [KeyValuePair.from_dict(m) for m in json_dict["metrics"]]
+                metrics_in_literature.metrics = [
+                    KeyValuePair.from_dict(m) for m in json_dict["metrics"]
+                ]
             return metrics_in_literature
         else:
             raise ValueError("The given json_dict is not a valid MetricsInLiterature")
@@ -92,6 +95,7 @@ class Task:
     """
     Basic task type
     """
+
     id: str
     dataset_id: str = field(default=None)
     description: str = field(default=None)
@@ -101,7 +105,7 @@ class Task:
             "type": "Task",
             "id": self.id,
             "datasetId": self.dataset_id,
-            "description": self.description
+            "description": self.description,
         }
 
     @staticmethod
@@ -122,15 +126,12 @@ class Labeler:
     """
     Labeler type
     """
+
     id: str
     name: str = field(default=None)
 
     def to_dict(self):
-        return {
-            "type": "Labeler",
-            "id": self.id,
-            "name": self.name
-        }
+        return {"type": "Labeler", "id": self.id, "name": self.name}
 
     @staticmethod
     def from_dict(json_dict: dict):
@@ -148,6 +149,7 @@ class LabelingProcedure:
     """
     Labeling procedure type
     """
+
     id: str
     methods: List[str] = field(default_factory=list)
     tools: List[str] = field(default_factory=list)
@@ -157,7 +159,7 @@ class LabelingProcedure:
             "type": "LabelingProcedure",
             "id": self.id,
             "methods": self.methods,
-            "tools": self.tools
+            "tools": self.tools,
         }
 
     @staticmethod
@@ -178,6 +180,7 @@ class Labeling:
     """
     Labeling type
     """
+
     id: str
     scope: object
     labelers: List[Labeler] = field(default_factory=list)
@@ -189,15 +192,23 @@ class Labeling:
             "id": self.id,
             "scope": self.scope,
             "labelers": [labeler.to_dict() for labeler in self.labelers],
-            "procedure": self.procedure.to_dict() if self.procedure is not None else None,
+            "procedure": (
+                self.procedure.to_dict() if self.procedure is not None else None
+            ),
         }
 
     @staticmethod
     def from_dict(json_dict: dict):
-        if json_dict.__contains__("id") and json_dict.__contains__("scope") and json_dict["type"] == "Labeling":
+        if (
+            json_dict.__contains__("id")
+            and json_dict.__contains__("scope")
+            and json_dict["type"] == "Labeling"
+        ):
             labeling = Labeling(json_dict["id"], json_dict["scope"])
             if json_dict.__contains__("labelers"):
-                labeling.labelers = [Labeler.from_dict(labeler) for labeler in json_dict["labelers"]]
+                labeling.labelers = [
+                    Labeler.from_dict(labeler) for labeler in json_dict["labelers"]
+                ]
             if json_dict.__contains__("procedure"):
                 labeling.procedure = LabelingProcedure.from_dict(json_dict["procedure"])
             return labeling
@@ -210,6 +221,7 @@ class ScopeDescription:
     """
     From ISO 19115-1 MD_ScopeDescription
     """
+
     attributes: List[str] = field(default_factory=list)
     features: List[str] = field(default_factory=list)
     featureInstances: List[str] = field(default_factory=list)
@@ -224,7 +236,7 @@ class ScopeDescription:
             "featureInstances": self.featureInstances,
             "attributeInstances": self.attributeInstances,
             "dataset": self.dataset,
-            "other": self.other
+            "other": self.other,
         }
 
     @staticmethod
@@ -250,13 +262,14 @@ class Scope:
     """
     From ISO 19115-1 MD_Scope
     """
+
     level: str
     levelDescription: List[ScopeDescription] = field(default_factory=list)
 
     def to_dict(self):
         return {
             "level": self.level,
-            "levelDescription": [ld.to_dict() for ld in self.levelDescription]
+            "levelDescription": [ld.to_dict() for ld in self.levelDescription],
         }
 
     @staticmethod
@@ -264,7 +277,10 @@ class Scope:
         if json_dict.__contains__("level"):
             scope = Scope(json_dict["level"])
             if json_dict.__contains__("levelDescription"):
-                scope.levelDescription = [ScopeDescription.from_dict(ld) for ld in json_dict["levelDescription"]]
+                scope.levelDescription = [
+                    ScopeDescription.from_dict(ld)
+                    for ld in json_dict["levelDescription"]
+                ]
             return scope
         else:
             raise ValueError("The given json_dict is not a valid Scope")
@@ -275,6 +291,7 @@ class QualityElement:
     """
     From ISO 19157-1 QualityElement
     """
+
     type: str = field(default=None)
     measure: str = field(default=None)
     evaluation_method: str = field(default=None)
@@ -285,7 +302,7 @@ class QualityElement:
             "type": self.type,
             "measure": self.measure,
             "evaluationMethod": self.evaluation_method,
-            "result": self.result
+            "result": self.result,
         }
 
     @staticmethod
@@ -307,6 +324,7 @@ class DataQuality:
     """
     From ISO 19157-1 DataQuality
     """
+
     scope: Scope
     report: List[QualityElement] = field(default_factory=list)
 
@@ -321,7 +339,9 @@ class DataQuality:
         if json_dict.__contains__("scope"):
             data_quality = DataQuality(scope=Scope.from_dict(json_dict["scope"]))
             if json_dict.__contains__("report"):
-                data_quality.report = [QualityElement.from_dict(element) for element in json_dict["report"]]
+                data_quality.report = [
+                    QualityElement.from_dict(element) for element in json_dict["report"]
+                ]
             return data_quality
         else:
             raise ValueError("The given json_dict is not a valid DataQuality")
@@ -332,6 +352,7 @@ class Label:
     """
     Basic label type
     """
+
     is_negative: bool = field(default=None)
     confidence: float = field(default=None)
 
@@ -339,7 +360,7 @@ class Label:
         return {
             "type": "Label",
             "isNegative": self.is_negative,
-            "confidence": self.confidence
+            "confidence": self.confidence,
         }
 
     @staticmethod
@@ -360,6 +381,7 @@ class TrainingData:
     """
     Basic training data type
     """
+
     id: str
     dataset_id: str = field(default=None)
     training_type: str = field(default=None)
@@ -385,7 +407,7 @@ class TrainingData:
             "dataSources": self.data_sources,
             "quality": self.quality.to_dict() if self.quality is not None else None,
             "labeling": [ll.to_dict() for ll in self.labeling],
-            "labels": [label.to_dict() for label in self.labels]
+            "labels": [label.to_dict() for label in self.labels],
         }
 
     @staticmethod
@@ -401,9 +423,13 @@ class TrainingData:
             if json_dict.__contains__("quality"):
                 training_data.quality = DataQuality.from_dict(json_dict["quality"])
             if json_dict.__contains__("labeling"):
-                training_data.labeling = [Labeling.from_dict(ll) for ll in json_dict["labeling"]]
+                training_data.labeling = [
+                    Labeling.from_dict(ll) for ll in json_dict["labeling"]
+                ]
             if json_dict.__contains__("labels"):
-                training_data.labels = [Label.from_dict(label) for label in json_dict["labels"]]
+                training_data.labels = [
+                    Label.from_dict(label) for label in json_dict["labels"]
+                ]
             return training_data
         else:
             raise ValueError("The given json_dict is not a valid TrainingData")
@@ -414,6 +440,7 @@ class Changeset:
     """
     Training Data Changeset
     """
+
     id: str
     change_count: int
     dataset_id: str = field(default=None)
@@ -438,8 +465,11 @@ class Changeset:
 
     @staticmethod
     def from_dict(json_dict: dict):
-        if json_dict.__contains__("id") and json_dict.__contains__("changeCount") \
-                and json_dict["type"] == "TDChangeset":
+        if (
+            json_dict.__contains__("id")
+            and json_dict.__contains__("changeCount")
+            and json_dict["type"] == "TDChangeset"
+        ):
             changeset = Changeset(json_dict["id"], json_dict["changeCount"])
             if json_dict.__contains__("datasetId"):
                 changeset.dataset_id = json_dict["datasetId"]
@@ -450,9 +480,13 @@ class Changeset:
             if json_dict.__contains__("add"):
                 changeset.add = [TrainingData.from_dict(td) for td in json_dict["add"]]
             if json_dict.__contains__("modify"):
-                changeset.add = [TrainingData.from_dict(td) for td in json_dict["modify"]]
+                changeset.add = [
+                    TrainingData.from_dict(td) for td in json_dict["modify"]
+                ]
             if json_dict.__contains__("delete"):
-                changeset.add = [TrainingData.from_dict(td) for td in json_dict["delete"]]
+                changeset.add = [
+                    TrainingData.from_dict(td) for td in json_dict["delete"]
+                ]
             return changeset
         else:
             raise ValueError("The given json_dict is not a valid Changeset")
@@ -463,6 +497,7 @@ class TrainingDataset:
     """
     Basic training dataset type
     """
+
     id: str
     name: str
     description: str
@@ -550,15 +585,24 @@ class TrainingDataset:
             "labeling": [ll.to_dict() for ll in self.labeling],
             "quality": self.quality.to_dict() if self.quality is not None else None,
             "changesets": [changeset.to_dict() for changeset in self.changesets],
-            "data": [d.to_dict() for d in self.data]
+            "data": [d.to_dict() for d in self.data],
         }
 
     @staticmethod
     def from_dict(json_dict: dict):
-        if json_dict.__contains__("id") and json_dict.__contains__("name") \
-                and json_dict.__contains__("description") and json_dict.__contains__("license") \
-                and json_dict["type"] == "TrainingDataset":
-            td = TrainingDataset(json_dict["id"], json_dict["name"], json_dict["description"], json_dict["license"])
+        if (
+            json_dict.__contains__("id")
+            and json_dict.__contains__("name")
+            and json_dict.__contains__("description")
+            and json_dict.__contains__("license")
+            and json_dict["type"] == "TrainingDataset"
+        ):
+            td = TrainingDataset(
+                json_dict["id"],
+                json_dict["name"],
+                json_dict["description"],
+                json_dict["license"],
+            )
             if json_dict.__contains__("doi"):
                 td.doi = json_dict["doi"]
             if json_dict.__contains__("scope"):
@@ -576,10 +620,13 @@ class TrainingDataset:
             if json_dict.__contains__("keywords"):
                 td.keywords = json_dict["keywords"]
             if json_dict.__contains__("metricsInLIT"):
-                td.metrics_in_literature = [MetricsInLiterature.from_dict(m) for m in
-                                            json_dict["metricsInLIT"]]
+                td.metrics_in_literature = [
+                    MetricsInLiterature.from_dict(m) for m in json_dict["metricsInLIT"]
+                ]
             if json_dict.__contains__("statisticsInfo"):
-                td.statistics_info = [KeyValuePair.from_dict(s) for s in json_dict["statisticsInfo"]]
+                td.statistics_info = [
+                    KeyValuePair.from_dict(s) for s in json_dict["statisticsInfo"]
+                ]
             if json_dict.__contains__("dataSources"):
                 td.dataSources = json_dict["dataSources"]
             if json_dict.__contains__("numberOfClasses"):
@@ -591,11 +638,16 @@ class TrainingDataset:
             if json_dict.__contains__("tasks"):
                 td.tasks = [Task.from_dict(t) for t in json_dict["tasks"]]
             if json_dict.__contains__("labeling"):
-                td.labeling = [Labeling.from_dict(labeling) for labeling in json_dict["labeling"]]
+                td.labeling = [
+                    Labeling.from_dict(labeling) for labeling in json_dict["labeling"]
+                ]
             if json_dict.__contains__("quality"):
                 td.quality = DataQuality.from_dict(json_dict["quality"])
             if json_dict.__contains__("changesets"):
-                td.changesets = [Changeset.from_dict(changeset) for changeset in json_dict["changesets"]]
+                td.changesets = [
+                    Changeset.from_dict(changeset)
+                    for changeset in json_dict["changesets"]
+                ]
             if json_dict.__contains__("data"):
                 td.data = [TrainingData.from_dict(data) for data in json_dict["data"]]
             return td

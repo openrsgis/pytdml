@@ -2,22 +2,22 @@ import torch
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 
-__all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
-           'resnet152']
+__all__ = ["ResNet", "resnet18", "resnet34", "resnet50", "resnet101", "resnet152"]
 
 model_urls = {
-    'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
-    'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
-    'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
-    'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
-    'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
+    "resnet18": "https://download.pytorch.org/models/resnet18-5c106cde.pth",
+    "resnet34": "https://download.pytorch.org/models/resnet34-333f7ec4.pth",
+    "resnet50": "https://download.pytorch.org/models/resnet50-19c8e357.pth",
+    "resnet101": "https://download.pytorch.org/models/resnet101-5d3b4d8f.pth",
+    "resnet152": "https://download.pytorch.org/models/resnet152-b121ed2d.pth",
 }
 
 
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
-                     padding=1, bias=False)
+    return nn.Conv2d(
+        in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False
+    )
 
 
 def conv1x1(in_planes, out_planes, stride=1):
@@ -100,8 +100,7 @@ class ResNet(nn.Module):
     def __init__(self, block, layers, zero_init_residual=False):
         super(ResNet, self).__init__()
         self.inplanes = 64
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
-                               bias=False)
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
@@ -112,7 +111,7 @@ class ResNet(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
@@ -167,10 +166,14 @@ def resnet18(pretrained=False, hr_pretrained=False, **kwargs):
     if pretrained:
         # strict = False as we don't need fc layer params.
         if hr_pretrained:
-            print('Loading the high resolution pretrained model ...')
-            model.load_state_dict(torch.load("backbone/weights/resnet18_hr_10.pth"), strict=False)
+            print("Loading the high resolution pretrained model ...")
+            model.load_state_dict(
+                torch.load("backbone/weights/resnet18_hr_10.pth"), strict=False
+            )
         else:
-            model.load_state_dict(model_zoo.load_url(model_urls['resnet18']), strict=False)
+            model.load_state_dict(
+                model_zoo.load_url(model_urls["resnet18"]), strict=False
+            )
     return model
 
 
@@ -182,7 +185,7 @@ def resnet34(pretrained=False, **kwargs):
     """
     model = ResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet34']), strict=False)
+        model.load_state_dict(model_zoo.load_url(model_urls["resnet34"]), strict=False)
     return model
 
 
@@ -194,7 +197,7 @@ def resnet50(pretrained=False, **kwargs):
     """
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']), strict=False)
+        model.load_state_dict(model_zoo.load_url(model_urls["resnet50"]), strict=False)
     return model
 
 
@@ -206,7 +209,7 @@ def resnet101(pretrained=False, **kwargs):
     """
     model = ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet101']), strict=False)
+        model.load_state_dict(model_zoo.load_url(model_urls["resnet101"]), strict=False)
     return model
 
 
@@ -218,11 +221,11 @@ def resnet152(pretrained=False, **kwargs):
     """
     model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
+        model.load_state_dict(model_zoo.load_url(model_urls["resnet152"]))
     return model
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # model = torchvision.models.resnet50()
     print("found ", torch.cuda.device_count(), " GPU(s)")
     device = torch.device("cuda")

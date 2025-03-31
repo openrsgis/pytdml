@@ -38,7 +38,14 @@ from typing import List, Union, Optional, Literal
 from pydantic import Field, field_validator
 
 from pytdml.type._utils import _validate_date, _validate_image_format
-from pytdml.type.basic_types import AI_Label, TrainingDataset, AI_TrainingData, MD_Band, EX_Extent, AI_Task
+from pytdml.type.basic_types import (
+    AI_Label,
+    TrainingDataset,
+    AI_TrainingData,
+    MD_Band,
+    EX_Extent,
+    AI_Task,
+)
 
 
 class AI_PixelLabel(AI_Label):
@@ -47,7 +54,7 @@ class AI_PixelLabel(AI_Label):
     """
 
     type: Literal["AI_PixelLabel"]
-    image_url: List[str] = Field(min_length=1, alias='imageURL')
+    image_url: List[str] = Field(min_length=1, alias="imageURL")
     image_format: List[str] = Field(min_length=1)
 
     @field_validator("image_format")
@@ -125,6 +132,7 @@ class AI_EOTask(AI_Task):
     """
     Extended task type for EO training data
     """
+
     type: Literal["AI_EOTask"]
     task_type: str
 
@@ -143,7 +151,7 @@ class AI_EOTrainingData(AI_TrainingData):
     """
 
     type: Literal["AI_EOTrainingData"]
-    data_url: List[str] = Field(min_length=1, alias='dataURL')
+    data_url: List[str] = Field(min_length=1, alias="dataURL")
     labels: List[Union[AI_Label, AI_PixelLabel, AI_ObjectLabel, AI_SceneLabel]]
 
     extent: Optional[Union[EX_Extent, List[Union[int, float]]]] = None

@@ -1,4 +1,3 @@
-
 # ------------------------------------------------------------------------------
 #
 # Project: pytdml
@@ -35,9 +34,18 @@ from typing import List, Union
 
 import geojson
 from geojson import Feature
-from pytdml.type.basic_types_old import Label, TrainingData, TrainingDataset, DataQuality, Task, \
-    MetricsInLiterature, \
-    KeyValuePair, Labeling, Changeset, Scope
+from pytdml.type.basic_types_old import (
+    Label,
+    TrainingData,
+    TrainingDataset,
+    DataQuality,
+    Task,
+    MetricsInLiterature,
+    KeyValuePair,
+    Labeling,
+    Changeset,
+    Scope,
+)
 
 
 @dataclass
@@ -45,6 +53,7 @@ class SceneLabel(Label):
     """
     Extended label type for scene level training data
     """
+
     label_class: str = field(default=None)
 
     def to_dict(self):
@@ -52,7 +61,7 @@ class SceneLabel(Label):
             "type": "SceneLabel",
             "isNegative": self.is_negative,
             "confidence": self.confidence,
-            'class': self.label_class
+            "class": self.label_class,
         }
 
     @staticmethod
@@ -73,6 +82,7 @@ class ObjectLabel(Label):
     """
     Extended label type for object level training data
     """
+
     object: Feature = field(default=None)
     label_class: str = field(default=None)
     bbox_type: str = field(default=None)
@@ -84,11 +94,11 @@ class ObjectLabel(Label):
             "type": "ObjectLabel",
             "isNegative": self.is_negative,
             "confidence": self.confidence,
-            'object': self.object,
-            'bboxType': self.bbox_type,
-            'class': self.label_class,
-            'isDiffDetectable': self.is_difficultly_detectable,
-            'dateTime': self.date_time
+            "object": self.object,
+            "bboxType": self.bbox_type,
+            "class": self.label_class,
+            "isDiffDetectable": self.is_difficultly_detectable,
+            "dateTime": self.date_time,
         }
 
     @staticmethod
@@ -119,6 +129,7 @@ class PixelLabel(Label):
     """
     Extended label type for pixel level training data
     """
+
     image_url: Union[str, List[str]] = field(default=None)
     image_format: Union[str, List[str]] = field(default=None)
 
@@ -128,14 +139,19 @@ class PixelLabel(Label):
             "isNegative": self.is_negative,
             "confidence": self.confidence,
             "imageURL": self.image_url,
-            "imageFormat": self.image_format
+            "imageFormat": self.image_format,
         }
 
     @staticmethod
     def from_dict(json_dict: dict):
-        if json_dict.__contains__("imageURL") and json_dict.__contains__("imageFormat") \
-                and json_dict["type"] == "PixelLabel":
-            label = PixelLabel(image_url=json_dict["imageURL"], image_format=json_dict["imageFormat"])
+        if (
+            json_dict.__contains__("imageURL")
+            and json_dict.__contains__("imageFormat")
+            and json_dict["type"] == "PixelLabel"
+        ):
+            label = PixelLabel(
+                image_url=json_dict["imageURL"], image_format=json_dict["imageFormat"]
+            )
             if json_dict.__contains__("isNegative"):
                 label.is_negative = json_dict["isNegative"]
             if json_dict.__contains__("confidence"):
@@ -195,6 +211,7 @@ class EOTask(Task):
     """
     Extended task type for EO training data
     """
+
     task_type: str = field(default=None)
 
     def to_dict(self):
@@ -203,12 +220,16 @@ class EOTask(Task):
             "id": self.id,
             "datasetId": self.dataset_id,
             "description": self.description,
-            "taskType": self.task_type
+            "taskType": self.task_type,
         }
 
     @staticmethod
     def from_dict(json_dict: dict):
-        if json_dict.__contains__("id") and json_dict.__contains__("type") and json_dict["type"] == "EOTask":
+        if (
+            json_dict.__contains__("id")
+            and json_dict.__contains__("type")
+            and json_dict["type"] == "EOTask"
+        ):
             task = EOTask(json_dict["id"])
             if json_dict.__contains__("datasetId"):
                 task.dataset_id = json_dict["datasetId"]
@@ -226,6 +247,7 @@ class EOTrainingData(TrainingData):
     """
     Extended training data type for EO training data
     """
+
     extent: List[float] = field(default_factory=list)
     date_time: Union[str, List[str]] = field(default=None)
     data_url: Union[str, List[str]] = field(default=None)
@@ -238,12 +260,12 @@ class EOTrainingData(TrainingData):
             "numberOfLabels": self.number_of_labels,
             "dataSources": self.data_sources,
             "datasetId": self.dataset_id,
-            'extent': self.extent,
-            'dateTime': self.date_time,
-            'dataURL': self.data_url,
+            "extent": self.extent,
+            "dateTime": self.date_time,
+            "dataURL": self.data_url,
             "quality": self.quality.to_dict() if self.quality is not None else None,
             "labeling": [ll.to_dict() for ll in self.labeling],
-            "labels": [label.to_dict() for label in self.labels]
+            "labels": [label.to_dict() for label in self.labels],
         }
 
     @staticmethod
@@ -259,16 +281,25 @@ class EOTrainingData(TrainingData):
             if json_dict.__contains__("quality"):
                 training_data.quality = DataQuality.from_dict(json_dict["quality"])
             if json_dict.__contains__("labeling"):
-                training_data.labeling = [Labeling.from_dict(ll) for ll in json_dict["labeling"]]
+                training_data.labeling = [
+                    Labeling.from_dict(ll) for ll in json_dict["labeling"]
+                ]
             if json_dict.__contains__("labels"):
                 # Different type of labels
                 if len(json_dict["labels"]) > 0:
                     if json_dict["labels"][0]["type"] == "SceneLabel":
-                        training_data.labels = [SceneLabel.from_dict(label) for label in json_dict["labels"]]
+                        training_data.labels = [
+                            SceneLabel.from_dict(label) for label in json_dict["labels"]
+                        ]
                     elif json_dict["labels"][0]["type"] == "ObjectLabel":
-                        training_data.labels = [ObjectLabel.from_dict(label) for label in json_dict["labels"]]
+                        training_data.labels = [
+                            ObjectLabel.from_dict(label)
+                            for label in json_dict["labels"]
+                        ]
                     elif json_dict["labels"][0]["type"] == "PixelLabel":
-                        training_data.labels = [PixelLabel.from_dict(label) for label in json_dict["labels"]]
+                        training_data.labels = [
+                            PixelLabel.from_dict(label) for label in json_dict["labels"]
+                        ]
                 else:
                     training_data.labels = []
             if json_dict.__contains__("extent"):
@@ -289,6 +320,7 @@ class EOTrainingDataset(TrainingDataset):
     """
     Extended training dataset type for EO training dataset
     """
+
     extent: List[float] = field(default_factory=list)
     bands: List[str] = field(default_factory=list)
     image_size: str = field(default=None)
@@ -315,23 +347,31 @@ class EOTrainingDataset(TrainingDataset):
             "classificationSchema": self.classification_schema,
             "classes": self.classes,
             "tasks": [t.to_dict() for t in self.tasks],
-            'extent': self.extent,
-            'bands': self.bands,
-            'imageSize': self.image_size,
+            "extent": self.extent,
+            "bands": self.bands,
+            "imageSize": self.image_size,
             "labeling": [labeling.to_dict() for labeling in self.labeling],
             "quality": self.quality.to_dict() if self.quality is not None else None,
             "changesets": [changeset.to_dict() for changeset in self.changesets],
-            "data": [d.to_dict() for d in self.data]
+            "data": [d.to_dict() for d in self.data],
         }
 
     @staticmethod
     def from_dict(json_dict: dict):
-        if json_dict.__contains__("id") and json_dict.__contains__("name") \
-                and json_dict.__contains__("description") \
-                and json_dict.__contains__("license") \
-                and json_dict["type"] == "EOTrainingDataset":
+        if (
+            json_dict.__contains__("id")
+            and json_dict.__contains__("name")
+            and json_dict.__contains__("description")
+            and json_dict.__contains__("license")
+            and json_dict["type"] == "EOTrainingDataset"
+        ):
 
-            td = EOTrainingDataset(json_dict["id"], json_dict["name"], json_dict["description"], json_dict["license"])
+            td = EOTrainingDataset(
+                json_dict["id"],
+                json_dict["name"],
+                json_dict["description"],
+                json_dict["license"],
+            )
             if json_dict.__contains__("doi"):
                 td.doi = json_dict["doi"]
             if json_dict.__contains__("scope"):
@@ -349,10 +389,13 @@ class EOTrainingDataset(TrainingDataset):
             if json_dict.__contains__("keywords"):
                 td.keywords = json_dict["keywords"]
             if json_dict.__contains__("metricsInLIT"):
-                td.metrics_in_literature = [MetricsInLiterature.from_dict(m) for m in
-                                            json_dict["metricsInLIT"]]
+                td.metrics_in_literature = [
+                    MetricsInLiterature.from_dict(m) for m in json_dict["metricsInLIT"]
+                ]
             if json_dict.__contains__("statisticsInfo"):
-                td.statistics_info = [KeyValuePair.from_dict(s) for s in json_dict["statisticsInfo"]]
+                td.statistics_info = [
+                    KeyValuePair.from_dict(s) for s in json_dict["statisticsInfo"]
+                ]
             if json_dict.__contains__("dataSources"):
                 td.dataSources = json_dict["dataSources"]
             if json_dict.__contains__("numberOfClasses"):
@@ -364,11 +407,16 @@ class EOTrainingDataset(TrainingDataset):
             if json_dict.__contains__("tasks"):
                 td.tasks = [EOTask.from_dict(t) for t in json_dict["tasks"]]
             if json_dict.__contains__("labeling"):
-                td.labeling = [Labeling.from_dict(labeling) for labeling in json_dict["labeling"]]
+                td.labeling = [
+                    Labeling.from_dict(labeling) for labeling in json_dict["labeling"]
+                ]
             if json_dict.__contains__("quality"):
                 td.quality = DataQuality.from_dict(json_dict["quality"])
             if json_dict.__contains__("changesets"):
-                td.changesets = [Changeset.from_dict(changeset) for changeset in json_dict["changesets"]]
+                td.changesets = [
+                    Changeset.from_dict(changeset)
+                    for changeset in json_dict["changesets"]
+                ]
             if json_dict.__contains__("data"):
                 td.data = [EOTrainingData.from_dict(data) for data in json_dict["data"]]
             if json_dict.__contains__("extent"):

@@ -271,19 +271,17 @@
 #
 
 # def s3test():
-    # minio_client.fget_object("scene-classification", "//AID/Airport/Airport_version1_1.jpg", "./Airport_version1_9.jpg")
-    # minio_client.fput_objct("scene-classification", "test.txt", "./Airport_version1_9.jpg",)
+# minio_client.fget_object("scene-classification", "//AID/Airport/Airport_version1_1.jpg", "./Airport_version1_9.jpg")
+# minio_client.fput_objct("scene-classification", "test.txt", "./Airport_version1_9.jpg",)
 
 # if __name__ == "__main__":
-    # 下载数据和加载数据分离
-    # datasetsForSceneTask()
-    # 数据管道加载
-    # datasetsForScenePipe()
-    # 测试一
-    # sceneDownloadTest()
-    # 测试二
-    # datasetsForSegmentationTask()
-    # tdml_test()
-    # s3test()
-
-
+# 下载数据和加载数据分离
+# datasetsForSceneTask()
+# 数据管道加载
+# datasetsForScenePipe()
+# 测试一
+# sceneDownloadTest()
+# 测试二
+# datasetsForSegmentationTask()
+# tdml_test()
+# s3test()

@@ -164,7 +164,7 @@ def _validate_image_format(image_format: str):
         "application/xml",
         "application/xhtml+xml",
         "application/x-netcdf",
-        "application/geopackage+sqlite3"
+        "application/geopackage+sqlite3",
     }
     if image_format in image_format_list:
         return image_format
