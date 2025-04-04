@@ -27,6 +27,6 @@ jobs:
     - name: Install Python dependencies
       run: |
         pip install pytest
-        pip install .[torch] --no-cache-dir
+        pip install ".[dev,io,ml]" --no-cache-dir
     - name: Run tests
       run: pytest

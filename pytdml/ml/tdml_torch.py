@@ -34,7 +34,7 @@ import torch
 from PIL import Image
 import os
 
-import pytdml.utils as utils
+import pytdml.ml.utils as utils
 
 from torch.utils.data import Dataset
 from torchvision.datasets.vision import VisionDataset

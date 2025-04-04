@@ -32,8 +32,7 @@ import time
 
 from datalibrary.downloader import DatasetDownload, DatasetDownload2
 from datalibrary.datasetcollection import Task
-from pytdml import utils
-from pytdml.ml import tdml_torch, tdml_torch_data_pipe, tdml_tensorflow
+from pytdml.ml import tdml_torch, tdml_torch_data_pipe, tdml_tensorflow, utils
 from pytdml.ml.ml_operators import create_classes_map_
 from pytdml.type import EOTrainingDataset
 

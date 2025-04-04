@@ -33,7 +33,7 @@ from dataclasses import dataclass, field
 from typing import List
 from urllib.parse import urlparse
 
-import pytdml.utils as utils
+import pytdml.ml.utils as utils
 from pytdml.io import internal, read_from_json, parse_json
 from pytdml.type.extended_types import EOTrainingDataset, AI_EOTask
 
