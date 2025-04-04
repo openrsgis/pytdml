@@ -28,13 +28,11 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-import json
 import math
 import os
 import pickle
 from abc import ABC
 
-import geojson
 import numpy as np
 import torch
 from PIL import Image
