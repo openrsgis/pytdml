@@ -1,5 +1,7 @@
 import pytest
 import pytdml
+import pytdml.io
+import pytdml.ml
 from torchvision import transforms
 
 

@@ -1,6 +1,6 @@
 from torchvision import transforms
 
-import pytdml
+import pytdml.io
 import torch
 import datetime
 import torch.nn as nn
