@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytdml"
+requires-python = ">=3.9, <3.11"
 dynamic = ["version", "authors", "license", "description", "readme"]
 dependencies = [
     "geojson~=3.1.0",
