@@ -9,7 +9,7 @@ import torch.nn.functional as F
 
 from modelNet.deeplabv3 import DeepLabV3
 from modelNet.deeplab_util import add_weight_decay, label_accuracy_score
-from pytdml.utils import class_to_index
+from pytdml.ml.utils import class_to_index
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("gid_5c.json")  # read from TDML json file

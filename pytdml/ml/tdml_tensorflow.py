@@ -32,7 +32,7 @@ import cv2
 import tensorflow as tf
 import tensorflow_io as tfio
 import numpy as np
-import pytdml.utils as utils
+import pytdml.ml.utils as utils
 from datalibrary.downloader import *
 
 

@@ -34,7 +34,6 @@ import json
 import pickle
 from io import BytesIO
 from threading import Lock
-from typing import Iterable
 
 import numpy as np
 import torch
@@ -47,35 +46,6 @@ from pytdml.type import MD_Band, MD_Identifier
 from pytdml.type.basic_types import NamedValue
 
 Image.MAX_IMAGE_PIXELS = 10_000_000_000  # 10 billion
-
-
-def json_empty(item):
-    """
-    Check if a json item is empty
-    Only null, empty collections and empty strings are considered "json empty"
-    """
-    if item is None:
-        return True
-    elif isinstance(item, Iterable):
-        return not item
-    elif isinstance(item, str):
-        return item == ""
-    else:
-        return False
-
-
-def remove_empty(item):
-    """
-    Remove empty items from a json item
-    """
-    if isinstance(item, dict):
-        new_item = {k: remove_empty(v) for k, v in item.items()}
-        return {k: v for k, v in new_item.items() if not json_empty(v)}
-    elif isinstance(item, (list, tuple)):
-        new_item = [remove_empty(v) for v in item]
-        return [v for v in new_item if not json_empty(v)]
-    else:
-        return item
 
 
 def get_bounding_box(geometry):
