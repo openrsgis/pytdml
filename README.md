@@ -11,22 +11,40 @@ The package can be installed via pip.
 
 ### Requirements
 
-* Python 3 and above
-
-### Dependencies
-
-Dependencies are listed in [requirements.txt](https://github.com/openrsgis/pytdml/blob/main/requirements.txt). Dependencies are automatically installed during
-pytdml's installation.
+* Python 3.9 or 3.10
 
 ### Installing the Package
 
+The package provides a base and light installation, and several optional dependencies for different usages.
+
+#### Base installation
 ```bash
 pip install pytdml
 ```
 
+#### IO additional dependencies
+
+The functionality under `pytdml.io` requires additional packages for handling different formats and network communications.
+
+```bash
+pip install pytdml[io]
+```
+
+#### ML additional dependencies
+
+The functionality under `pytdml.ml` requires additional packages for machine learning and deep learning.
+Installing this optional dependency will install heavy packages, like `torch` and `tensorflow`.
+
+```bash
+pip install pytdml[ml]
+```
+
+
+
 ### (For developers) Installing the git hooks
 
 ```bash
+pip install -e .[dev]
 pre-commit install
 pre-commit install --hook-type commit-msg
 ```
@@ -42,7 +60,7 @@ pre-commit install --hook-type commit-msg
 The training dataset can be encoded to TrainingDML-AI JSON format by YAML configuration file with command line.
 
 ```bash
-pytdml/io/yaml_converter.py --config=<YAML configuration file path> --output=<Output TrainingDML-AI JSON file path>
+python -m pytdml.io.yaml_converter.py --config=<YAML configuration file path> --output=<Output TrainingDML-AI JSON file path>
 ```
 
 YAML configuration file schema is described in [encoding YAML configuration file schema](https://github.com/openrsgis/pytdml/blob/main/encoding_config_schema.yml).
@@ -133,7 +151,7 @@ PyTorch/TensorFlow dataset.
 #### Read TrainingDataset object from JSON file
 
 ```python
-import pytdml
+import pytdml.io
 
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
 print("Load training dataset: " + training_dataset.name)
@@ -144,7 +162,7 @@ print("Number of classes: " + str(training_dataset.number_of_classes))
 #### Read training data from s3
 
 ```python
-import pytdml
+import pytdml.io
 
 # Initialize S3client
 s3_client = pytdml.io.S3_reader.S3Client("s3", "your_server", "your_akey", "your_skey")
@@ -167,7 +185,8 @@ for item in training_dataset.data:
 * Scene classification dataset
 
 ```python
-import pytdml
+import pytdml.io
+import pytdml.ml
 from torchvision import transforms
 
 # Load the training dataset
@@ -192,7 +211,8 @@ train_dataset = pytdml.ml.TorchEOImageSceneTD(  # create Torch train dataset
 * Object detection dataset
 
 ```python
-import pytdml
+import pytdml.io
+import pytdml.ml
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
@@ -209,7 +229,8 @@ train_dataset = pytdml.ml.TorchEOImageObjectTD(  # create Torch train dataset
 * Semantic segmentation dataset
 
 ```python
-import pytdml
+import pytdml.io
+import pytdml.ml
 from torchvision import transforms
 
 # Load the training dataset
@@ -232,7 +253,8 @@ train_dataset = pytdml.ml.TorchEOImageSegmentationTD(  # create Torch train data
 * Scene classification dataset
 
 ```python
-import pytdml
+import pytdml.io
+import pytdml.ml
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
@@ -249,7 +271,8 @@ tf_train_dataset = train_dataset.create_dataset()
 * Object detection dataset
 
 ```python
-import pytdml
+import pytdml.io
+import pytdml.ml
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
@@ -266,7 +289,8 @@ tf_train_dataset = train_dataset.create_dataset()
 * Semantic segmentation dataset
 
 ```python
-import pytdml
+import pytdml.io
+import pytdml.ml
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file

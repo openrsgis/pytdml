@@ -28,22 +28,20 @@
 # SOFTWARE.
 #
 # ------------------------------------------------------------------------------
-import json
 import math
 import os
 import pickle
 from abc import ABC
 
-import geojson
 import numpy as np
 import torch
 from PIL import Image
 from torchdata.datapipes.iter import IterDataPipe
 
-import pytdml.utils as utils
+import pytdml.ml.utils as utils
 from pytdml.type import AI_ObjectLabel
-from pytdml.utils import image_open, save_cache
-from pytdml.tdml_image_crop import CropWithImage, CropWithTargetImage
+from pytdml.ml.utils import image_open, save_cache
+from pytdml.ml.tdml_image_crop import CropWithImage, CropWithTargetImage
 from datalibrary import downloader
 from datalibrary.s3Client import minio_client as client
 

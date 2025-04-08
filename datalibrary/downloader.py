@@ -38,9 +38,9 @@ from minio.error import MinioException
 from tqdm import tqdm
 
 from datalibrary.s3Client import minio_client as client
-from pytdml.tdml_image_crop import CropWithImage, CropWithTargetImage
+from pytdml.ml.tdml_image_crop import CropWithImage, CropWithTargetImage
 from pytdml.type.extended_types import AI_EOTrainingData, AI_ObjectLabel, AI_PixelLabel
-from pytdml.utils import split_data_url, generate_local_file_path, image_open
+from pytdml.ml.utils import split_data_url, generate_local_file_path, image_open
 
 # Creating a Mutual Exclusion Lock
 lock = multiprocessing.Lock()

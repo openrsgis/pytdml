@@ -4,34 +4,39 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytdml"
+requires-python = ">=3.9, <3.11"
 dynamic = ["version", "authors", "license", "description", "readme"]
 dependencies = [
     "geojson~=3.1.0",
     "Pillow~=10.4.0",
-    "PyYAML~=6.0.2",
     "numpy~=1.26.4",
-    "opencv-python~=4.10.0.84",
     "jsonschema~=4.23.0",
     "typing_extensions~=4.11.0",
-    "requests~=2.32.3",
     "pydantic~=2.8.2",
     "urllib3~=1.25.4",
     "rasterio~=1.3.10",
-    "matplotlib~=3.9.1",
-    "minio~=7.2.7",
-    "tqdm~=4.66.4",
-    "s3fs~=2024.9.0",
-    "pystac~=1.10.1",
-    "boto3~=1.34.69"
 ]
 
 [project.optional-dependencies]
-torch = [
+ml = [
     "torch~=2.3.1",
     "torchvision~=0.18.1",
     "torchdata~=0.7.1",
     "tensorflow~=2.17.0",
-    "tensorflow_io~=0.36.0"
+    "tensorflow_io~=0.36.0",
+    "opencv-python~=4.10.0.84",
+    "tqdm~=4.66.4",
+]
+io = [
+    "boto3~=1.34.69",
+    "s3fs~=2024.9.0",
+    "minio~=7.2.7",
+    "pystac~=1.10.1",
+    "requests~=2.32.3",
+    "PyYAML~=6.0.2",
+]
+examples = [
+    "matplotlib~=3.9.1",
 ]
 dev = [
     "pre-commit~=4.2.0",
@@ -39,7 +44,7 @@ dev = [
 ]
 
 [project.urls]
-homepage = "https://github.com/TrainingDML/pytdml"
+homepage = "https://github.com/openrsgis/pytdml"
 
 [tool.setuptools.packages.find]
 where = ["."]
