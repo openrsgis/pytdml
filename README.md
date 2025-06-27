@@ -1,61 +1,82 @@
+from build.lib.pytdml.type.basic_types import NamedValue
+
 # pytdml
 
 [pytdml](https://github.com/openrsgis/pytdml) is a pure python parser and encoder for training datasets based on OGC
 Training Data Markup Language for AI standard.
 
 ---
-
 ## Installation
 
-The package can be installed via pip.
+> **⚠️ Current Package Status**  
+> 
+> The PyPI repository currently hosts an outdated version of PyTDML.
+> As we are actively updating and maintaining the library to ensure full functionality, 
+> **direct installation via `pip install` is temporarily unavailable**.
+> 
+> We provide pre-built artifacts for immediate use:
+
+### Pre-built Artifacts
+The repository includes the following files for direct installation:
+- `pytdml-1.2.0-py3-none-any.whl`: Pre-built wheel package for Python 3
+- `Dockerfile`: Docker configuration for containerized deployment
+
+> **Functionality Scope**  
+> The current version (1.2.0) provides a base and light installation, including core functionality:
+> - Full implementation of TrainingDML-AI class definitions
+> - Dataset parsing and encoding capabilities (IO functionality)
+> 
+> ⚠️ **Machine Learning (ML) specific features are under active development and update** and will be included in future releases.
 
 ### Requirements
 
-* Python 3.9 or 3.10
+* **For wheel installation**: 
+  - Python 3.9 or 3.10
+  - [pip](https://pip.pypa.io/en/stable/installation/) package manager
 
-### Installing the Package
+* **For Docker deployment**:
+  - [Docker](https://docs.docker.com/get-docker/) installed and configured
 
-The package provides a base and light installation, and several optional dependencies for different usages.
+#### Method 1: Install Pre-built Wheel Package
+Directly install the provided wheel package:
 
-#### Base installation
-```bash
-pip install pytdml
-```
+1. **Navigate to the repository directory** (contains the wheel file):
+   ```bash
+   cd /path/to/pytdml-repo
+   ```
+   
+2. **Install the wheel package**:
+   ```bash
+   # Base installation
+   pip install pytdml-1.2.0-py3-none-any.whl
+   
+   # IO additional dependencies(The functionality under `pytdml.io` requires additional packages for handling different formats and network communications.)
+   pip install pytdml-1.2.0-py3-none-any.whl[io]
+   ```
+   
+#### Method 2: Docker Container Deployment
+1. **Build the Docker image from the provided Dockerfile**:
+   ```bash
+   docker build -t pytdml-base:1.2.0 .
+   ```
+2. **Run Python with PyTDML in a container**:   
+   - 
+   - Interactive mode:
+   ```bash
+   docker run -it --rm --name pytdml-python pytdml-base:1.2.0 python
+   ```
 
-#### IO additional dependencies
-
-The functionality under `pytdml.io` requires additional packages for handling different formats and network communications.
-
-```bash
-pip install pytdml[io]
-```
-
-#### ML additional dependencies
-
-The functionality under `pytdml.ml` requires additional packages for machine learning and deep learning.
-Installing this optional dependency will install heavy packages, like `torch` and `tensorflow`.
-
-```bash
-pip install pytdml[ml]
-```
-
-
-
-### (For developers) Installing the git hooks
-
-```bash
-pip install -e .[dev]
-pre-commit install
-pre-commit install --hook-type commit-msg
-```
-
+   - Execute a script:
+   ```bash
+   docker run -it --rm -v "$(pwd)":/workspace pytdml-base:1.2.0 python /workspace/your_script.py
+   ```
 ---
 
 ## Usage
 
 ### Encoding
 
-#### From the command line
+#### 1. From the command line
 
 The training dataset can be encoded to TrainingDML-AI JSON format by YAML configuration file with command line.
 
@@ -65,82 +86,140 @@ python -m pytdml.io.yaml_converter.py --config=<YAML configuration file path> --
 
 YAML configuration file schema is described in [encoding YAML configuration file schema](https://github.com/openrsgis/pytdml/blob/main/encoding_config_schema.yml).
 
-#### Using the API from python
+#### 2. Using the API from python
 
 The training dataset can also be encoded to TrainingDML-AI JSON format with Python API.
 
 ```python
-from pytdml.io import write_to_json
-from pytdml.type import EOTrainingDataset, AI_EOTrainingData, AI_EOTask, AI_SceneLabel
+from pytdml.type import EOTrainingDataset, AI_EOTask, AI_EOTrainingData, AI_SceneLabel, MD_Band, MD_Identifier, NamedValue, CI_Citation, MD_Scope, AI_Labeling, AI_MetricsInLiterature, DataQuality, AI_TDChangeset
 
-# generate EO training dataset
+# Generate EO training dataset with required and optional fields
 dataset = EOTrainingDataset(
+    # required fields
     id='...',
     name='...',
     description='...',
     license='...',
+    type='AI_EOTrainingDataset',
+
+    # Task definition (at least one required)
     tasks=[
         AI_EOTask(
             id='...',
-            task_type='...'),
+            task_type='...',
+            type='AI_EOTask'
+        ),
         ...
     ],
+
+    # Training data (at least one required)
     data=[
         AI_EOTrainingData(
             id='...',
-            data_URL='...',
+            data_url=['...'],
             labels=[
                 AI_SceneLabel(
-                    label_class='...'
+                    label_class='...',
+                    type='AI_SceneLabel'
                 ),
-                ...
-            ]),
+               ...
+            ],
+            type="AI_EOTrainingData"
+        ),
         ...
     ],
 
+    # Optional fields
+    bands=[
+        MD_Band(
+           name=[
+              MD_Identifier(
+                 code='...'
+              )
+           ]
+        ),
+       ...
+    ],
+    extent=[...],
+    image_size='...',
     amount_of_training_data=...,
-    classes=["...", "...", "..."],
-    classification_scheme='...',
-    created_time="...",
-    data_sources=['...'],
+    classes=[
+        NamedValue(
+            key='...',
+            value=...
+        ),
+        ...
+    ],
+    classification_schema='...',
+    created_time='...',
+    data_sources=[
+        CI_Citation(
+            title='...'
+        ),
+       ...
+    ],
     doi='...',
-    keywords=['...', '...'],
+    keywords=['...', ...],
     number_of_classes=...,
-    providers=['...'],
-    scope=...,
-    statistics_info=[...],
+    providers=['...', ...],
+    scope=MD_Scope(
+        level='...'
+    ),
+    statistics_info=[
+        NamedValue(
+            key='...',
+            value=...
+        ),
+        ...
+    ],
     updated_time='...',
     version='...',
-    labeling=[...],
-    metrics_in_LIT=[...],
-    quality=[...],
-    changesets=[...],
-    bands=[...],
-    extent=[...],
-    image_size='...'
+    labeling=[
+        AI_Labeling(
+            id='...',
+            scope=MD_Scope(
+                level='...'
+            ),
+            type='AI_Labeling'
+        ),
+        ...
+    ],
+    metrics_in_LIT=[
+        AI_MetricsInLiterature(
+            doi='...',
+            metrics=[
+                NamedValue(
+                    key='...',
+                    value=...
+                ),
+                ...
+            ]
+        ),
+       ...
+    ],
+    quality=[
+        DataQuality(
+            type='DataQuality',
+            scope=MD_Scope(
+                level='...'
+            )
+        ),
+       ...
+    ],
+    changesets=[
+        AI_TDChangeset(
+            type='AI_TDChangeset',
+            id='...',
+            change_count=...
+        ),
+        ...
+    ]
 )
-# write to json
-write_to_json(dataset, "dataset.json")
-```
 
-#### Encoding training data from S3
+# Write to JSON file
+from pytdml.io import write_to_json
 
-```python
-# get training data from s3
-
-s3_client = pytdml.datalibrary.S3Client('s3', "your_server", "your_ak", "your_sk")
-
-td_list = []
-bucket_name = "my-bucket"
-obj_list = s3_client.list_objects(Bucket=bucket_name, Prefix="whu_rs19/")
-for obj in obj_list:
-    td = EOTrainingData(
-        id=obj.split(".")[0],
-        labels=[SceneLabel(label_class=obj.split("/")[1])],
-        data_url=f"s3://{bucket_name}/{quote(obj)}",
-        date_time="2010"
-    )
-    td_list.append(td)
+write_to_json(dataset, "eo_dataset.json")
 ```
 
 ### Parsing
@@ -159,33 +238,11 @@ print("Number of training samples: " + str(training_dataset.amount_of_training_d
 print("Number of classes: " + str(training_dataset.number_of_classes))
 ```
 
-#### Read training data from s3
-
-```python
-import pytdml.io
-
-# Initialize S3client
-s3_client = pytdml.io.S3_reader.S3Client("s3", "your_server", "your_akey", "your_skey")
-# Load the training dataset
-training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
-for item in training_dataset.data:
-    path = item.data_url
-    if pytdml.io.S3_reader.pasrse_s3_path(path):
-        bucket_name, key_name = pytdml.io.S3_reader.parse_s3_path(path)
-        object_data = s3_client.get_object(bucket_name, key_name)
-        # Process the S3 object data (read as PIL Image)
-        with PIL.Image.open(BytesIO(object_data)) as img:
-            # processing....
-    else:
-        print("Invalid S3 path:", path)
-```
-
 #### Transform to PyTorch dataset
 
 * Scene classification dataset
 
 ```python
-import pytdml.io
 import pytdml.ml
 from torchvision import transforms
 
@@ -193,7 +250,7 @@ from torchvision import transforms
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
 
 # Transform the training dataset
-class_map = pytdml.ml.creat_class_map(training_dataset)  # create class map
+class_map = pytdml.ml.create_class_map(training_dataset)  # create class map
 train_dataset = pytdml.ml.TorchEOImageSceneTD(  # create Torch train dataset
     training_dataset.data,
     class_map,
@@ -211,14 +268,13 @@ train_dataset = pytdml.ml.TorchEOImageSceneTD(  # create Torch train dataset
 * Object detection dataset
 
 ```python
-import pytdml.io
 import pytdml.ml
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
 
 # Transform the training dataset
-class_map = pytdml.ml.creat_class_map(training_dataset)  # create class map
+class_map = pytdml.ml.create_class_map(training_dataset)  # create class map
 train_dataset = pytdml.ml.TorchEOImageObjectTD(  # create Torch train dataset
     training_dataset.data,
     class_map,
@@ -229,7 +285,6 @@ train_dataset = pytdml.ml.TorchEOImageObjectTD(  # create Torch train dataset
 * Semantic segmentation dataset
 
 ```python
-import pytdml.io
 import pytdml.ml
 from torchvision import transforms
 
@@ -237,7 +292,7 @@ from torchvision import transforms
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
 
 # Transform the training dataset
-class_map = pytdml.ml.creat_class_map(training_dataset)  # create class map
+class_map = pytdml.ml.create_class_map(training_dataset)  # create class map
 train_dataset = pytdml.ml.TorchEOImageSegmentationTD(  # create Torch train dataset
     training_dataset.data,
     class_map,
@@ -253,14 +308,13 @@ train_dataset = pytdml.ml.TorchEOImageSegmentationTD(  # create Torch train data
 * Scene classification dataset
 
 ```python
-import pytdml.io
 import pytdml.ml
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
 
 # Transform the training dataset
-class_map = pytdml.ml.creat_class_map(training_dataset)  # create class map
+class_map = pytdml.ml.create_class_map(training_dataset)  # create class map
 train_dataset = pytdml.ml.TensorflowEOImageSceneTD(  # create TensorFlow train dataset
     training_dataset.data,
     class_map
@@ -271,14 +325,13 @@ tf_train_dataset = train_dataset.create_dataset()
 * Object detection dataset
 
 ```python
-import pytdml.io
 import pytdml.ml
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
 
 # Transform the training dataset
-class_map = pytdml.ml.creat_class_map(training_dataset)  # create class map
+class_map = pytdml.ml.create_class_map(training_dataset)  # create class map
 train_dataset = pytdml.ml.TensorflowEOImageObjectTD(  # create TensorFlow train dataset
     training_dataset.data,
     class_map
@@ -289,14 +342,13 @@ tf_train_dataset = train_dataset.create_dataset()
 * Semantic segmentation dataset
 
 ```python
-import pytdml.io
 import pytdml.ml
 
 # Load the training dataset
 training_dataset = pytdml.io.read_from_json("dataset.json")  # read from TDML json file
 
 # Transform the training dataset
-class_map = pytdml.ml.creat_class_map(training_dataset)  # create class map
+class_map = pytdml.ml.create_class_map(training_dataset)  # create class map
 train_dataset = pytdml.ml.TensorflowEOImageSegmentationTD(  # create TensorFlow train dataset
     training_dataset.data,
     class_map
@@ -304,113 +356,3 @@ train_dataset = pytdml.ml.TensorflowEOImageSegmentationTD(  # create TensorFlow 
 tf_train_dataset = train_dataset.create_dataset()
 ```
 
-### Image Cropping
-
-The images of training dataset in TrainingDML-AI JSON format can be cropped with command line for preprocessing.
-
-```bash
-pytdml/tdml_image_crop.py  --input=<Input original TrainingDML-AU file path> --output_json=<Output result TrainingDML-AI JSON file path>
-                          --output_images=<Output dir of result cropped images> --size=<Crop size of images>
-```
-
-
-###　Load datasets to provide training-ready training data
-
-- View available datasets according to different tasks and categories
-
-```python
-ds_lib = EOTrainingDatasetCollection()
-
-# Find the EO dataset that contains the category 'Building Area' in the Semantic Segmentation task in the Server.
-ds_lib.dataset_list(Task.semantic_segmentation, ["Building Area"])
-
-```
-
-- Load the TrainingDML code for the corresponding dataset
-
-```python
-aisd_tds = ds_lib["AISD"]
-# Output to obtain metadata information such as the name of the corresponding dataset, the number of training samples, the number of categories included in the dataset, etc.
-print("Load training dataset: " + aisd_tds.name)
-print("Number of training samples: " + str(aisd_tds.amount_of_training_data))
-print("Number of classes: " + str(aisd_tds.number_of_classes))
-```
-
-- Acquire more training datas of this category across datasets
-
-```python
-building_extraction_td = ds_lib["buildingExtraction"]
-# Combine training datas from two datasets with the category 'Building Area' into one training data collection
-my_dataset_td = ds_lib.training_data_collection(Task.semantic_segmentation, [aisd_td, building_extraction_td], ["Building Area"])
-```
-
-- Call the pipeline framework's wrapper class to encapsulate the training datas into a trainable dataset
-
-```python
-transform = transforms.Compose(  # transform for the dataset
-    [
-        transforms.ToTensor(),
-        transforms.CenterCrop(224),
-        transforms.RandomCrop(224),
-        transforms.RandomHorizontalFlip(),  # random flip
-        # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])  # normalize
-    ]
-)
-# transforms for object detection task
-import pytdml.ml.object_transforms as transform_target
-target_transform = transform_target.Compose([
-    transform_target.ToTensor(),
-    transform_target.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
-    transform_target.RandomResize((512, 512))
-])
-# Split the dataset by a customized ratio
-train_data, val_data, test_data = pytdml.ml.split_data(my_dataset_td.data, 0.7, 0.2, 0.1)
-# OR split the dataset by training type of training data
-# train_data = pytdml.ml.split_data(my_dataset_td.data, "train")
-# valid_data = pytdml.ml.split_data(my_dataset_td.data, "valid")
-path = "."
-# Wrapping dataset classes with pytorch framework
-train_set = PipeLine(train_data, path).torch_dataset(download=True, transform=transform)
-valid_set = PipeLine(valid_data, path).torch_dataset(download=True, transform=transform)
-# dataPipe load
-# train_set = PipeLine(train_data, path).torch_dataPipe(transform=transform)
-
-train_dataloader = DataLoader(train_set, batch_size=4, num_workers=4)
-val_dataloader = DataLoader(val_set, batch_size=4, num_workers=4)
-# Create the model
-net = DeepLabV3()
-criterion = nn.NLLLoss()
-params = add_weight_decay(net, l2_value=0.0001)
-optimizer = torch.optim.Adam(params, lr=1e-3)
-# Train the network
-for e in range(100):
-    print("Epoch: " + str(e))
-    net = net.train()
-    train_loss = 0
-    train_acc = 0
-    train_acc_cls = 0
-    train_mean_iu = 0
-    train_fwavacc = 0
-    prev_time = datetime.datetime.now()
-    for iter_i, data in enumerate(train_dataloader):
-        # forward
-        # ...
-        # backword
-        # ...
-        with torch.no_grad():
-            for data in val_dataloader:
-                # ...
-```
-
-### Convert other EO dataset formats to TrainingDML-AI format
-
-- convert stac format to TrainingDMl-AI format:
-
-```python
-from pytdml.io.stac_converter import convert_stac_to_tdml
-
-stac_path = "/mnt/example/stac_file.json"
-output_path = "convert_result.json"
-
-dataset = convert_stac_to_tdml(stac_path)
-```

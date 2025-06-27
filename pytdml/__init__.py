@@ -31,3 +31,7 @@
 
 name = "pytdml"
 __version__ = "1.2.0"
+
+from . import type
+from . import io
+from . import ml
