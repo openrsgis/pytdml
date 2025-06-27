@@ -37,13 +37,21 @@ The repository includes the following files for direct installation:
 * **For Docker deployment**:
   - [Docker](https://docs.docker.com/get-docker/) installed and configured
 
-#### Method 1: Install Pre-built Wheel Package
-Directly install the provided wheel package:
+#### Method 1: Install from GitHub Release
+Install the pre-built wheel package directly from GitHub Releases:
 
-1. **Navigate to the repository directory** (contains the wheel file):
+Option A: Direct URL Installation
+
    ```bash
-   cd /path/to/pytdml-repo
+   # Base installation (core functionality)
+   pip install https://github.com/openrsgis/pytdml/releases/download/v1.2.0/pytdml-1.2.0-py3-none-any.whl
+    
+   # With IO functionality After base installation (additional dependencies)
+   pip install pytdml[io]
    ```
+
+Option B: Local Installation
+1. **Download the .whl file**: Navigate to Releases page and download pytdml-1.2.0-py3-none-any.whl from the **Assets** section.
    
 2. **Install the wheel package**:
    ```bash
@@ -59,8 +67,9 @@ Directly install the provided wheel package:
    ```bash
    docker build -t pytdml-base:1.2.0 .
    ```
+   
 2. **Run Python with PyTDML in a container**:   
-   - 
+   
    - Interactive mode:
    ```bash
    docker run -it --rm --name pytdml-python pytdml-base:1.2.0 python
