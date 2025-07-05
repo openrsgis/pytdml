@@ -19,7 +19,7 @@ Training Data Markup Language for AI standard.
 ### Pre-built Artifacts
 The repository includes the following files for direct installation:
 - `pytdml-1.2.0-py3-none-any.whl`: Pre-built wheel package for Python 3
-- `Dockerfile`: Docker configuration for containerized deployment
+- `Dockerfile`: Docker configuration for containerized deployment (launches directly into Python environment with PyTDML pre-installed)
 
 > **Functionality Scope**  
 > The current version (1.2.0) provides a base and light installation, including core functionality:
@@ -63,6 +63,10 @@ Option B: Local Installation
    ```
    
 #### Method 2: Docker Container Deployment
+1. **Prepare the PyTDML wheel file**:
+   - Ensure you have the PyTDML-1.2.0-py3-none-any.whl file (generated via poetry build or pip wheel)
+   - Place the .whl file in the same directory as the Dockerfile
+
 1. **Build the Docker image from the provided Dockerfile**:
    ```bash
    docker build -t pytdml-base:1.2.0 .
