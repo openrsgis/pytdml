@@ -63,16 +63,16 @@ Option B: Local Installation
    ```
    
 #### Method 2: Docker Container Deployment
-1. **Prepare the PyTDML wheel file**:
-   - Ensure you have the PyTDML-1.2.0-py3-none-any.whl file (generated via poetry build or pip wheel)
-   - Place the .whl file in the same directory as the Dockerfile
+1. **Download Artifacts from GitHub Release:**:
+   - Download the Dockerfile and pytdml-1.2.0-py3-none-any.whl from the GitHub Release page.
+   - Place both files in the same directory.
 
-1. **Build the Docker image from the provided Dockerfile**:
+2. **Build the Docker image from the provided Dockerfile**:
    ```bash
    docker build -t pytdml-base:1.2.0 .
    ```
    
-2. **Run Python with PyTDML in a container**:   
+3. **Run Python with PyTDML in a container**:   
    
    - Interactive mode:
    ```bash
