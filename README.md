@@ -8,12 +8,12 @@ Training Data Markup Language for AI standard.
 ---
 ## Installation
 
-> **⚠️ Current Package Status**  
-> 
+> **⚠️ Current Package Status**
+>
 > The PyPI repository currently hosts an outdated version of PyTDML.
-> As we are actively updating and maintaining the library to ensure full functionality, 
+> As we are actively updating and maintaining the library to ensure full functionality,
 > **direct installation via `pip install` is temporarily unavailable**.
-> 
+>
 > We provide pre-built artifacts for immediate use:
 
 ### Pre-built Artifacts
@@ -21,16 +21,16 @@ The repository includes the following files for direct installation:
 - `pytdml-1.2.0-py3-none-any.whl`: Pre-built wheel package for Python 3
 - `Dockerfile`: Docker configuration for containerized deployment (launches directly into Python environment with PyTDML pre-installed)
 
-> **Functionality Scope**  
+> **Functionality Scope**
 > The current version (1.2.0) provides a base and light installation, including core functionality:
 > - Full implementation of TrainingDML-AI class definitions
 > - Dataset parsing and encoding capabilities (IO functionality)
-> 
+>
 > ⚠️ **Machine Learning (ML) specific features are under active development and update** and will be included in future releases.
 
 ### Requirements
 
-* **For wheel installation**: 
+* **For wheel installation**:
   - Python 3.9 or 3.10
   - [pip](https://pip.pypa.io/en/stable/installation/) package manager
 
@@ -45,23 +45,23 @@ Option A: Direct URL Installation
    ```bash
    # Base installation (core functionality)
    pip install https://github.com/openrsgis/pytdml/releases/download/v1.2.0/pytdml-1.2.0-py3-none-any.whl
-    
+
    # With IO functionality After base installation (additional dependencies)
    pip install pytdml[io]
    ```
 
 Option B: Local Installation
 1. **Download the .whl file**: Navigate to Releases page and download pytdml-1.2.0-py3-none-any.whl from the **Assets** section.
-   
+
 2. **Install the wheel package**:
    ```bash
    # Base installation
    pip install pytdml-1.2.0-py3-none-any.whl
-   
+
    # IO additional dependencies(The functionality under `pytdml.io` requires additional packages for handling different formats and network communications.)
    pip install pytdml-1.2.0-py3-none-any.whl[io]
    ```
-   
+
 #### Method 2: Docker Container Deployment
 1. **Download Artifacts from GitHub Release:**:
    - Download the Dockerfile and pytdml-1.2.0-py3-none-any.whl from the GitHub Release page.
@@ -71,9 +71,9 @@ Option B: Local Installation
    ```bash
    docker build -t pytdml-base:1.2.0 .
    ```
-   
-3. **Run Python with PyTDML in a container**:   
-   
+
+3. **Run Python with PyTDML in a container**:
+
    - Interactive mode:
    ```bash
    docker run -it --rm --name pytdml-python pytdml-base:1.2.0 python
@@ -368,4 +368,3 @@ train_dataset = pytdml.ml.TensorflowEOImageSegmentationTD(  # create TensorFlow 
 )
 tf_train_dataset = train_dataset.create_dataset()
 ```
-
