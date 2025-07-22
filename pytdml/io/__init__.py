@@ -30,5 +30,6 @@
 # ------------------------------------------------------------------------------
 from pytdml.io.tdml_readers import read_from_json, parse_json
 from pytdml.io.tdml_writers import write_to_json
-
-from pytdml.io.internal import read_from_server, datasets_load, task_load
+from pytdml.io.yaml_converter import yaml_to_eo_tdml, yaml_to_tdml
+from pytdml.io.coco_converter import convert_coco_to_tdml
+from pytdml.io.stac_converter import convert_stac_to_tdml
