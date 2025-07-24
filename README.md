@@ -1,5 +1,3 @@
-from build.lib.pytdml.type.basic_types import NamedValue
-
 # pytdml
 
 [pytdml](https://github.com/openrsgis/pytdml) is a pure python parser and encoder for training datasets based on OGC
