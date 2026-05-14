@@ -1085,7 +1085,15 @@ class QualityElement(BaseCamelModel):
     ]
 
     def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
+        d = self.model_dump(by_alias=True, exclude_none=True)
+        if "result" in d:
+            wrapped = []
+            for item, obj in zip(d["result"], self.result):
+                type_name = type(obj).__name__
+                key = type_name[0].lower() + type_name[1:]
+                wrapped.append({key: item})
+            d["result"] = wrapped
+        return d
 
     @staticmethod
     def from_dict(json_dict):
@@ -1103,7 +1111,10 @@ class DataQuality(BaseCamelModel):
     report: Optional[List[QualityElement]] = None
 
     def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
+        d = self.model_dump(by_alias=True, exclude_none=True)
+        if self.report and "report" in d:
+            d["report"] = [qe.to_dict() for qe in self.report]
+        return d
 
     @staticmethod
     def from_dict(json_dict):
@@ -1152,7 +1163,7 @@ class AI_TrainingData(BaseCamelModel):
     id: str
     labels: List[Union[AI_Label, "AI_PixelLabel", "AI_ObjectLabel", "AI_SceneLabel"]]
 
-    dataSet_id: Optional[str] = None
+    dataset_id: Optional[str] = None
     data_sources: Optional[List[CI_Citation]] = None
     number_of_labels: Optional[int] = None
     labeling: Optional[List[AI_Labeling]] = None
@@ -1165,7 +1176,10 @@ class AI_TrainingData(BaseCamelModel):
             return v
 
     def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
+        d = self.model_dump(by_alias=True, exclude_none=True)
+        if self.quality and "quality" in d:
+            d["quality"] = [q.to_dict() for q in self.quality]
+        return d
 
     @staticmethod
     def from_dict(json_dict):
@@ -1248,7 +1262,12 @@ class TrainingDataset(BaseCamelModel):
             return v
 
     def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
+        d = self.model_dump(by_alias=True, exclude_none=True)
+        if self.quality and "quality" in d:
+            d["quality"] = [q.to_dict() for q in self.quality]
+        if self.data and "data" in d:
+            d["data"] = [item.to_dict() for item in self.data]
+        return d
 
     @staticmethod
     def from_dict(json_dict):

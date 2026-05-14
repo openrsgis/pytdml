@@ -33,3 +33,4 @@ from pytdml.io.tdml_writers import write_to_json
 from pytdml.io.yaml_converter import yaml_to_eo_tdml, yaml_to_tdml
 from pytdml.io.coco_converter import convert_coco_to_tdml
 from pytdml.io.stac_converter import convert_stac_to_tdml
+from pytdml.io.xml_converter import convert_xml_to_tdml

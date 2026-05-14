@@ -168,7 +168,10 @@ class AI_EOTrainingData(AI_TrainingData):
             return None
 
     def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
+        d = self.model_dump(by_alias=True, exclude_none=True)
+        if self.quality and "quality" in d:
+            d["quality"] = [q.to_dict() for q in self.quality]
+        return d
 
     @staticmethod
     def from_dict(json_dict):
@@ -191,7 +194,12 @@ class EOTrainingDataset(TrainingDataset):
     image_size: Optional[str] = None
 
     def to_dict(self):
-        return self.model_dump(by_alias=True, exclude_none=True)
+        d = self.model_dump(by_alias=True, exclude_none=True)
+        if self.quality and "quality" in d:
+            d["quality"] = [q.to_dict() for q in self.quality]
+        if self.data and "data" in d:
+            d["data"] = [item.to_dict() for item in self.data]
+        return d
 
     @staticmethod
     def from_dict(json_dict):

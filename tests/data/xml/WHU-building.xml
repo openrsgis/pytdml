@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<AI_EOTrainingDataset
+        xmlns="https://raw.githubusercontent.com/opengeospatial/TrainingDML-AI_SWG/main/schemas/1.0/xml_schema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mcc="https://schemas.isotc211.org/19115/-1/mcc/1.3"
+        xmlns:gex="https://schemas.isotc211.org/19115/-1/gex/1.3"
+        xmlns:mrc="https://schemas.isotc211.org/19115/-1/mrc/1.3"
+        xmlns:gco="https://schemas.isotc211.org/19103/-/gco/1.2">
+    <type>AI_EOTrainingDataset</type>
+    <id>whu-building</id>
+    <name>WHU-Building Dataset-Building Change Detection Dataset</name>
+    <description>This dataset covers an area where a 6.3-magnitude earthquake has occurred in February 2011 and rebuilt
+        in the following years. This dataset consists of aerial images obtained in April 2012 that contains 12796
+        buildings in 20.5 km2 (16077 buildings in the same area in 2016 dataset).
+    </description>
+    <license>CC BY-SA 4.0</license>
+    <version>1.0</version>
+    <amountOfTrainingData>1</amountOfTrainingData>
+    <createdTime>2011-01-01T00:00:00</createdTime>
+    <providers>Wuhan University</providers>
+    <numberOfClasses>1</numberOfClasses>
+    <classes>
+        <key>building</key>
+        <value>1</value>
+    </classes>
+    <extent/>
+    <bands>
+        <mrc:name>
+            <mcc:MD_Identifier>
+                <mcc:code>
+                    <gco:CharacterString>red</gco:CharacterString>
+                </mcc:code>
+            </mcc:MD_Identifier>
+        </mrc:name>
+    </bands>
+    <bands>
+        <mrc:name>
+            <mcc:MD_Identifier>
+                <mcc:code>
+                    <gco:CharacterString>green</gco:CharacterString>
+                </mcc:code>
+            </mcc:MD_Identifier>
+        </mrc:name>
+    </bands>
+    <bands>
+        <mrc:name>
+            <mcc:MD_Identifier>
+                <mcc:code>
+                    <gco:CharacterString>blue</gco:CharacterString>
+                </mcc:code>
+            </mcc:MD_Identifier>
+        </mrc:name>
+    </bands>
+    <imageSize>32507x15354</imageSize>
+    <tasks>
+        <type>AI_EOTask</type>
+        <id>whu-building-task</id>
+        <description>Building change detection based on aerial images</description>
+        <taskType>Change Detection</taskType>
+    </tasks>
+    <data>
+        <type>AI_EOTrainingData</type>
+        <id>0</id>
+        <numberOfLabels>1</numberOfLabels>
+        <extent>
+            <gex:geographicElement>
+                <gex:EX_GeographicBoundingBox>
+                    <gex:westBoundLongitude>
+                        <gco:Decimal>1560160</gco:Decimal>
+                    </gex:westBoundLongitude>
+                    <gex:eastBoundLongitude>
+                        <gco:Decimal>1566661.4</gco:Decimal>
+                    </gex:eastBoundLongitude>
+                    <gex:southBoundLatitude>
+                        <gco:Decimal>5176338.4</gco:Decimal>
+                    </gex:southBoundLatitude>
+                    <gex:northBoundLatitude>
+                        <gco:Decimal>5179409.2</gco:Decimal>
+                    </gex:northBoundLatitude>
+                </gex:EX_GeographicBoundingBox>
+            </gex:geographicElement>
+        </extent>
+        <dataTime>2012-01-01T00:00:00</dataTime>
+        <dataTime>2016-01-01T00:00:00</dataTime>
+        <dataURL>before/before.tif</dataURL>
+        <dataURL>after/after.tif</dataURL>
+        <labels>
+            <AI_PixelLabel>
+                <type>AI_PixelLabel</type>
+                <imageURL>change label/change_label.tif</imageURL>
+                <imageFormat>image/tiff</imageFormat>
+            </AI_PixelLabel>
+        </labels>
+    </data>
+</AI_EOTrainingDataset>

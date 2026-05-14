@@ -1,5 +1,10 @@
 import pytest
 import pytdml
+
+pytest.importorskip("torch")
+pytest.importorskip("torchvision")
+pytest.importorskip("cv2")
+
 import pytdml.io
 import pytdml.ml
 from torchvision import transforms

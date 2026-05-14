@@ -32,21 +32,32 @@
 # ------------------------------------------------------------------------------
 
 import json
+import os
 import re
 from datetime import datetime
 from geojson import Feature
-from pystac import Collection
 from pytdml.type import EOTrainingDataset, AI_EOTrainingData, AI_ObjectLabel, AI_EOTask
+
+
+def _parse_stac_datetime(value):
+    if value is None:
+        return None
+
+    cleaned_date_time_str = re.sub(r"(\\+00:00|Z)$", "", value)
+    for fmt in ("%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S"):
+        try:
+            date_time_obj = datetime.strptime(cleaned_date_time_str, fmt)
+            return date_time_obj.strftime("%Y-%m-%dT%H:%M:%S")
+        except ValueError:
+            continue
+
+    raise ValueError(f"Unsupported STAC datetime format: {value}")
 
 
 def convert_stac_to_tdml(stac_dataset_path):
     # Reads JSON data in stac format from a given path.
     with open(stac_dataset_path, "r") as file:
-        collection_data = json.load(file)
-    collection_object = Collection.from_dict(collection_data)
-    stac_collection_dataset = collection_object.to_dict(
-        include_self_link=False, transform_hrefs=True
-    )
+        stac_collection_dataset = json.load(file)
 
     # Reads the necessary attributes from the Collection object and maps them to the EOTrainingDataset object
     collection_version = stac_collection_dataset.get("stac_version")
@@ -60,12 +71,9 @@ def convert_stac_to_tdml(stac_dataset_path):
     data_time = []
     for item in collection_interval:
         for time in item:
-            cleaned_date_time_str = re.sub(r"(\\+00:00|Z)$", "", time)
-            date_time_obj = datetime.strptime(
-                cleaned_date_time_str, "%Y-%m-%dT%H:%M:%S.%f"
-            )
-            formatted_date_time_str = date_time_obj.strftime("%Y-%m-%dT%H:%M:%S")
-            data_time.append(formatted_date_time_str)
+            formatted_date_time_str = _parse_stac_datetime(time)
+            if formatted_date_time_str is not None:
+                data_time.append(formatted_date_time_str)
 
     if len(collection_bbox) == 1:
         collection_extent = collection_bbox[0]
@@ -79,8 +87,11 @@ def convert_stac_to_tdml(stac_dataset_path):
     ]
 
     datalist = []
+    collection_dir = os.path.dirname(os.path.abspath(stac_dataset_path))
     for link in collection_filtered_links:
         item_path = link.get("href")
+        if not os.path.isabs(item_path) and not os.path.exists(item_path):
+            item_path = os.path.normpath(os.path.join(collection_dir, item_path))
         with open(item_path, "r") as item_file:
             stac_item = json.load(item_file)
         link_id = stac_item.get("id")

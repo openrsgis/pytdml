@@ -54,11 +54,16 @@ def _validate_date(v: str) -> str:
     """
     formats = [
         "%Y-%m-%dT%H:%M:%S",  # date-time
+        "%Y-%m-%dT%H:%M:%S.%f",  # fractional date-time
+        "%Y-%m-%dT%H:%M:%SZ",  # UTC date-time
+        "%Y-%m-%dT%H:%M:%S.%fZ",  # fractional UTC date-time
         "%Y-%m-%d",  # date
         "%H:%M:%S",  # time
+        "%H:%M:%SZ",  # UTC time
     ]
     year_pattern = "^(19|20)\\d{2}$"
     year_month_pattern = "^(19|20)\\d{2}-(0[1-9]|1[0-2])$"
+    date_z_pattern = "^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])Z$"
 
     # Try to match date-time, date, or time format
     for fmt in formats:
@@ -69,7 +74,7 @@ def _validate_date(v: str) -> str:
             pass
 
     # Try to match year or year-month pattern
-    if re.match(year_pattern, v) or re.match(year_month_pattern, v):
+    if re.match(year_pattern, v) or re.match(year_month_pattern, v) or re.match(date_z_pattern, v):
         return v
 
     raise InvalidDatetimeError(f"String {v} does not match any allowed format")
